@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" width=device-width, initial-scale=1.0">
+    <title>AR Menu - View Food on Your Table</title>
+    
+    <!-- This is Google's AR library - it does all the hard work for us -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+    
+    <style>
+        /* Remove default spacing */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Make AR viewer fill the screen */
+        model-viewer {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Top bar with food info */
+        .info-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .food-name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .food-price {
+            font-size: 22px;
+            color: #fbbf24;
+        }
+
+        /* Style the AR button */
+        .ar-button {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .ar-button:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+
+        /* Instructions */
+        .instructions {
+            position: absolute;
+            bottom: 100px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 16px;
+            z-index: 10;
+        }
+
+        /* Loading message */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top info bar -->
+    <div class="info-bar">
+        <div class="food-name">🍔 Classic Burger</div>
+        <div class="food-price">$12.99</div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+        👇 Tap the button below to view this burger on your table in AR!
+    </div>
+
+    <!-- The AR Viewer - This is the magic component -->
+    <model-viewer
+        id="ar-viewer"
+        src="https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb"
+        ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
+        alt="A 3D model of a burger"
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        camera-controls
+        auto-rotate
+        shadow-intensity="1"
+        camera-orbit="0deg 75deg 2.5m"
+        min-camera-orbit="auto auto auto"
+        max-camera-orbit="auto auto auto">
+        
+        <!-- Custom AR Button -->
+        <button slot="ar-button" class="ar-button">
+            📱 View on Your Table
+        </button>
+
+        <!-- Loading indicator -->
+        <div class="loading" slot="poster">
+            Loading 3D model...
+        </div>
+    </model-viewer>
+
+    <script>
+        // Get the AR viewer element
+        const viewer = document.querySelector('model-viewer');
+        
+        // When model loads successfully
+        viewer.addEventListener('load', () => {
+            console.log('✅ 3D model loaded!');
+        });
+
+        // When AR session starts
+        viewer.addEventListener('ar-status', (event) => {
+            if (event.detail.status === 'session-started') {
+                console.log('🎉 AR session started!');
+                document.querySelector('.instructions').style.display = 'none';
+            } else if (event.detail.status === 'not-presenting') {
+                document.querySelector('.instructions').style.display = 'block';
+            }
+        });
+
+        // If there's an error
+        viewer.addEventListener('error', (event) => {
+            console.error('❌ Error:', event);
+            alert('Could not load 3D model. Please check your internet connection.');
+        });
+
+        // Log when page loads
+        console.log('🚀 AR Menu loaded! Ready to view in AR.');
+    </script>
+
+</body>
+</html>
