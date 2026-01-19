@@ -1249,19 +1249,11 @@
             });
         });
 
-        // AR Button - Special handling for iOS
         arButton.addEventListener('click', () => {
-            if (isIOS) {
-                // iOS: Trigger Quick Look directly
-                const link = document.createElement('a');
-                link.rel = 'ar';
-                link.href = currentItem.model;
-                link.click();
-            } else {
-                // Android: Use model-viewer's built-in AR
-                viewer.activateAR();
-            }
+        viewer.activateAR();
+        console.log('🎯 AR activated');
         });
+    
 
         /* ═══════════════════════════════════════════════════════════════════
            📡 AR VIEWER EVENTS
