@@ -708,6 +708,7 @@
     <model-viewer
         id="ar-viewer"
         src="Restaurants/Candle Cafe/All Items/Blue Artifact.glb"
+        ios-src="Restaurants/Candle Cafe/All Items/Blue Artifact.usdz"
         alt="3D model"
         ar
         ar-modes="webxr scene-viewer quick-look"
@@ -716,8 +717,7 @@
         camera-orbit="0deg 75deg 1m"
         environment-image="neutral"
         exposure="1"
-        shadow-softness="1"
-        ios-src="">
+        shadow-softness="1">
         
         <!-- Loading message -->
         <div class="loading" slot="poster">
@@ -800,13 +800,15 @@
                                 id: 'blue-artifact',
                                 name: '🔵 Blue Artifact Special',
                                 price: '$9.99',
-                                model: 'Restaurants/Candle Cafe/All Items/Blue Artifact.glb'
+                                modelGLB: 'Restaurants/Candle Cafe/All Items/Blue Artifact.glb',
+                                modelUSDZ: 'Restaurants/Candle Cafe/All Items/Blue Artifact.usdz'
                             },
                             {
                                 id: 'red-stand',
                                 name: '🔴 Red Stand Deluxe',
                                 price: '$12.99',
-                                model: 'Restaurants/Candle Cafe/All Items/Red Stand.glb'
+                                modelGLB: 'Restaurants/Candle Cafe/All Items/Red Stand.glb',
+                                modelUSDZ: 'Restaurants/Candle Cafe/All Items/Red Stand.usdz'
                             }
                         ]
                     }
@@ -824,7 +826,8 @@
                                 id: 'coffee-cup',
                                 name: '☕ Premium Coffee Cup',
                                 price: '$4.99',
-                                model: 'Restaurants/Coffee Shop/Coffee Cup.glb'
+                                modelGLB: 'Restaurants/Coffee Shop/Coffee Cup.glb',
+                                modelUSDZ: 'Restaurants/Coffee Shop/Coffee Cup.usdz'
                             }
                         ]
                     }
@@ -842,13 +845,15 @@
                                 id: 'blue-cube',
                                 name: '🔷 Blue Cube Delight',
                                 price: '$7.99',
-                                model: 'Restaurants/Cube Cafe/Blue Cube.glb'
+                                modelGLB: 'Restaurants/Cube Cafe/Blue Cube.glb',
+                                modelUSDZ: 'Restaurants/Cube Cafe/Blue Cube.usdz'
                             },
                             {
                                 id: 'pink-cube',
                                 name: '🟪 Pink Cube Surprise',
                                 price: '$7.99',
-                                model: 'Restaurants/Cube Cafe/Pink Cube.glb'
+                                modelGLB: 'Restaurants/Cube Cafe/Pink Cube.glb',
+                                modelUSDZ: 'Restaurants/Cube Cafe/Pink Cube.usdz'
                             }
                         ]
                     }
@@ -1103,19 +1108,19 @@
             currentFoodPrice.textContent = item.price;
             currentFoodMeta.textContent = `${restaurant.name} • ${category.name}`;
             
-            // Load model
-            viewer.src = item.model;
+            // Load models
+            // GLB for Android WebXR
+            viewer.src = item.modelGLB;
             
-            // iOS: Use same GLB file for Quick Look (it converts automatically)
-            if (isIOS) {
-                viewer.iosSrc = item.model;
-            }
+            // USDZ for iOS Quick Look AR
+            viewer.iosSrc = item.modelUSDZ;
             
             renderAllItems();
             renderFavorites();
             
             console.log(`✅ Selected: ${item.name}`);
-            console.log(`📁 Model: ${item.model}`);
+            console.log(`📁 GLB: ${item.modelGLB}`);
+            console.log(`📁 USDZ: ${item.modelUSDZ}`);
         }
 
         /* ═══════════════════════════════════════════════════════════════════
