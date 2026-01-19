@@ -150,7 +150,6 @@
 
         /* ==========================================
            SIDE MENU - Hierarchical Navigation
-           Restaurant > Category > Items
            ========================================== */
         
         .side-menu {
@@ -694,7 +693,7 @@
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
             <div class="menu-title">🍽️ AR Food Menu</div>
-            <div class="menu-subtitle">Choose a delicious item to view in AR</div>
+            <div class="menu-subtitle">Choose an item to view in AR</div>
         </div>
 
         <!-- Tab Navigation -->
@@ -721,9 +720,9 @@
          ========================================== -->
     
     <div class="info-card">
-        <div class="food-name" id="currentFoodName">🍔 Classic Burger</div>
-        <div class="food-price" id="currentFoodPrice">$12.99</div>
-        <div class="food-meta" id="currentFoodMeta">Restaurant 1 • Snacks</div>
+        <div class="food-name" id="currentFoodName">🔵 Blue Artifact</div>
+        <div class="food-price" id="currentFoodPrice">$9.99</div>
+        <div class="food-meta" id="currentFoodMeta">Candle Cafe • All Items</div>
     </div>
 
     <!-- ==========================================
@@ -741,9 +740,8 @@
     
     <model-viewer
         id="ar-viewer"
-        src="https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb"
-        ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
-        alt="3D food model"
+        src="Restaurants/Candle Cafe/All Items/Blue Artifact.glb"
+        alt="3D model"
         ar
         ar-modes="webxr scene-viewer quick-look"
         camera-controls
@@ -752,8 +750,6 @@
         environment-image="neutral"
         exposure="1"
         shadow-softness="1">
-        
-        <!-- Bottom action bar moved outside model-viewer for better control -->
     </model-viewer>
 
     <!-- ==========================================
@@ -775,7 +771,7 @@
          ========================================== -->
     
     <div class="share-modal" id="shareModal">
-        <div class="share-header">Share this delicious item!</div>
+        <div class="share-header">Share this item!</div>
         <div class="share-options">
             <div class="share-option" data-platform="whatsapp">
                 <div class="share-option-icon">💬</div>
@@ -803,99 +799,82 @@
     
     <script>
         // ==========================================
-        // DATABASE - Multi-Restaurant Food Items
-        // STRUCTURE: Restaurant > Category > Items
+        // DATABASE - YOUR ACTUAL RESTAURANT DATA
+        // Using your exact file paths from:
+        // Restaurants/Candle Cafe/All Items/Blue Artifact.glb
+        // Restaurants/Candle Cafe/All Items/Red Stand.glb
+        // Restaurants/Coffee Shop/Coffee Cup.glb
+        // Restaurants/Cube Cafe/Blue Cube.glb
+        // Restaurants/Cube Cafe/Pink Cube.glb
         // ==========================================
         
         const restaurantsData = [
             {
-                id: 'restaurant-1',
-                name: 'Candle Cafe',
+                id: 'candle-cafe',
+                name: '🕯️ Candle Cafe',
                 categories: [
                     {
-                        id: 'breakfast',
-                        name: 'Breakfast',
+                        id: 'all-items',
+                        name: 'All Items',
                         items: [
                             {
-                                id: 'Blue Artifact',
-                                name: '☕ Blue Artifact',
-                                price: '$4.99',
-                                model: 'Restaurants\Candle Cafe\All Items\Blue Artifact.glb',
-                                iosModel: 'Restaurants\Candle Cafe\All Items\Blue Artifact.usdz'
+                                id: 'blue-artifact',
+                                name: '🔵 Blue Artifact Special',
+                                price: '$9.99',
+                                model: 'Restaurants/Candle Cafe/All Items/Blue Artifact.glb',
+                                iosModel: 'Restaurants/Candle Cafe/All Items/Blue Artifact.glb' // Will work with GLB on iOS too
                             },
                             {
-                                id: 'Red Stand',
-                                name: 'Red Stand',
-                                price: '$6.99',
-                                model: 'Restaurants\Candle Cafe\All Items\Red Stand.glb',
-                                iosModel: 'Restaurants\Candle Cafe\All Items\Red Stand.usdz'
-                            }
-                        ]
-                    },
-                    {
-                        id: 'snacks',
-                        name: 'Cube Snacks',
-                        items: [
-                            {
-                                id: 'burger',
-                                name: 'Blue Cube Burger',
+                                id: 'red-stand',
+                                name: '🔴 Red Stand Deluxe',
                                 price: '$12.99',
-                                model: 'Restaurants\Cube Cafe\Blue Cube.glb"',
-                                iosModel: 'Restaurants\Cube Cafe\Blue Cube.usdz'
-                            },
-                            {
-                                id: 'fries',
-                                name: 'Pink Cube Fries',
-                                price: '$4.99',
-                                model: 'Restaurants\Cube Cafe\Pink Cube.glb',
-                                iosModel: 'Restaurants\Cube Cafe\Pink Cube.usdz'
+                                model: 'Restaurants/Candle Cafe/All Items/Red Stand.glb',
+                                iosModel: 'Restaurants/Candle Cafe/All Items/Red Stand.glb'
                             }
                         ]
                     }
                 ]
             },
             {
-                id: 'restaurant-2',
-                name: 'Coffee Shop',
+                id: 'coffee-shop',
+                name: '☕ Coffee Shop',
                 categories: [
                     {
-                        id: 'Coffees',
-                        name: 'Coffees',
+                        id: 'all-items',
+                        name: 'All Items',
                         items: [
                             {
-                                id: 'coffee',
-                                name: 'Coffee Cup',
+                                id: 'coffee-cup',
+                                name: '☕ Premium Coffee Cup',
                                 price: '$4.99',
-                                model: 'Restaurants\Coffee Shop\Coffee Cup.glb',
-                                iosModel: 'Restaurants\Coffee Shop\Coffee Cup.usdz'
-                            },
-                           
+                                model: 'Restaurants/Coffee Shop/Coffee Cup.glb',
+                                iosModel: 'Restaurants/Coffee Shop/Coffee Cup.glb'
+                            }
                         ]
-                    },
-                    
+                    }
                 ]
             },
             {
-                id: 'restaurant-3',
-                name: '🍕 Pizza Corner-Astronaut',
+                id: 'cube-cafe',
+                name: '◼️ Cube Cafe',
                 categories: [
                     {
-                        id: 'lunch',
-                        name: 'Lunch',
+                        id: 'all-items',
+                        name: 'All Items',
                         items: [
                             {
-                                id: 'pizza',
-                                name: '🍕 Margherita Pizza',
-                                price: '$16.99',
-                                model: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb',
-                                iosModel: 'https://modelviewer.dev/shared-assets/models/Astronaut.usdz'
+                                id: 'blue-cube',
+                                name: '🔷 Blue Cube Delight',
+                                price: '$7.99',
+                                model: 'Restaurants/Cube Cafe/Blue Cube.glb',
+                                iosModel: 'Restaurants/Cube Cafe/Blue Cube.glb'
                             },
                             {
-                                id: 'pasta',
-                                name: '🍝 Spaghetti',
-                                price: '$14.99',
-                                model: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb',
-                                iosModel: 'https://modelviewer.dev/shared-assets/models/Astronaut.usdz'
+                                id: 'pink-cube',
+                                name: '🟪 Pink Cube Surprise',
+                                price: '$7.99',
+                                model: 'Restaurants/Cube Cafe/Pink Cube.glb',
+                                iosModel: 'Restaurants/Cube Cafe/Pink Cube.glb'
                             }
                         ]
                     }
@@ -905,6 +884,7 @@
 
         // ==========================================
         // ELEMENT REFERENCES
+        // Get all the HTML elements we'll need to interact with
         // ==========================================
         
         const viewer = document.querySelector('model-viewer');
@@ -929,13 +909,14 @@
 
         // ==========================================
         // STATE MANAGEMENT
+        // Track what's currently selected and favorited
         // ==========================================
         
         let currentItem = null; // Currently selected item
         let favorites = []; // Array of favorite item IDs
         let expandedRestaurants = []; // Which restaurants are expanded in menu
 
-        // Load favorites from browser storage
+        // Load favorites from browser's local storage
         function loadFavorites() {
             const saved = localStorage.getItem('ar-menu-favorites');
             if (saved) {
@@ -944,7 +925,7 @@
             }
         }
 
-        // Save favorites to browser storage
+        // Save favorites to browser's local storage
         function saveFavorites() {
             localStorage.setItem('ar-menu-favorites', JSON.stringify(favorites));
             updateFavoriteCounter();
@@ -961,7 +942,8 @@
         }
 
         // ==========================================
-        // MENU RENDERING
+        // MENU RENDERING FUNCTIONS
+        // Build the visual menu from the data
         // ==========================================
         
         function renderAllItems() {
@@ -971,7 +953,7 @@
                 const restaurantDiv = document.createElement('div');
                 restaurantDiv.className = 'restaurant-section';
                 
-                // Restaurant header
+                // Restaurant header (clickable to expand/collapse)
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'restaurant-header';
                 if (expandedRestaurants.includes(restaurant.id)) {
@@ -990,7 +972,7 @@
                 
                 restaurantDiv.appendChild(headerDiv);
                 
-                // Categories
+                // Categories (for now just "All Items")
                 restaurant.categories.forEach(category => {
                     const categoryDiv = document.createElement('div');
                     categoryDiv.className = 'category-section';
@@ -1003,7 +985,7 @@
                     categoryHeader.textContent = category.name;
                     categoryDiv.appendChild(categoryHeader);
                     
-                    // Items
+                    // Individual items
                     category.items.forEach(item => {
                         const itemDiv = createMenuItem(item, restaurant, category);
                         categoryDiv.appendChild(itemDiv);
@@ -1016,11 +998,12 @@
             });
         }
 
+        // Create a single menu item element
         function createMenuItem(item, restaurant, category) {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'menu-item';
             
-            // Check if this is the current item
+            // Highlight if this is the current item
             if (currentItem && currentItem.id === item.id) {
                 itemDiv.classList.add('active');
             }
@@ -1035,22 +1018,23 @@
                 </button>
             `;
             
-            // Select item on click
+            // Click to select this item
             itemDiv.querySelector('.menu-item-content').addEventListener('click', () => {
                 selectItem(item, restaurant, category);
                 closeMenu();
             });
             
-            // Toggle favorite
+            // Click heart to toggle favorite
             const favBtn = itemDiv.querySelector('.item-fav-btn');
             favBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
+                e.stopPropagation(); // Don't trigger item selection
                 toggleFavorite(item.id);
             });
             
             return itemDiv;
         }
 
+        // Toggle restaurant expanded/collapsed state
         function toggleRestaurant(restaurantId) {
             const index = expandedRestaurants.indexOf(restaurantId);
             if (index > -1) {
@@ -1068,8 +1052,10 @@
         function toggleFavorite(itemId) {
             const index = favorites.indexOf(itemId);
             if (index > -1) {
+                // Remove from favorites
                 favorites.splice(index, 1);
             } else {
+                // Add to favorites
                 favorites.push(itemId);
             }
             saveFavorites();
@@ -1090,6 +1076,7 @@
             emptyFavorites.classList.add('hidden');
             favoritesContent.innerHTML = '';
             
+            // Show only favorited items, organized by restaurant
             restaurantsData.forEach(restaurant => {
                 let restaurantHasFavorites = false;
                 const restaurantDiv = document.createElement('div');
@@ -1134,6 +1121,7 @@
 
         // ==========================================
         // ITEM SELECTION
+        // When user taps an item, load it in AR viewer
         // ==========================================
         
         function selectItem(item, restaurant, category) {
@@ -1143,17 +1131,21 @@
                 category: category.name
             };
             
+            // Update the info card
             currentFoodName.textContent = item.name;
             currentFoodPrice.textContent = item.price;
             currentFoodMeta.textContent = `${restaurant.name} • ${category.name}`;
             
+            // Load the 3D model
             viewer.src = item.model;
             viewer.iosSrc = item.iosModel;
             
+            // Re-render menus to show active state
             renderAllItems();
             renderFavorites();
             
             console.log(`✅ Selected: ${item.name} from ${restaurant.name}`);
+            console.log(`📁 Model path: ${item.model}`);
         }
 
         // ==========================================
@@ -1171,7 +1163,7 @@
         }
 
         // ==========================================
-        // TAB SWITCHING
+        // TAB SWITCHING (All Items / Favorites)
         // ==========================================
         
         function showAllItems() {
@@ -1189,7 +1181,7 @@
         }
 
         // ==========================================
-        // THEME TOGGLE
+        // THEME TOGGLE (Dark/Light)
         // ==========================================
         
         function toggleTheme() {
@@ -1200,15 +1192,17 @@
                 body.classList.add('dark-theme');
                 themeBtn.textContent = '☀️';
                 localStorage.setItem('ar-menu-theme', 'dark');
+                console.log('🌙 Dark theme activated');
             } else {
                 body.classList.remove('dark-theme');
                 body.classList.add('light-theme');
                 themeBtn.textContent = '🌙';
                 localStorage.setItem('ar-menu-theme', 'light');
+                console.log('☀️ Light theme activated');
             }
         }
 
-        // Load saved theme
+        // Load saved theme preference
         function loadTheme() {
             const savedTheme = localStorage.getItem('ar-menu-theme');
             if (savedTheme === 'dark') {
@@ -1245,7 +1239,7 @@
                     break;
                 case 'copy':
                     navigator.clipboard.writeText(shareUrl).then(() => {
-                        alert('Link copied to clipboard!');
+                        alert('✅ Link copied to clipboard!');
                     });
                     break;
                 case 'native':
@@ -1256,7 +1250,7 @@
                             url: shareUrl
                         });
                     } else {
-                        alert('Share not supported on this device');
+                        alert('❌ Share not supported on this browser');
                     }
                     break;
             }
@@ -1266,6 +1260,7 @@
 
         // ==========================================
         // EVENT LISTENERS
+        // Connect buttons to functions
         // ==========================================
         
         menuBtn.addEventListener('click', openMenu);
@@ -1287,22 +1282,23 @@
             });
         });
 
-        // AR button click (triggers model-viewer AR)
+        // AR button click (triggers model-viewer AR mode)
         arButton.addEventListener('click', () => {
             viewer.activateAR();
         });
 
         // ==========================================
         // AR VIEWER EVENTS
+        // Monitor what's happening with the 3D viewer
         // ==========================================
         
         viewer.addEventListener('load', () => {
-            console.log('✅ Model loaded');
+            console.log('✅ 3D model loaded successfully!');
         });
 
         viewer.addEventListener('ar-status', (event) => {
             if (event.detail.status === 'session-started') {
-                console.log('🎉 AR session started');
+                console.log('🎉 AR session started!');
                 instructions.style.display = 'none';
             } else if (event.detail.status === 'not-presenting') {
                 instructions.style.display = 'block';
@@ -1310,15 +1306,18 @@
         });
 
         viewer.addEventListener('error', (event) => {
-            console.error('❌ Error:', event);
-            alert('Could not load model. Please check your connection.');
+            console.error('❌ Error loading model:', event);
+            alert('Could not load 3D model. Please check the file path.');
         });
 
         // ==========================================
         // INITIALIZATION
+        // Run when page loads
         // ==========================================
         
         function init() {
+            console.log('🚀 AR Menu Platform Initializing...');
+            
             loadFavorites();
             loadTheme();
             renderAllItems();
@@ -1334,11 +1333,12 @@
             expandedRestaurants.push(firstRestaurant.id);
             renderAllItems();
             
-            console.log('🚀 AR Menu Platform Ready!');
-            console.log('📱 Device:', navigator.userAgent);
-            console.log('🏪 Restaurants:', restaurantsData.length);
+            console.log('✅ AR Menu Ready!');
+            console.log('🏪 Restaurants loaded:', restaurantsData.length);
+            console.log('📦 Total items:', restaurantsData.reduce((sum, r) => sum + r.categories.reduce((s, c) => s + c.items.length, 0), 0));
         }
 
+        // Start the app!
         init();
     </script>
 
