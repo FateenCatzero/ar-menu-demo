@@ -708,7 +708,7 @@
     <model-viewer
         id="ar-viewer"
         src="Restaurants/Candle Cafe/All Items/Blue Artifact.glb"
-        ios-src="Restaurants/Candle Cafe/All Items/Blue Artifact.usdz"
+        ios-src="Restaurants/Candle%20Cafe/All%20Items/Blue%20Artifact.usdz"
         alt="3D model"
         ar
         ar-modes="webxr scene-viewer quick-look"
@@ -1113,7 +1113,9 @@
             viewer.src = item.modelGLB;
             
             // USDZ for iOS Quick Look AR
-            viewer.iosSrc = item.modelUSDZ;
+            // Encode the path to handle spaces in filenames
+            const encodedUSDZ = item.modelUSDZ.split('/').map(encodeURIComponent).join('/');
+            viewer.iosSrc = encodedUSDZ;
             
             renderAllItems();
             renderFavorites();
@@ -1121,6 +1123,7 @@
             console.log(`✅ Selected: ${item.name}`);
             console.log(`📁 GLB: ${item.modelGLB}`);
             console.log(`📁 USDZ: ${item.modelUSDZ}`);
+            console.log(`📁 Encoded USDZ: ${encodedUSDZ}`);
         }
 
         /* ═══════════════════════════════════════════════════════════════════
