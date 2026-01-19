@@ -3,47 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Food Menu - Multi-Restaurant Platform</title>
+    <title>AR Food Menu</title>
     
-    <!-- Google's Model Viewer - Handles AR functionality -->
+    <!-- Google's Model Viewer Library - Handles all AR magic -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
     
     <style>
-        /* ==========================================
-           GLOBAL RESET & VARIABLES
-           Modern CSS custom properties for easy theming
-           ========================================== */
+        /* ═══════════════════════════════════════════════════════════════════
+           CSS VARIABLES - Change colors here!
+           ═══════════════════════════════════════════════════════════════════ */
         
         :root {
-            /* Light theme colors */
-            --bg-light: #E8E8E8FF;
-            --bg-light-secondary: #f5f5f5;
-            --text-light: #1a1a1a;
+            /* Light Theme Colors */
+            --light-bg: #E8E8E8FF;
+            --light-bg-secondary: #f5f5f5;
+            --light-text: #1a1a1a;
             
-            /* Dark theme colors */
-            --bg-dark: #191919FF;
-            --bg-dark-secondary: #2a2a2a;
-            --text-dark: #ffffff;
+            /* Dark Theme Colors */
+            --dark-bg: #191919FF;
+            --dark-bg-secondary: #2a2a2a;
+            --dark-text: #ffffff;
             
-            /* Accent colors - Modern gradient palette */
-            --accent-primary: #6366f1;
-            --accent-secondary: #8b5cf6;
-            --accent-success: #10b981;
-            --accent-warning: #f59e0b;
-            --accent-favorite: #ef4444;
+            /* Brand Colors - Change these to customize look */
+            --color-primary: #6366f1;        /* Purple-blue */
+            --color-secondary: #8b5cf6;      /* Purple */
+            --color-success: #10b981;        /* Green (AR button) */
+            --color-warning: #f59e0b;        /* Orange (prices) */
+            --color-favorite: #ef4444;       /* Red (hearts) */
             
-            /* UI spacing */
-            --spacing-sm: 8px;
-            --spacing-md: 16px;
-            --spacing-lg: 24px;
+            /* Spacing */
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
             
-            /* Border radius for modern look */
+            /* Border Radius */
             --radius-sm: 8px;
             --radius-md: 16px;
             --radius-lg: 24px;
             --radius-full: 9999px;
         }
 
+        /* ═══════════════════════════════════════════════════════════════════
+           RESET & BASE STYLES
+           ═══════════════════════════════════════════════════════════════════ */
+        
         * {
             margin: 0;
             padding: 0;
@@ -51,27 +54,27 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             height: 100vh;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background 0.3s ease;
         }
 
-        /* LIGHT THEME STYLES */
+        /* Light theme (default) */
         body.light-theme {
-            background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-light-secondary) 100%);
-            color: var(--text-light);
+            background: linear-gradient(135deg, var(--light-bg) 0%, var(--light-bg-secondary) 100%);
+            color: var(--light-text);
         }
 
-        /* DARK THEME STYLES */
+        /* Dark theme */
         body.dark-theme {
-            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-dark-secondary) 100%);
-            color: var(--text-dark);
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-secondary) 100%);
+            color: var(--dark-text);
         }
 
-        /* ==========================================
-           TOP NAVIGATION BAR - Glassmorphism design
-           ========================================== */
+        /* ═══════════════════════════════════════════════════════════════════
+           TOP NAVIGATION BAR
+           ═══════════════════════════════════════════════════════════════════ */
         
         .top-nav {
             position: fixed;
@@ -81,26 +84,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: var(--spacing-md);
+            padding: var(--space-md);
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             z-index: 100;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .nav-left {
+        .nav-left, .nav-right {
             display: flex;
-            gap: var(--spacing-sm);
-        }
-
-        .nav-right {
-            display: flex;
-            gap: var(--spacing-sm);
+            gap: var(--space-sm);
             align-items: center;
         }
 
-        /* Icon buttons - Modern minimal style */
+        /* All icon buttons (menu, favorites, theme) */
         .icon-btn {
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -117,11 +114,6 @@
             position: relative;
         }
 
-        .icon-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: scale(1.05);
-        }
-
         .icon-btn:active {
             transform: scale(0.95);
         }
@@ -131,7 +123,7 @@
             position: absolute;
             top: -5px;
             right: -5px;
-            background: var(--accent-favorite);
+            background: var(--color-favorite);
             color: white;
             width: 20px;
             height: 20px;
@@ -148,10 +140,28 @@
             display: flex;
         }
 
-        /* ==========================================
-           SIDE MENU - Hierarchical Navigation
-           ========================================== */
+        /* ═══════════════════════════════════════════════════════════════════
+           SIDE MENU
+           ═══════════════════════════════════════════════════════════════════ */
         
+        /* Dark overlay when menu is open */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 98;
+            display: none;
+            backdrop-filter: blur(4px);
+        }
+
+        .menu-overlay.show {
+            display: block;
+        }
+
+        /* The sliding menu panel */
         .side-menu {
             position: fixed;
             top: 0;
@@ -172,11 +182,11 @@
             left: 0;
         }
 
-        /* Menu header */
+        /* Menu header with gradient */
         .menu-header {
-            padding: var(--spacing-lg);
+            padding: var(--space-lg);
             padding-top: 80px;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
             position: sticky;
             top: 0;
             z-index: 10;
@@ -185,7 +195,7 @@
         .menu-title {
             font-size: 28px;
             font-weight: bold;
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: var(--space-sm);
         }
 
         .menu-subtitle {
@@ -193,11 +203,11 @@
             opacity: 0.9;
         }
 
-        /* Tab navigation (All Items / Favorites) */
+        /* Tabs: All Items / Favorites */
         .menu-tabs {
             display: flex;
-            gap: var(--spacing-sm);
-            padding: var(--spacing-md);
+            gap: var(--space-sm);
+            padding: var(--space-md);
             background: rgba(0, 0, 0, 0.3);
             position: sticky;
             top: 140px;
@@ -219,22 +229,23 @@
 
         .menu-tab.active {
             background: white;
-            color: var(--bg-dark);
+            color: var(--dark-bg);
         }
 
         /* Restaurant section */
         .restaurant-section {
-            margin: var(--spacing-md);
+            margin: var(--space-md);
         }
 
+        /* Restaurant header (clickable to expand) */
         .restaurant-header {
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
-            padding: var(--spacing-md);
+            gap: var(--space-sm);
+            padding: var(--space-md);
             background: rgba(255, 255, 255, 0.05);
             border-radius: var(--radius-md);
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: var(--space-sm);
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -262,10 +273,10 @@
             transform: rotate(180deg);
         }
 
-        /* Category section */
+        /* Category section (hidden by default, shown when restaurant expanded) */
         .category-section {
-            margin-left: var(--spacing-md);
-            margin-bottom: var(--spacing-md);
+            margin-left: var(--space-md);
+            margin-bottom: var(--space-md);
             display: none;
         }
 
@@ -279,15 +290,15 @@
             color: rgba(255, 255, 255, 0.6);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: var(--spacing-sm);
-            padding-left: var(--spacing-sm);
+            margin-bottom: var(--space-sm);
+            padding-left: var(--space-sm);
         }
 
-        /* Individual food items */
+        /* Individual menu items */
         .menu-item {
             background: rgba(255, 255, 255, 0.08);
-            padding: var(--spacing-md);
-            margin-bottom: var(--spacing-sm);
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s;
@@ -302,8 +313,9 @@
             transform: translateX(4px);
         }
 
+        /* Currently selected item */
         .menu-item.active {
-            border-color: var(--accent-success);
+            border-color: var(--color-success);
             background: rgba(16, 185, 129, 0.2);
         }
 
@@ -319,17 +331,17 @@
 
         .menu-item-price {
             font-size: 18px;
-            color: var(--accent-warning);
+            color: var(--color-warning);
             font-weight: bold;
         }
 
-        /* Favorite button on each item */
+        /* Favorite heart button on each item */
         .item-fav-btn {
             background: none;
             border: none;
             font-size: 24px;
             cursor: pointer;
-            padding: var(--spacing-sm);
+            padding: var(--space-sm);
             transition: transform 0.2s;
         }
 
@@ -337,35 +349,25 @@
             transform: scale(1.3);
         }
 
-        .item-fav-btn.favorited {
-            animation: heartBeat 0.3s;
+        /* Empty state (when no favorites) */
+        .empty-state {
+            text-align: center;
+            padding: 40px var(--space-lg);
+            opacity: 0.6;
         }
 
-        @keyframes heartBeat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.3); }
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--space-md);
         }
 
-        /* Overlay for closing menu */
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 98;
-            display: none;
-            backdrop-filter: blur(4px);
+        .empty-state-text {
+            font-size: 16px;
         }
 
-        .menu-overlay.show {
-            display: block;
-        }
-
-        /* ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
            CURRENT ITEM INFO CARD
-           ========================================== */
+           ═══════════════════════════════════════════════════════════════════ */
         
         .info-card {
             position: absolute;
@@ -375,7 +377,7 @@
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(20px);
             color: white;
-            padding: var(--spacing-lg) var(--spacing-lg);
+            padding: var(--space-lg);
             border-radius: var(--radius-lg);
             text-align: center;
             z-index: 10;
@@ -387,48 +389,76 @@
         .food-name {
             font-size: 24px;
             font-weight: bold;
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: var(--space-sm);
         }
 
         .food-price {
             font-size: 28px;
-            color: var(--accent-warning);
+            color: var(--color-warning);
             font-weight: bold;
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: var(--space-sm);
         }
 
         .food-meta {
             font-size: 12px;
             opacity: 0.7;
-            margin-top: var(--spacing-sm);
+            margin-top: var(--space-sm);
         }
 
-        /* ==========================================
-           AR VIEWER
-           ========================================== */
+        /* ═══════════════════════════════════════════════════════════════════
+           AR VIEWER - The 3D model display
+           ═══════════════════════════════════════════════════════════════════ */
         
         model-viewer {
             width: 100%;
             height: 100%;
         }
 
-        /* ==========================================
-           BOTTOM ACTION BAR - Modern floating design
-           ========================================== */
+        /* Loading message */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.85);
+            padding: var(--space-lg) 40px;
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(10px);
+        }
+
+        .loading::after {
+            content: '⏳';
+            display: block;
+            font-size: 40px;
+            margin-top: var(--space-sm);
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           BOTTOM ACTION BAR
+           ═══════════════════════════════════════════════════════════════════ */
         
         .bottom-bar {
             position: fixed;
-            bottom: var(--spacing-lg);
+            bottom: var(--space-lg);
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: var(--spacing-md);
+            gap: var(--space-md);
             z-index: 10;
         }
 
         /* Main AR button */
         .ar-button {
-            background: linear-gradient(135deg, var(--accent-success), #059669);
+            background: linear-gradient(135deg, var(--color-success), #059669);
             color: white;
             border: none;
             padding: 18px 40px;
@@ -440,19 +470,14 @@
             transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
-        }
-
-        .ar-button:hover {
-            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.6);
-            transform: translateY(-2px);
+            gap: var(--space-sm);
         }
 
         .ar-button:active {
             transform: translateY(0) scale(0.98);
         }
 
-        /* Secondary action buttons */
+        /* Share button */
         .action-btn {
             background: rgba(255, 255, 255, 0.9);
             border: none;
@@ -468,18 +493,13 @@
             justify-content: center;
         }
 
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
         .action-btn:active {
             transform: scale(0.95);
         }
 
-        /* ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
            INSTRUCTIONS
-           ========================================== */
+           ═══════════════════════════════════════════════════════════════════ */
         
         .instructions {
             position: absolute;
@@ -489,7 +509,7 @@
             background: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(10px);
             color: white;
-            padding: var(--spacing-md) var(--spacing-lg);
+            padding: var(--space-md) var(--space-lg);
             border-radius: var(--radius-lg);
             text-align: center;
             font-size: 14px;
@@ -499,9 +519,9 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
            SHARE MODAL
-           ========================================== */
+           ═══════════════════════════════════════════════════════════════════ */
         
         .share-modal {
             position: fixed;
@@ -510,14 +530,14 @@
             right: 0;
             background: white;
             border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            padding: var(--spacing-lg);
+            padding: var(--space-lg);
             z-index: 101;
             transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.2);
         }
 
         .dark-theme .share-modal {
-            background: var(--bg-dark-secondary);
+            background: var(--dark-bg-secondary);
             color: white;
         }
 
@@ -528,23 +548,23 @@
         .share-header {
             font-size: 20px;
             font-weight: bold;
-            margin-bottom: var(--spacing-lg);
+            margin-bottom: var(--space-lg);
             text-align: center;
         }
 
         .share-options {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: var(--spacing-md);
-            margin-bottom: var(--spacing-lg);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
         }
 
         .share-option {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: var(--spacing-sm);
-            padding: var(--spacing-md);
+            gap: var(--space-sm);
+            padding: var(--space-md);
             background: rgba(0, 0, 0, 0.05);
             border-radius: var(--radius-md);
             cursor: pointer;
@@ -569,8 +589,8 @@
 
         .share-close {
             width: 100%;
-            padding: var(--spacing-md);
-            background: var(--bg-dark);
+            padding: var(--space-md);
+            background: var(--dark-bg);
             color: white;
             border: none;
             border-radius: var(--radius-md);
@@ -583,59 +603,17 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* ==========================================
-           LOADING STATE
-           ========================================== */
+        /* ═══════════════════════════════════════════════════════════════════
+           UTILITY CLASSES
+           ═══════════════════════════════════════════════════════════════════ */
         
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 18px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.85);
-            padding: var(--spacing-lg) 40px;
-            border-radius: var(--radius-lg);
-            backdrop-filter: blur(10px);
+        .hidden {
+            display: none !important;
         }
 
-        .loading::after {
-            content: '⏳';
-            display: block;
-            font-size: 40px;
-            margin-top: var(--spacing-sm);
-            animation: spin 2s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* ==========================================
-           EMPTY STATE
-           ========================================== */
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px var(--spacing-lg);
-            opacity: 0.6;
-        }
-
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: var(--spacing-md);
-        }
-
-        .empty-state-text {
-            font-size: 16px;
-        }
-
-        /* ==========================================
-           RESPONSIVE DESIGN
-           ========================================== */
+        /* ═══════════════════════════════════════════════════════════════════
+           RESPONSIVE - Mobile adjustments
+           ═══════════════════════════════════════════════════════════════════ */
         
         @media (max-width: 400px) {
             .food-name {
@@ -651,52 +629,41 @@
                 grid-template-columns: repeat(3, 1fr);
             }
         }
-
-        /* ==========================================
-           UTILITY CLASSES
-           ========================================== */
-        
-        .hidden {
-            display: none !important;
-        }
     </style>
 </head>
 <body class="light-theme">
 
-    <!-- ==========================================
+    <!-- ═══════════════════════════════════════════════════════════════════
          TOP NAVIGATION
-         ========================================== -->
+         ═══════════════════════════════════════════════════════════════════ -->
     
     <div class="top-nav">
         <div class="nav-left">
-            <button class="icon-btn" id="menuBtn" aria-label="Open menu" title="Menu">
-                ☰
-            </button>
+            <button class="icon-btn" id="menuBtn" title="Menu">☰</button>
         </div>
         <div class="nav-right">
-            <button class="icon-btn" id="favBtn" aria-label="Favorites" title="Favorites">
+            <button class="icon-btn" id="favBtn" title="Favorites">
                 ❤️
                 <span class="fav-counter" id="favCounter">0</span>
             </button>
-            <button class="icon-btn" id="themeBtn" aria-label="Toggle theme" title="Change Theme">
-                🌙
-            </button>
+            <button class="icon-btn" id="themeBtn" title="Theme">🌙</button>
         </div>
     </div>
 
-    <!-- ==========================================
+    <!-- ═══════════════════════════════════════════════════════════════════
          SIDE MENU
-         ========================================== -->
+         ═══════════════════════════════════════════════════════════════════ -->
     
     <div class="menu-overlay" id="menuOverlay"></div>
     
     <div class="side-menu" id="sideMenu">
+        <!-- Header -->
         <div class="menu-header">
             <div class="menu-title">🍽️ AR Food Menu</div>
             <div class="menu-subtitle">Choose an item to view in AR</div>
         </div>
 
-        <!-- Tab Navigation -->
+        <!-- Tabs -->
         <div class="menu-tabs">
             <button class="menu-tab active" id="allTab">All Items</button>
             <button class="menu-tab" id="favTab">Favorites</button>
@@ -709,15 +676,15 @@
         <div id="favoritesView" class="hidden">
             <div class="empty-state" id="emptyFavorites">
                 <div class="empty-state-icon">💔</div>
-                <div class="empty-state-text">No favorites yet!<br>Tap the ❤️ on any item to save it.</div>
+                <div class="empty-state-text">No favorites yet!<br>Tap ❤️ on items to save them.</div>
             </div>
             <div id="favoritesContent"></div>
         </div>
     </div>
 
-    <!-- ==========================================
+    <!-- ═══════════════════════════════════════════════════════════════════
          CURRENT ITEM INFO
-         ========================================== -->
+         ═══════════════════════════════════════════════════════════════════ -->
     
     <div class="info-card">
         <div class="food-name" id="currentFoodName">🔵 Blue Artifact</div>
@@ -725,18 +692,18 @@
         <div class="food-meta" id="currentFoodMeta">Candle Cafe • All Items</div>
     </div>
 
-    <!-- ==========================================
+    <!-- ═══════════════════════════════════════════════════════════════════
          INSTRUCTIONS
-         ========================================== -->
+         ═══════════════════════════════════════════════════════════════════ -->
     
     <div class="instructions" id="instructions">
-        📱 Tap "View in AR" to place this item on your table<br>
-        <small>Move your phone slowly to detect surfaces</small>
+        📱 Tap "View in AR" to place on your table<br>
+        <small>Move phone slowly to detect surfaces</small>
     </div>
 
-    <!-- ==========================================
-         AR VIEWER
-         ========================================== -->
+    <!-- ═══════════════════════════════════════════════════════════════════
+         AR VIEWER - The 3D Model Display
+         ═══════════════════════════════════════════════════════════════════ -->
     
     <model-viewer
         id="ar-viewer"
@@ -744,35 +711,35 @@
         alt="3D model"
         ar
         ar-modes="webxr scene-viewer quick-look"
-        ar-scale="fixed"
         camera-controls
         shadow-intensity="1"
         camera-orbit="0deg 75deg 1m"
-        min-camera-orbit="auto auto 0.5m"
-        max-camera-orbit="auto auto 10m"
         environment-image="neutral"
         exposure="1"
         shadow-softness="1"
-        interaction-prompt="none">
+        ios-src="">
+        
+        <!-- Loading message -->
+        <div class="loading" slot="poster">
+            Loading 3D model...
+        </div>
     </model-viewer>
 
-    <!-- ==========================================
+    <!-- ═══════════════════════════════════════════════════════════════════
          BOTTOM ACTION BAR
-         ========================================== -->
+         ═══════════════════════════════════════════════════════════════════ -->
     
     <div class="bottom-bar">
         <button class="ar-button" id="arButton">
             <span>📱</span>
             <span>View in AR</span>
         </button>
-        <button class="action-btn" id="shareBtn" title="Share">
-            🔗
-        </button>
+        <button class="action-btn" id="shareBtn" title="Share">🔗</button>
     </div>
 
-    <!-- ==========================================
+    <!-- ═══════════════════════════════════════════════════════════════════
          SHARE MODAL
-         ========================================== -->
+         ═══════════════════════════════════════════════════════════════════ -->
     
     <div class="share-modal" id="shareModal">
         <div class="share-header">Share this item!</div>
@@ -797,22 +764,30 @@
         <button class="share-close" id="shareClose">Close</button>
     </div>
 
-    <!-- ==========================================
-         JAVASCRIPT - Application Logic
-         ========================================== -->
+    <!-- ═══════════════════════════════════════════════════════════════════
+         JAVASCRIPT - ALL YOUR DATA & LOGIC
+         ═══════════════════════════════════════════════════════════════════ -->
     
     <script>
-        // ==========================================
-        // DATABASE - YOUR ACTUAL RESTAURANT DATA
-        // Using your exact file paths from:
-        // Restaurants/Candle Cafe/All Items/Blue Artifact.glb
-        // Restaurants/Candle Cafe/All Items/Red Stand.glb
-        // Restaurants/Coffee Shop/Coffee Cup.glb
-        // Restaurants/Cube Cafe/Blue Cube.glb
-        // Restaurants/Cube Cafe/Pink Cube.glb
-        // ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
+           📝 YOUR RESTAURANT DATA - EDIT THIS TO ADD/CHANGE ITEMS
+           ═══════════════════════════════════════════════════════════════════
+           
+           How to add a new item:
+           1. Go to the restaurant you want
+           2. Add a new object inside the "items" array
+           3. Fill in: id, name, price, model path
+           
+           Example:
+           {
+               id: 'new-dish',
+               name: '🍕 New Pizza',
+               price: '$15.99',
+               model: 'Restaurants/YourCafe/YourFolder/YourFile.glb'
+           }
+        */
         
-        const restaurantsData = [
+        const RESTAURANTS = [
             {
                 id: 'candle-cafe',
                 name: '🕯️ Candle Cafe',
@@ -825,15 +800,13 @@
                                 id: 'blue-artifact',
                                 name: '🔵 Blue Artifact Special',
                                 price: '$9.99',
-                                model: 'Restaurants/Candle Cafe/All Items/Blue Artifact.glb',
-                                iosModel: 'Restaurants/Candle Cafe/All Items/Blue Artifact.glb' // Will work with GLB on iOS too
+                                model: 'Restaurants/Candle Cafe/All Items/Blue Artifact.glb'
                             },
                             {
                                 id: 'red-stand',
                                 name: '🔴 Red Stand Deluxe',
                                 price: '$12.99',
-                                model: 'Restaurants/Candle Cafe/All Items/Red Stand.glb',
-                                iosModel: 'Restaurants/Candle Cafe/All Items/Red Stand.glb'
+                                model: 'Restaurants/Candle Cafe/All Items/Red Stand.glb'
                             }
                         ]
                     }
@@ -851,8 +824,7 @@
                                 id: 'coffee-cup',
                                 name: '☕ Premium Coffee Cup',
                                 price: '$4.99',
-                                model: 'Restaurants/Coffee Shop/Coffee Cup.glb',
-                                iosModel: 'Restaurants/Coffee Shop/Coffee Cup.glb'
+                                model: 'Restaurants/Coffee Shop/Coffee Cup.glb'
                             }
                         ]
                     }
@@ -870,15 +842,13 @@
                                 id: 'blue-cube',
                                 name: '🔷 Blue Cube Delight',
                                 price: '$7.99',
-                                model: 'Restaurants/Cube Cafe/Blue Cube.glb',
-                                iosModel: 'Restaurants/Cube Cafe/Blue Cube.glb'
+                                model: 'Restaurants/Cube Cafe/Blue Cube.glb'
                             },
                             {
                                 id: 'pink-cube',
                                 name: '🟪 Pink Cube Surprise',
                                 price: '$7.99',
-                                model: 'Restaurants/Cube Cafe/Pink Cube.glb',
-                                iosModel: 'Restaurants/Cube Cafe/Pink Cube.glb'
+                                model: 'Restaurants/Cube Cafe/Pink Cube.glb'
                             }
                         ]
                     }
@@ -886,10 +856,9 @@
             }
         ];
 
-        // ==========================================
-        // ELEMENT REFERENCES
-        // Get all the HTML elements we'll need to interact with
-        // ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
+           🔧 GET HTML ELEMENTS
+           ═══════════════════════════════════════════════════════════════════ */
         
         const viewer = document.querySelector('model-viewer');
         const menuBtn = document.getElementById('menuBtn');
@@ -911,16 +880,29 @@
         const favoritesView = document.getElementById('favoritesView');
         const favCounter = document.getElementById('favCounter');
 
-        // ==========================================
-        // STATE MANAGEMENT
-        // Track what's currently selected and favorited
-        // ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
+           💾 STATE - What's currently happening
+           ═══════════════════════════════════════════════════════════════════ */
         
-        let currentItem = null; // Currently selected item
-        let favorites = []; // Array of favorite item IDs
-        let expandedRestaurants = []; // Which restaurants are expanded in menu
+        let currentItem = null;              // Currently selected item
+        let favorites = [];                  // Array of favorited item IDs
+        let expandedRestaurants = [];        // Which restaurants are expanded in menu
+        let isIOS = false;                   // Are we on iOS?
 
-        // Load favorites from browser's local storage
+        /* ═══════════════════════════════════════════════════════════════════
+           🍎 iOS DETECTION & AR FIX
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function detectIOS() {
+            isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+            console.log(isIOS ? '🍎 iOS device detected' : '🤖 Android device detected');
+            return isIOS;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           ❤️ FAVORITES SYSTEM
+           ═══════════════════════════════════════════════════════════════════ */
+        
         function loadFavorites() {
             const saved = localStorage.getItem('ar-menu-favorites');
             if (saved) {
@@ -929,13 +911,11 @@
             }
         }
 
-        // Save favorites to browser's local storage
         function saveFavorites() {
             localStorage.setItem('ar-menu-favorites', JSON.stringify(favorites));
             updateFavoriteCounter();
         }
 
-        // Update the favorite counter badge
         function updateFavoriteCounter() {
             if (favorites.length > 0) {
                 favCounter.textContent = favorites.length;
@@ -945,19 +925,30 @@
             }
         }
 
-        // ==========================================
-        // MENU RENDERING FUNCTIONS
-        // Build the visual menu from the data
-        // ==========================================
+        function toggleFavorite(itemId) {
+            const index = favorites.indexOf(itemId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push(itemId);
+            }
+            saveFavorites();
+            renderAllItems();
+            renderFavorites();
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           🎨 RENDERING - Build the visual menu
+           ═══════════════════════════════════════════════════════════════════ */
         
         function renderAllItems() {
             allItemsView.innerHTML = '';
             
-            restaurantsData.forEach(restaurant => {
+            RESTAURANTS.forEach(restaurant => {
                 const restaurantDiv = document.createElement('div');
                 restaurantDiv.className = 'restaurant-section';
                 
-                // Restaurant header (clickable to expand/collapse)
+                // Restaurant header
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'restaurant-header';
                 if (expandedRestaurants.includes(restaurant.id)) {
@@ -970,13 +961,10 @@
                     <span class="expand-icon">▼</span>
                 `;
                 
-                headerDiv.addEventListener('click', () => {
-                    toggleRestaurant(restaurant.id);
-                });
-                
+                headerDiv.addEventListener('click', () => toggleRestaurant(restaurant.id));
                 restaurantDiv.appendChild(headerDiv);
                 
-                // Categories (for now just "All Items")
+                // Categories
                 restaurant.categories.forEach(category => {
                     const categoryDiv = document.createElement('div');
                     categoryDiv.className = 'category-section';
@@ -989,7 +977,7 @@
                     categoryHeader.textContent = category.name;
                     categoryDiv.appendChild(categoryHeader);
                     
-                    // Individual items
+                    // Items
                     category.items.forEach(item => {
                         const itemDiv = createMenuItem(item, restaurant, category);
                         categoryDiv.appendChild(itemDiv);
@@ -1002,12 +990,10 @@
             });
         }
 
-        // Create a single menu item element
         function createMenuItem(item, restaurant, category) {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'menu-item';
             
-            // Highlight if this is the current item
             if (currentItem && currentItem.id === item.id) {
                 itemDiv.classList.add('active');
             }
@@ -1017,28 +1003,25 @@
                     <div class="menu-item-name">${item.name}</div>
                     <div class="menu-item-price">${item.price}</div>
                 </div>
-                <button class="item-fav-btn ${favorites.includes(item.id) ? 'favorited' : ''}">
+                <button class="item-fav-btn">
                     ${favorites.includes(item.id) ? '❤️' : '🤍'}
                 </button>
             `;
             
-            // Click to select this item
             itemDiv.querySelector('.menu-item-content').addEventListener('click', () => {
                 selectItem(item, restaurant, category);
                 closeMenu();
             });
             
-            // Click heart to toggle favorite
             const favBtn = itemDiv.querySelector('.item-fav-btn');
             favBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Don't trigger item selection
+                e.stopPropagation();
                 toggleFavorite(item.id);
             });
             
             return itemDiv;
         }
 
-        // Toggle restaurant expanded/collapsed state
         function toggleRestaurant(restaurantId) {
             const index = expandedRestaurants.indexOf(restaurantId);
             if (index > -1) {
@@ -1047,24 +1030,6 @@
                 expandedRestaurants.push(restaurantId);
             }
             renderAllItems();
-        }
-
-        // ==========================================
-        // FAVORITES SYSTEM
-        // ==========================================
-        
-        function toggleFavorite(itemId) {
-            const index = favorites.indexOf(itemId);
-            if (index > -1) {
-                // Remove from favorites
-                favorites.splice(index, 1);
-            } else {
-                // Add to favorites
-                favorites.push(itemId);
-            }
-            saveFavorites();
-            renderAllItems();
-            renderFavorites();
         }
 
         function renderFavorites() {
@@ -1080,8 +1045,7 @@
             emptyFavorites.classList.add('hidden');
             favoritesContent.innerHTML = '';
             
-            // Show only favorited items, organized by restaurant
-            restaurantsData.forEach(restaurant => {
+            RESTAURANTS.forEach(restaurant => {
                 let restaurantHasFavorites = false;
                 const restaurantDiv = document.createElement('div');
                 restaurantDiv.className = 'restaurant-section';
@@ -1123,10 +1087,9 @@
             });
         }
 
-        // ==========================================
-        // ITEM SELECTION
-        // When user taps an item, load it in AR viewer
-        // ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
+           🎯 SELECT ITEM - Load 3D model
+           ═══════════════════════════════════════════════════════════════════ */
         
         function selectItem(item, restaurant, category) {
             currentItem = {
@@ -1135,26 +1098,29 @@
                 category: category.name
             };
             
-            // Update the info card
+            // Update UI
             currentFoodName.textContent = item.name;
             currentFoodPrice.textContent = item.price;
             currentFoodMeta.textContent = `${restaurant.name} • ${category.name}`;
             
-            // Load the 3D model
+            // Load model
             viewer.src = item.model;
-            viewer.iosSrc = item.iosModel;
             
-            // Re-render menus to show active state
+            // iOS: Use same GLB file for Quick Look (it converts automatically)
+            if (isIOS) {
+                viewer.iosSrc = item.model;
+            }
+            
             renderAllItems();
             renderFavorites();
             
-            console.log(`✅ Selected: ${item.name} from ${restaurant.name}`);
-            console.log(`📁 Model path: ${item.model}`);
+            console.log(`✅ Selected: ${item.name}`);
+            console.log(`📁 Model: ${item.model}`);
         }
 
-        // ==========================================
-        // MENU CONTROLS
-        // ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
+           🎛️ MENU CONTROLS
+           ═══════════════════════════════════════════════════════════════════ */
         
         function openMenu() {
             sideMenu.classList.add('open');
@@ -1166,10 +1132,6 @@
             menuOverlay.classList.remove('show');
         }
 
-        // ==========================================
-        // TAB SWITCHING (All Items / Favorites)
-        // ==========================================
-        
         function showAllItems() {
             allTab.classList.add('active');
             favTab.classList.remove('active');
@@ -1184,9 +1146,9 @@
             allItemsView.classList.add('hidden');
         }
 
-        // ==========================================
-        // THEME TOGGLE (Dark/Light)
-        // ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
+           🌙 THEME TOGGLE
+           ═══════════════════════════════════════════════════════════════════ */
         
         function toggleTheme() {
             const body = document.body;
@@ -1196,17 +1158,14 @@
                 body.classList.add('dark-theme');
                 themeBtn.textContent = '☀️';
                 localStorage.setItem('ar-menu-theme', 'dark');
-                console.log('🌙 Dark theme activated');
             } else {
                 body.classList.remove('dark-theme');
                 body.classList.add('light-theme');
                 themeBtn.textContent = '🌙';
                 localStorage.setItem('ar-menu-theme', 'light');
-                console.log('☀️ Light theme activated');
             }
         }
 
-        // Load saved theme preference
         function loadTheme() {
             const savedTheme = localStorage.getItem('ar-menu-theme');
             if (savedTheme === 'dark') {
@@ -1216,9 +1175,9 @@
             }
         }
 
-        // ==========================================
-        // SHARE FUNCTIONALITY
-        // ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
+           🔗 SHARE FUNCTIONALITY
+           ═══════════════════════════════════════════════════════════════════ */
         
         function openShareModal() {
             shareModal.classList.add('show');
@@ -1232,7 +1191,7 @@
             if (!currentItem) return;
             
             const shareUrl = window.location.href;
-            const shareText = `Check out this ${currentItem.name} in AR! ${currentItem.price}`;
+            const shareText = `Check out ${currentItem.name} in AR! ${currentItem.price}`;
             
             switch(platform) {
                 case 'whatsapp':
@@ -1243,7 +1202,7 @@
                     break;
                 case 'copy':
                     navigator.clipboard.writeText(shareUrl).then(() => {
-                        alert('✅ Link copied to clipboard!');
+                        alert('✅ Link copied!');
                     });
                     break;
                 case 'native':
@@ -1253,8 +1212,6 @@
                             text: shareText,
                             url: shareUrl
                         });
-                    } else {
-                        alert('❌ Share not supported on this browser');
                     }
                     break;
             }
@@ -1262,10 +1219,9 @@
             closeShareModal();
         }
 
-        // ==========================================
-        // EVENT LISTENERS
-        // Connect buttons to functions
-        // ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
+           🔘 EVENT LISTENERS - Button clicks
+           ═══════════════════════════════════════════════════════════════════ */
         
         menuBtn.addEventListener('click', openMenu);
         favBtn.addEventListener('click', () => {
@@ -1279,30 +1235,37 @@
         allTab.addEventListener('click', showAllItems);
         favTab.addEventListener('click', showFavorites);
 
-        // Share options
         document.querySelectorAll('.share-option').forEach(option => {
             option.addEventListener('click', () => {
                 shareItem(option.dataset.platform);
             });
         });
 
-        // AR button click (triggers model-viewer AR mode)
+        // AR Button - Special handling for iOS
         arButton.addEventListener('click', () => {
-            viewer.activateAR();
+            if (isIOS) {
+                // iOS: Trigger Quick Look directly
+                const link = document.createElement('a');
+                link.rel = 'ar';
+                link.href = currentItem.model;
+                link.click();
+            } else {
+                // Android: Use model-viewer's built-in AR
+                viewer.activateAR();
+            }
         });
 
-        // ==========================================
-        // AR VIEWER EVENTS
-        // Monitor what's happening with the 3D viewer
-        // ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
+           📡 AR VIEWER EVENTS
+           ═══════════════════════════════════════════════════════════════════ */
         
         viewer.addEventListener('load', () => {
-            console.log('✅ 3D model loaded successfully!');
+            console.log('✅ Model loaded');
         });
 
         viewer.addEventListener('ar-status', (event) => {
             if (event.detail.status === 'session-started') {
-                console.log('🎉 AR session started!');
+                console.log('🎉 AR started');
                 instructions.style.display = 'none';
             } else if (event.detail.status === 'not-presenting') {
                 instructions.style.display = 'block';
@@ -1310,39 +1273,43 @@
         });
 
         viewer.addEventListener('error', (event) => {
-            console.error('❌ Error loading model:', event);
-            alert('Could not load 3D model. Please check the file path.');
+            console.error('❌ Error:', event);
+            alert('Could not load model. Check file path.');
         });
 
-        // ==========================================
-        // INITIALIZATION
-        // Run when page loads
-        // ==========================================
+        /* ═══════════════════════════════════════════════════════════════════
+           🚀 INITIALIZATION - Run when page loads
+           ═══════════════════════════════════════════════════════════════════ */
         
         function init() {
-            console.log('🚀 AR Menu Platform Initializing...');
+            console.log('🚀 AR Menu Starting...');
             
+            // Detect device
+            detectIOS();
+            
+            // Load saved data
             loadFavorites();
             loadTheme();
+            
+            // Render menus
             renderAllItems();
             renderFavorites();
             
-            // Select first item by default
-            const firstRestaurant = restaurantsData[0];
+            // Select first item
+            const firstRestaurant = RESTAURANTS[0];
             const firstCategory = firstRestaurant.categories[0];
             const firstItem = firstCategory.items[0];
             selectItem(firstItem, firstRestaurant, firstCategory);
             
-            // Expand first restaurant by default
+            // Expand first restaurant
             expandedRestaurants.push(firstRestaurant.id);
             renderAllItems();
             
             console.log('✅ AR Menu Ready!');
-            console.log('🏪 Restaurants loaded:', restaurantsData.length);
-            console.log('📦 Total items:', restaurantsData.reduce((sum, r) => sum + r.categories.reduce((s, c) => s + c.items.length, 0), 0));
+            console.log(`🏪 ${RESTAURANTS.length} restaurants loaded`);
         }
 
-        // Start the app!
+        // START THE APP!
         init();
     </script>
 
