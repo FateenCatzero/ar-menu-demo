@@ -2,40 +2,189 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AR Menu - View Food on Your Table</title>
     
-    <!-- This is Google's AR library - it does all the hard work for us -->
+    <!-- Google's Model Viewer library - handles all AR functionality -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
     
     <style>
-        /* Remove default spacing */
-        body {
+        /* ==========================================
+           GLOBAL STYLES - Affects entire page
+           ========================================== */
+        
+        * {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            height: 100vh;
-            overflow: hidden;
+            box-sizing: border-box; /* Makes width/height calculations easier */
         }
 
-        /* Make AR viewer fill the screen */
-        model-viewer {
-            width: 100%;
-            height: 100%;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh; /* Full screen height */
+            overflow: hidden; /* Prevents scrolling */
+            transition: background 0.3s ease; /* Smooth theme transition */
         }
 
-        /* Top bar with food info */
-        .info-bar {
+        /* LIGHT THEME BACKGROUND (default) */
+        body.light-theme {
+            background: linear-gradient(135deg, #E8E8E8FF 0%, #d0d0d0 100%);
+        }
+
+        /* DARK THEME BACKGROUND */
+        body.dark-theme {
+            background: linear-gradient(135deg, #191919FF 0%, #2a2a2a 100%);
+        }
+
+        /* ==========================================
+           TOP NAVIGATION BAR - Menu and Theme Toggle
+           ========================================== */
+        
+        .top-nav {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
+            display: flex;
+            justify-content: space-between; /* Space between menu and theme button */
+            align-items: center;
+            padding: 15px 20px;
             background: rgba(0, 0, 0, 0.7);
+            z-index: 100; /* Appears above everything */
+        }
+
+        /* HAMBURGER MENU BUTTON (☰) */
+        .menu-button {
+            background: none;
+            border: none;
             color: white;
-            padding: 20px;
+            font-size: 32px;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: transform 0.2s;
+        }
+
+        .menu-button:active {
+            transform: scale(0.9); /* Shrinks slightly when tapped */
+        }
+
+        /* THEME TOGGLE BUTTON (🌙/☀️) */
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%; /* Makes it circular */
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(180deg); /* Fun spin effect */
+        }
+
+        /* ==========================================
+           SIDE MENU - Food Item Selector
+           ========================================== */
+        
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px; /* Hidden off-screen by default */
+            width: 300px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 80px 20px 20px; /* Extra top padding for nav bar */
+            z-index: 99;
+            transition: left 0.3s ease; /* Smooth slide animation */
+            overflow-y: auto; /* Allows scrolling if many items */
+        }
+
+        /* WHEN MENU IS OPEN - slides into view */
+        .side-menu.open {
+            left: 0;
+        }
+
+        .menu-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 10px;
+        }
+
+        /* EACH FOOD ITEM IN THE MENU */
+        .menu-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        /* HOVER/TAP EFFECT */
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px); /* Slides right slightly */
+        }
+
+        /* CURRENTLY SELECTED ITEM */
+        .menu-item.active {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .menu-item-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .menu-item-price {
+            font-size: 18px;
+            color: #fbbf24;
+        }
+
+        /* CLOSE MENU OVERLAY - tap outside menu to close */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 98;
+            display: none; /* Hidden by default */
+        }
+
+        .menu-overlay.show {
+            display: block; /* Shows when menu is open */
+        }
+
+        /* ==========================================
+           CURRENT FOOD INFO DISPLAY
+           ========================================== */
+        
+        .info-card {
+            position: absolute;
+            top: 80px; /* Below the nav bar */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 20px;
             text-align: center;
             z-index: 10;
+            min-width: 250px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .food-name {
@@ -45,125 +194,404 @@
         }
 
         .food-price {
-            font-size: 22px;
+            font-size: 24px;
             color: #fbbf24;
+            font-weight: bold;
         }
 
-        /* Style the AR button */
+        /* ==========================================
+           AR VIEWER - The 3D model display area
+           ========================================== */
+        
+        model-viewer {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ==========================================
+           AR BUTTON - "View on Your Table"
+           ========================================== */
+        
         .ar-button {
             position: absolute;
-            bottom: 30px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            background: #10b981;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             border: none;
-            padding: 18px 40px;
+            padding: 20px 50px;
             font-size: 20px;
             font-weight: bold;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
             z-index: 10;
+            transition: all 0.3s;
         }
 
         .ar-button:active {
             transform: translateX(-50%) scale(0.95);
         }
 
-        /* Instructions */
+        .ar-button:hover {
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.6);
+        }
+
+        /* ==========================================
+           INSTRUCTIONS - How to use AR
+           ========================================== */
+        
         .instructions {
             position: absolute;
-            bottom: 100px;
+            bottom: 120px;
             left: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             color: white;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 15px 20px;
+            border-radius: 15px;
             text-align: center;
             font-size: 16px;
             z-index: 10;
+            line-height: 1.5;
         }
 
-        /* Loading message */
+        /* ==========================================
+           LOADING INDICATOR
+           ========================================== */
+        
         .loading {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
-            font-size: 18px;
+            font-size: 20px;
             text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px 40px;
+            border-radius: 20px;
+        }
+
+        /* Spinning animation */
+        .loading::after {
+            content: '⏳';
+            display: block;
+            font-size: 40px;
+            margin-top: 10px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ==========================================
+           RESPONSIVE - Adjusts for smaller screens
+           ========================================== */
+        
+        @media (max-width: 400px) {
+            .food-name {
+                font-size: 24px;
+            }
+            
+            .ar-button {
+                padding: 18px 40px;
+                font-size: 18px;
+            }
+            
+            .side-menu {
+                width: 280px;
+                left: -280px;
+            }
         }
     </style>
 </head>
-<body>
+<body class="light-theme">
 
-    <!-- Top info bar -->
-    <div class="info-bar">
-        <div class="food-name">🍕 FlatWhite_Small_FriendsPerkCafe</div>
-        <div class="food-price">$03</div>
+    <!-- ==========================================
+         TOP NAVIGATION BAR
+         ========================================== -->
+    
+    <div class="top-nav">
+        <!-- Menu button - opens side panel -->
+        <button class="menu-button" id="menuBtn" aria-label="Open menu">☰</button>
+        
+        <!-- Theme toggle button -->
+        <button class="theme-toggle" id="themeBtn" aria-label="Toggle theme">🌙</button>
     </div>
 
-    <!-- Instructions -->
-    <div class="instructions">
-        👇 Tap the button below to view this burger on your table in AR!
+    <!-- ==========================================
+         SIDE MENU - Food selection panel
+         ========================================== -->
+    
+    <!-- Overlay - closes menu when tapped -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    
+    <!-- The actual menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-title">🍽️ Select Food Item</div>
+        
+        <!-- Each menu item will be generated by JavaScript -->
+        <div id="menuItems"></div>
     </div>
 
-    <!-- The AR Viewer - This is the magic component -->
+    <!-- ==========================================
+         CURRENT FOOD INFO CARD
+         ========================================== -->
+    
+    <div class="info-card">
+        <div class="food-name" id="currentFoodName">🍔 Classic Burger</div>
+        <div class="food-price" id="currentFoodPrice">$12.99</div>
+    </div>
+
+    <!-- ==========================================
+         INSTRUCTIONS
+         ========================================== -->
+    
+    <div class="instructions" id="instructions">
+        📱 Tap the button below to place this item on your table in AR!<br>
+        <small>Move your phone slowly to detect surfaces</small>
+    </div>
+
+    <!-- ==========================================
+         AR VIEWER - The 3D model component
+         ========================================== -->
+    
     <model-viewer
         id="ar-viewer"
-        src="FlatWhite_Small_FriendsPerkCafe.glb"
-        ios-src="FlatWhite_Small_FriendsPerkCafe.glb"
-        alt="A 3D model of a Coffee Cup"
+        src="https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb"
+        ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
+        alt="3D food model"
         ar
         ar-modes="webxr scene-viewer quick-look"
         camera-controls
-        auto-rotate
         shadow-intensity="1"
         camera-orbit="0deg 75deg 2.5m"
-        min-camera-orbit="auto auto auto"
-        max-camera-orbit="auto auto auto">
+        environment-image="neutral"
+        exposure="1">
         
         <!-- Custom AR Button -->
         <button slot="ar-button" class="ar-button">
             📱 View on Your Table
         </button>
 
-        <!-- Loading indicator -->
+        <!-- Loading message -->
         <div class="loading" slot="poster">
             Loading 3D model...
         </div>
     </model-viewer>
 
+    <!-- ==========================================
+         JAVASCRIPT - All the interactive logic
+         ========================================== -->
+    
     <script>
-        // Get the AR viewer element
-        const viewer = document.querySelector('model-viewer');
+        // ==========================================
+        // FOOD ITEMS DATABASE
+        // Add more items here to expand your menu
+        // ==========================================
         
-        // When model loads successfully
+        const foodItems = [
+            {
+                id: 'burger',
+                name: '🍔 Classic Burger',
+                price: '$12.99',
+                model: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb',
+                iosModel: 'https://modelviewer.dev/shared-assets/models/Astronaut.usdz'
+            },
+            {
+                id: 'pizza',
+                name: '🍕 Pizza Margherita',
+                price: '$16.99',
+                model: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb',
+                iosModel: 'https://modelviewer.dev/shared-assets/models/Astronaut.usdz'
+            },
+            {
+                id: 'salad',
+                name: '🥗 Caesar Salad',
+                price: '$9.99',
+                model: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb',
+                iosModel: 'https://modelviewer.dev/shared-assets/models/Astronaut.usdz'
+            },
+            {
+                id: 'pasta',
+                name: '🍝 Spaghetti Carbonara',
+                price: '$14.99',
+                model: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb',
+                iosModel: 'https://modelviewer.dev/shared-assets/models/Astronaut.usdz'
+            }
+        ];
+
+        // ==========================================
+        // GET REFERENCES TO HTML ELEMENTS
+        // ==========================================
+        
+        const viewer = document.querySelector('model-viewer');
+        const menuBtn = document.getElementById('menuBtn');
+        const sideMenu = document.getElementById('sideMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const menuItemsContainer = document.getElementById('menuItems');
+        const themeBtn = document.getElementById('themeBtn');
+        const currentFoodName = document.getElementById('currentFoodName');
+        const currentFoodPrice = document.getElementById('currentFoodPrice');
+        const instructions = document.getElementById('instructions');
+
+        // ==========================================
+        // KEEP TRACK OF CURRENT SELECTION
+        // ==========================================
+        
+        let currentItemId = 'burger'; // Start with burger selected
+
+        // ==========================================
+        // FUNCTION: CREATE MENU ITEMS
+        // This builds the list of food items in the side menu
+        // ==========================================
+        
+        function createMenuItems() {
+            // Clear existing items
+            menuItemsContainer.innerHTML = '';
+            
+            // Loop through each food item
+            foodItems.forEach(item => {
+                // Create a div for this menu item
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'menu-item';
+                
+                // Mark as active if it's the current item
+                if (item.id === currentItemId) {
+                    itemDiv.classList.add('active');
+                }
+                
+                // Add the HTML content
+                itemDiv.innerHTML = `
+                    <div class="menu-item-name">${item.name}</div>
+                    <div class="menu-item-price">${item.price}</div>
+                `;
+                
+                // What happens when this item is clicked
+                itemDiv.addEventListener('click', () => {
+                    selectFoodItem(item.id);
+                    closeMenu();
+                });
+                
+                // Add to the menu
+                menuItemsContainer.appendChild(itemDiv);
+            });
+        }
+
+        // ==========================================
+        // FUNCTION: SELECT A FOOD ITEM
+        // Updates the 3D model and info display
+        // ==========================================
+        
+        function selectFoodItem(itemId) {
+            // Find the food item data
+            const item = foodItems.find(food => food.id === itemId);
+            if (!item) return; // Exit if not found
+            
+            // Update current selection
+            currentItemId = itemId;
+            
+            // Update the info card
+            currentFoodName.textContent = item.name;
+            currentFoodPrice.textContent = item.price;
+            
+            // Update the 3D model
+            viewer.src = item.model;
+            viewer.iosSrc = item.iosModel;
+            
+            // Update active state in menu
+            createMenuItems();
+            
+            console.log(`✅ Switched to: ${item.name}`);
+        }
+
+        // ==========================================
+        // FUNCTION: OPEN MENU
+        // ==========================================
+        
+        function openMenu() {
+            sideMenu.classList.add('open');
+            menuOverlay.classList.add('show');
+        }
+
+        // ==========================================
+        // FUNCTION: CLOSE MENU
+        // ==========================================
+        
+        function closeMenu() {
+            sideMenu.classList.remove('open');
+            menuOverlay.classList.remove('show');
+        }
+
+        // ==========================================
+        // FUNCTION: TOGGLE THEME (Dark/Light)
+        // ==========================================
+        
+        function toggleTheme() {
+            const body = document.body;
+            
+            if (body.classList.contains('light-theme')) {
+                // Switch to dark theme
+                body.classList.remove('light-theme');
+                body.classList.add('dark-theme');
+                themeBtn.textContent = '☀️'; // Sun icon for "switch to light"
+                console.log('🌙 Dark theme activated');
+            } else {
+                // Switch to light theme
+                body.classList.remove('dark-theme');
+                body.classList.add('light-theme');
+                themeBtn.textContent = '🌙'; // Moon icon for "switch to dark"
+                console.log('☀️ Light theme activated');
+            }
+        }
+
+        // ==========================================
+        // EVENT LISTENERS - Button clicks
+        // ==========================================
+        
+        menuBtn.addEventListener('click', openMenu);
+        menuOverlay.addEventListener('click', closeMenu);
+        themeBtn.addEventListener('click', toggleTheme);
+
+        // ==========================================
+        // AR VIEWER EVENT LISTENERS
+        // ==========================================
+        
+        // When 3D model finishes loading
         viewer.addEventListener('load', () => {
-            console.log('✅ 3D model loaded!');
+            console.log('✅ 3D model loaded successfully!');
         });
 
         // When AR session starts
         viewer.addEventListener('ar-status', (event) => {
             if (event.detail.status === 'session-started') {
                 console.log('🎉 AR session started!');
-                document.querySelector('.instructions').style.display = 'none';
+                instructions.style.display = 'none'; // Hide instructions
             } else if (event.detail.status === 'not-presenting') {
-                document.querySelector('.instructions').style.display = 'block';
+                instructions.style.display = 'block'; // Show instructions again
             }
         });
 
-        // If there's an error
+        // If there's an error loading the model
         viewer.addEventListener('error', (event) => {
-            console.error('❌ Error:', event);
+            console.error('❌ Error loading model:', event);
             alert('Could not load 3D model. Please check your internet connection.');
         });
 
-        // Log when page loads
-        console.log('🚀 AR Menu loaded! Ready to view in AR.');
+        // ==========================================
+        // INITIALIZE ON PAGE LOAD
+        // ==========================================
+        
+        // Create the menu items when page loads
+        createMenuItems();
+        
+        // Log that everything is ready
+        console.log('🚀 AR Menu app loaded!');
+        console.log('📱 Current device:', navigator.userAgent);
     </script>
 
 </body>
