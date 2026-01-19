@@ -5,48 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AR Food Menu</title>
     
-    <!-- Google's Model Viewer Library - Handles all AR magic -->
+    <!-- Google's Model Viewer Library -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
     
     <style>
-        /* ═══════════════════════════════════════════════════════════════════
-           CSS VARIABLES - Change colors here!
-           ═══════════════════════════════════════════════════════════════════ */
-        
         :root {
-            /* Light Theme Colors */
             --light-bg: #E8E8E8FF;
             --light-bg-secondary: #f5f5f5;
             --light-text: #1a1a1a;
-            
-            /* Dark Theme Colors */
             --dark-bg: #191919FF;
             --dark-bg-secondary: #2a2a2a;
             --dark-text: #ffffff;
-            
-            /* Brand Colors - Change these to customize look */
-            --color-primary: #6366f1;        /* Purple-blue */
-            --color-secondary: #8b5cf6;      /* Purple */
-            --color-success: #10b981;        /* Green (AR button) */
-            --color-warning: #f59e0b;        /* Orange (prices) */
-            --color-favorite: #ef4444;       /* Red (hearts) */
-            
-            /* Spacing */
+            --color-primary: #6366f1;
+            --color-secondary: #8b5cf6;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-favorite: #ef4444;
             --space-sm: 8px;
             --space-md: 16px;
             --space-lg: 24px;
-            
-            /* Border Radius */
             --radius-sm: 8px;
             --radius-md: 16px;
             --radius-lg: 24px;
             --radius-full: 9999px;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           RESET & BASE STYLES
-           ═══════════════════════════════════════════════════════════════════ */
-        
         * {
             margin: 0;
             padding: 0;
@@ -60,22 +43,17 @@
             transition: background 0.3s ease;
         }
 
-        /* Light theme (default) */
         body.light-theme {
             background: linear-gradient(135deg, var(--light-bg) 0%, var(--light-bg-secondary) 100%);
             color: var(--light-text);
         }
 
-        /* Dark theme */
         body.dark-theme {
             background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-secondary) 100%);
             color: var(--dark-text);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           TOP NAVIGATION BAR
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* Top Navigation */
         .top-nav {
             position: fixed;
             top: 0;
@@ -97,7 +75,6 @@
             align-items: center;
         }
 
-        /* All icon buttons (menu, favorites, theme) */
         .icon-btn {
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -118,7 +95,6 @@
             transform: scale(0.95);
         }
 
-        /* Favorite counter badge */
         .fav-counter {
             position: absolute;
             top: -5px;
@@ -140,11 +116,7 @@
             display: flex;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           SIDE MENU
-           ═══════════════════════════════════════════════════════════════════ */
-        
-        /* Dark overlay when menu is open */
+        /* Side Menu */
         .menu-overlay {
             position: fixed;
             top: 0;
@@ -161,7 +133,6 @@
             display: block;
         }
 
-        /* The sliding menu panel */
         .side-menu {
             position: fixed;
             top: 0;
@@ -182,7 +153,6 @@
             left: 0;
         }
 
-        /* Menu header with gradient */
         .menu-header {
             padding: var(--space-lg);
             padding-top: 80px;
@@ -203,7 +173,6 @@
             opacity: 0.9;
         }
 
-        /* Tabs: All Items / Favorites */
         .menu-tabs {
             display: flex;
             gap: var(--space-sm);
@@ -232,12 +201,10 @@
             color: var(--dark-bg);
         }
 
-        /* Restaurant section */
         .restaurant-section {
             margin: var(--space-md);
         }
 
-        /* Restaurant header (clickable to expand) */
         .restaurant-header {
             display: flex;
             align-items: center;
@@ -273,7 +240,6 @@
             transform: rotate(180deg);
         }
 
-        /* Category section (hidden by default, shown when restaurant expanded) */
         .category-section {
             margin-left: var(--space-md);
             margin-bottom: var(--space-md);
@@ -294,7 +260,6 @@
             padding-left: var(--space-sm);
         }
 
-        /* Individual menu items */
         .menu-item {
             background: rgba(255, 255, 255, 0.08);
             padding: var(--space-md);
@@ -313,7 +278,6 @@
             transform: translateX(4px);
         }
 
-        /* Currently selected item */
         .menu-item.active {
             border-color: var(--color-success);
             background: rgba(16, 185, 129, 0.2);
@@ -335,7 +299,6 @@
             font-weight: bold;
         }
 
-        /* Favorite heart button on each item */
         .item-fav-btn {
             background: none;
             border: none;
@@ -349,7 +312,6 @@
             transform: scale(1.3);
         }
 
-        /* Empty state (when no favorites) */
         .empty-state {
             text-align: center;
             padding: 40px var(--space-lg);
@@ -365,10 +327,7 @@
             font-size: 16px;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           CURRENT ITEM INFO CARD
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* Info Card */
         .info-card {
             position: absolute;
             top: 90px;
@@ -405,36 +364,39 @@
             margin-top: var(--space-sm);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           AR VIEWER - The 3D model display
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* AR Viewer */
         model-viewer {
             width: 100%;
             height: 100%;
         }
 
-        /* Loading message */
-        .loading {
+        /* Loading Progress Bar */
+        .loading-overlay {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 18px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.85);
-            padding: var(--space-lg) 40px;
-            border-radius: var(--radius-lg);
-            backdrop-filter: blur(10px);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            flex-direction: column;
+            gap: var(--space-lg);
         }
 
-        .loading::after {
-            content: '⏳';
-            display: block;
-            font-size: 40px;
-            margin-top: var(--space-sm);
-            animation: spin 2s linear infinite;
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
@@ -442,10 +404,74 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           BOTTOM ACTION BAR
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        .loading-text {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .loading-progress {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            background: var(--color-success);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Error Message */
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(239, 68, 68, 0.95);
+            color: white;
+            padding: var(--space-lg) 30px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            z-index: 60;
+            max-width: 80%;
+            display: none;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .error-message.show {
+            display: flex;
+        }
+
+        .error-icon {
+            font-size: 48px;
+        }
+
+        .error-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .error-text {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .error-close {
+            background: white;
+            color: #ef4444;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Bottom Bar */
         .bottom-bar {
             position: fixed;
             bottom: var(--space-lg);
@@ -456,7 +482,6 @@
             z-index: 10;
         }
 
-        /* Main AR button */
         .ar-button {
             background: linear-gradient(135deg, var(--color-success), #059669);
             color: white;
@@ -477,7 +502,6 @@
             transform: translateY(0) scale(0.98);
         }
 
-        /* Share button */
         .action-btn {
             background: rgba(255, 255, 255, 0.9);
             border: none;
@@ -497,16 +521,13 @@
             transform: scale(0.95);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           INSTRUCTIONS
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* Instructions Panel */
         .instructions {
             position: absolute;
             bottom: 130px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(10px);
             color: white;
             padding: var(--space-md) var(--space-lg);
@@ -517,12 +538,59 @@
             max-width: 90%;
             line-height: 1.6;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           SHARE MODAL
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        .instructions.hidden {
+            display: none;
+        }
+
+        .instructions-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Help Button */
+        .help-btn {
+            position: fixed;
+            bottom: 200px;
+            right: var(--space-lg);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .help-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Share Modal */
         .share-modal {
             position: fixed;
             bottom: -100%;
@@ -603,18 +671,10 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           UTILITY CLASSES
-           ═══════════════════════════════════════════════════════════════════ */
-        
         .hidden {
             display: none !important;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           RESPONSIVE - Mobile adjustments
-           ═══════════════════════════════════════════════════════════════════ */
-        
         @media (max-width: 400px) {
             .food-name {
                 font-size: 20px;
@@ -633,10 +693,7 @@
 </head>
 <body class="light-theme">
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         TOP NAVIGATION
-         ═══════════════════════════════════════════════════════════════════ -->
-    
+    <!-- Top Navigation -->
     <div class="top-nav">
         <div class="nav-left">
             <button class="icon-btn" id="menuBtn" title="Menu">☰</button>
@@ -650,29 +707,22 @@
         </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         SIDE MENU
-         ═══════════════════════════════════════════════════════════════════ -->
-    
+    <!-- Side Menu -->
     <div class="menu-overlay" id="menuOverlay"></div>
     
     <div class="side-menu" id="sideMenu">
-        <!-- Header -->
         <div class="menu-header">
             <div class="menu-title">🍽️ AR Food Menu</div>
             <div class="menu-subtitle">Choose an item to view in AR</div>
         </div>
 
-        <!-- Tabs -->
         <div class="menu-tabs">
             <button class="menu-tab active" id="allTab">All Items</button>
             <button class="menu-tab" id="favTab">Favorites</button>
         </div>
 
-        <!-- All Items View -->
         <div id="allItemsView"></div>
 
-        <!-- Favorites View -->
         <div id="favoritesView" class="hidden">
             <div class="empty-state" id="emptyFavorites">
                 <div class="empty-state-icon">💔</div>
@@ -682,33 +732,29 @@
         </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         CURRENT ITEM INFO
-         ═══════════════════════════════════════════════════════════════════ -->
-    
+    <!-- Current Item Info -->
     <div class="info-card">
         <div class="food-name" id="currentFoodName">🔵 Blue Artifact</div>
         <div class="food-price" id="currentFoodPrice">$9.99</div>
         <div class="food-meta" id="currentFoodMeta">Candle Cafe • All Items</div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         INSTRUCTIONS
-         ═══════════════════════════════════════════════════════════════════ -->
-    
+    <!-- Instructions Panel -->
     <div class="instructions" id="instructions">
-        📱 Tap "View in AR" to place on your table<br>
-        <small>Move phone slowly to detect surfaces</small>
+        <button class="instructions-close" id="instructionsClose">×</button>
+        <div>📱 Tap "View in AR" to place on your table</div>
+        <div><small>Move phone slowly to detect surfaces</small></div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         AR VIEWER - The 3D Model Display
-         ═══════════════════════════════════════════════════════════════════ -->
-    
+    <!-- Help Button (appears after closing instructions) -->
+    <button class="help-btn hidden" id="helpBtn" title="Show Instructions">❓</button>
+
+    <!-- AR Viewer -->
     <model-viewer
         id="ar-viewer"
         src="Restaurants/Candle Cafe/All Items/Blue Artifact.glb"
         ios-src="Restaurants/Candle%20Cafe/All%20Items/Blue%20Artifact.usdz"
+        poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23191919' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='%23ffffff'%3ELoading...%3C/text%3E%3C/svg%3E"
         alt="3D model"
         ar
         ar-modes="webxr scene-viewer quick-look"
@@ -718,17 +764,26 @@
         environment-image="neutral"
         exposure="1"
         shadow-softness="1">
-        
-        <!-- Loading message -->
-        <div class="loading" slot="poster">
-            Loading 3D model...
-        </div>
     </model-viewer>
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         BOTTOM ACTION BAR
-         ═══════════════════════════════════════════════════════════════════ -->
-    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading 3D Model...</div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar" id="loadingProgressBar"></div>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" id="errorMessage">
+        <div class="error-icon">⚠️</div>
+        <div class="error-title" id="errorTitle">Oops!</div>
+        <div class="error-text" id="errorText">Something went wrong</div>
+        <button class="error-close" id="errorClose">Try Again</button>
+    </div>
+
+    <!-- Bottom Action Bar -->
     <div class="bottom-bar">
         <button class="ar-button" id="arButton">
             <span>📱</span>
@@ -737,10 +792,7 @@
         <button class="action-btn" id="shareBtn" title="Share">🔗</button>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         SHARE MODAL
-         ═══════════════════════════════════════════════════════════════════ -->
-    
+    <!-- Share Modal -->
     <div class="share-modal" id="shareModal">
         <div class="share-header">Share this item!</div>
         <div class="share-options">
@@ -764,28 +816,10 @@
         <button class="share-close" id="shareClose">Close</button>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         JAVASCRIPT - ALL YOUR DATA & LOGIC
-         ═══════════════════════════════════════════════════════════════════ -->
-    
     <script>
         /* ═══════════════════════════════════════════════════════════════════
-           📝 YOUR RESTAURANT DATA - EDIT THIS TO ADD/CHANGE ITEMS
-           ═══════════════════════════════════════════════════════════════════
-           
-           How to add a new item:
-           1. Go to the restaurant you want
-           2. Add a new object inside the "items" array
-           3. Fill in: id, name, price, model path
-           
-           Example:
-           {
-               id: 'new-dish',
-               name: '🍕 New Pizza',
-               price: '$15.99',
-               model: 'Restaurants/YourCafe/YourFolder/YourFile.glb'
-           }
-        */
+           📝 RESTAURANT DATA
+           ═══════════════════════════════════════════════════════════════════ */
         
         const RESTAURANTS = [
             {
@@ -875,6 +909,8 @@
         const currentFoodPrice = document.getElementById('currentFoodPrice');
         const currentFoodMeta = document.getElementById('currentFoodMeta');
         const instructions = document.getElementById('instructions');
+        const instructionsClose = document.getElementById('instructionsClose');
+        const helpBtn = document.getElementById('helpBtn');
         const arButton = document.getElementById('arButton');
         const shareBtn = document.getElementById('shareBtn');
         const shareModal = document.getElementById('shareModal');
@@ -884,22 +920,75 @@
         const allItemsView = document.getElementById('allItemsView');
         const favoritesView = document.getElementById('favoritesView');
         const favCounter = document.getElementById('favCounter');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingProgressBar = document.getElementById('loadingProgressBar');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorTitle = document.getElementById('errorTitle');
+        const errorText = document.getElementById('errorText');
+        const errorClose = document.getElementById('errorClose');
 
         /* ═══════════════════════════════════════════════════════════════════
-           💾 STATE - What's currently happening
+           💾 STATE
            ═══════════════════════════════════════════════════════════════════ */
         
-        let currentItem = null;              // Currently selected item
-        let favorites = [];                  // Array of favorited item IDs
-        let expandedRestaurants = [];        // Which restaurants are expanded in menu
-        let isIOS = false;                   // Are we on iOS?
+        let currentItem = null;
+        let favorites = [];
+        let expandedRestaurants = [];
+        let isIOS = false;
+        
+        /* ═══════════════════════════════════════════════════════════════════
+           📊 ANALYTICS SYSTEM
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        const analytics = {
+            sessionStart: Date.now(),
+            itemViews: {},
+            arActivations: 0,
+            shareClicks: 0,
+            deviceType: ''
+        };
+        
+        function trackItemView(itemId, itemName) {
+            if (!analytics.itemViews[itemId]) {
+                analytics.itemViews[itemId] = { name: itemName, count: 0 };
+            }
+            analytics.itemViews[itemId].count++;
+            console.log(`📊 Analytics: ${itemName} viewed ${analytics.itemViews[itemId].count} time(s)`);
+        }
+        
+        function trackARActivation() {
+            analytics.arActivations++;
+            console.log(`📊 Analytics: AR activated ${analytics.arActivations} time(s) this session`);
+        }
+        
+        function trackShareClick() {
+            analytics.shareClicks++;
+            console.log(`📊 Analytics: Share clicked ${analytics.shareClicks} time(s)`);
+        }
+        
+        function getAnalyticsSummary() {
+            const sessionDuration = Math.round((Date.now() - analytics.sessionStart) / 1000);
+            return {
+                sessionDuration,
+                deviceType: analytics.deviceType,
+                itemViews: analytics.itemViews,
+                arActivations: analytics.arActivations,
+                shareClicks: analytics.shareClicks
+            };
+        }
+        
+        // Log analytics on page close
+        window.addEventListener('beforeunload', () => {
+            console.log('📊 SESSION SUMMARY:', getAnalyticsSummary());
+        });
 
         /* ═══════════════════════════════════════════════════════════════════
-           🍎 iOS DETECTION & AR FIX
+           🍎 iOS DETECTION
            ═══════════════════════════════════════════════════════════════════ */
         
         function detectIOS() {
             isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+            analytics.deviceType = isIOS ? 'iOS' : 'Android';
             console.log(isIOS ? '🍎 iOS device detected' : '🤖 Android device detected');
             return isIOS;
         }
@@ -943,7 +1032,107 @@
         }
 
         /* ═══════════════════════════════════════════════════════════════════
-           🎨 RENDERING - Build the visual menu
+           🔗 URL PARAMETER SYSTEM - Unique URLs for each item
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function getURLParameters() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                restaurant: params.get('restaurant'),
+                item: params.get('item')
+            };
+        }
+        
+        function updateURL(restaurantId, itemId) {
+            const url = new URL(window.location);
+            url.searchParams.set('restaurant', restaurantId);
+            url.searchParams.set('item', itemId);
+            window.history.pushState({}, '', url);
+        }
+        
+        function getShareableURL(restaurantId, itemId) {
+            const url = new URL(window.location.origin + window.location.pathname);
+            url.searchParams.set('restaurant', restaurantId);
+            url.searchParams.set('item', itemId);
+            return url.toString();
+        }
+        
+        function findItemByURL() {
+            const { restaurant: restaurantId, item: itemId } = getURLParameters();
+            
+            if (!restaurantId || !itemId) return null;
+            
+            for (const restaurant of RESTAURANTS) {
+                if (restaurant.id === restaurantId) {
+                    for (const category of restaurant.categories) {
+                        for (const item of category.items) {
+                            if (item.id === itemId) {
+                                return { item, restaurant, category };
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return null;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           ⚠️ ERROR HANDLING
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function showError(title, message) {
+            errorTitle.textContent = title;
+            errorText.textContent = message;
+            errorMessage.classList.add('show');
+            loadingOverlay.classList.remove('show');
+        }
+        
+        function hideError() {
+            errorMessage.classList.remove('show');
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           ⏳ LOADING STATES
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function showLoading() {
+            loadingOverlay.classList.add('show');
+            loadingProgressBar.style.width = '0%';
+        }
+        
+        function hideLoading() {
+            loadingOverlay.classList.remove('show');
+        }
+        
+        function updateLoadingProgress(percent) {
+            loadingProgressBar.style.width = percent + '%';
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           📋 INSTRUCTIONS SYSTEM
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function hideInstructions() {
+            instructions.classList.add('hidden');
+            helpBtn.classList.remove('hidden');
+            localStorage.setItem('ar-instructions-dismissed', 'true');
+        }
+        
+        function showInstructions() {
+            instructions.classList.remove('hidden');
+            helpBtn.classList.add('hidden');
+        }
+        
+        function checkInstructionsState() {
+            const dismissed = localStorage.getItem('ar-instructions-dismissed');
+            if (dismissed === 'true') {
+                hideInstructions();
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           🎨 RENDERING
            ═══════════════════════════════════════════════════════════════════ */
         
         function renderAllItems() {
@@ -953,7 +1142,6 @@
                 const restaurantDiv = document.createElement('div');
                 restaurantDiv.className = 'restaurant-section';
                 
-                // Restaurant header
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'restaurant-header';
                 if (expandedRestaurants.includes(restaurant.id)) {
@@ -969,7 +1157,6 @@
                 headerDiv.addEventListener('click', () => toggleRestaurant(restaurant.id));
                 restaurantDiv.appendChild(headerDiv);
                 
-                // Categories
                 restaurant.categories.forEach(category => {
                     const categoryDiv = document.createElement('div');
                     categoryDiv.className = 'category-section';
@@ -982,7 +1169,6 @@
                     categoryHeader.textContent = category.name;
                     categoryDiv.appendChild(categoryHeader);
                     
-                    // Items
                     category.items.forEach(item => {
                         const itemDiv = createMenuItem(item, restaurant, category);
                         categoryDiv.appendChild(itemDiv);
@@ -1100,6 +1286,7 @@
             currentItem = {
                 ...item,
                 restaurant: restaurant.name,
+                restaurantId: restaurant.id,
                 category: category.name
             };
             
@@ -1108,22 +1295,25 @@
             currentFoodPrice.textContent = item.price;
             currentFoodMeta.textContent = `${restaurant.name} • ${category.name}`;
             
-            // Load models
-            // GLB for Android WebXR
-            viewer.src = item.modelGLB;
+            // Show loading
+            showLoading();
             
-            // USDZ for iOS Quick Look AR
-            // Encode the path to handle spaces in filenames
+            // Load models
+            viewer.src = item.modelGLB;
             const encodedUSDZ = item.modelUSDZ.split('/').map(encodeURIComponent).join('/');
             viewer.iosSrc = encodedUSDZ;
+            
+            // Update URL for sharing
+            updateURL(restaurant.id, item.id);
+            
+            // Track analytics
+            trackItemView(item.id, item.name);
             
             renderAllItems();
             renderFavorites();
             
             console.log(`✅ Selected: ${item.name}`);
-            console.log(`📁 GLB: ${item.modelGLB}`);
-            console.log(`📁 USDZ: ${item.modelUSDZ}`);
-            console.log(`📁 Encoded USDZ: ${encodedUSDZ}`);
+            console.log(`🔗 Shareable URL: ${getShareableURL(restaurant.id, item.id)}`);
         }
 
         /* ═══════════════════════════════════════════════════════════════════
@@ -1189,6 +1379,7 @@
         
         function openShareModal() {
             shareModal.classList.add('show');
+            trackShareClick();
         }
 
         function closeShareModal() {
@@ -1198,7 +1389,7 @@
         function shareItem(platform) {
             if (!currentItem) return;
             
-            const shareUrl = window.location.href;
+            const shareUrl = getShareableURL(currentItem.restaurantId, currentItem.id);
             const shareText = `Check out ${currentItem.name} in AR! ${currentItem.price}`;
             
             switch(platform) {
@@ -1210,7 +1401,9 @@
                     break;
                 case 'copy':
                     navigator.clipboard.writeText(shareUrl).then(() => {
-                        alert('✅ Link copied!');
+                        alert('✅ Link copied to clipboard!\n\n' + shareUrl);
+                    }).catch(() => {
+                        prompt('Copy this link:', shareUrl);
                     });
                     break;
                 case 'native':
@@ -1220,6 +1413,8 @@
                             text: shareText,
                             url: shareUrl
                         });
+                    } else {
+                        alert('Share not supported on this browser');
                     }
                     break;
             }
@@ -1228,7 +1423,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════════════
-           🔘 EVENT LISTENERS - Button clicks
+           🔘 EVENT LISTENERS
            ═══════════════════════════════════════════════════════════════════ */
         
         menuBtn.addEventListener('click', openMenu);
@@ -1242,74 +1437,105 @@
         shareClose.addEventListener('click', closeShareModal);
         allTab.addEventListener('click', showAllItems);
         favTab.addEventListener('click', showFavorites);
+        
+        // Instructions controls
+        instructionsClose.addEventListener('click', hideInstructions);
+        helpBtn.addEventListener('click', showInstructions);
+        
+        // Error close
+        errorClose.addEventListener('click', hideError);
 
+        // Share options
         document.querySelectorAll('.share-option').forEach(option => {
             option.addEventListener('click', () => {
                 shareItem(option.dataset.platform);
             });
         });
 
+        // AR Button
         arButton.addEventListener('click', () => {
-        viewer.activateAR();
-        console.log('🎯 AR activated');
+            viewer.activateAR();
+            trackARActivation();
         });
-    
 
         /* ═══════════════════════════════════════════════════════════════════
            📡 AR VIEWER EVENTS
            ═══════════════════════════════════════════════════════════════════ */
         
         viewer.addEventListener('load', () => {
-            console.log('✅ Model loaded');
+            console.log('✅ Model loaded successfully');
+            hideLoading();
+        });
+        
+        viewer.addEventListener('progress', (event) => {
+            const percent = Math.round(event.detail.totalProgress * 100);
+            updateLoadingProgress(percent);
+            console.log(`⏳ Loading: ${percent}%`);
         });
 
         viewer.addEventListener('ar-status', (event) => {
             if (event.detail.status === 'session-started') {
-                console.log('🎉 AR started');
-                instructions.style.display = 'none';
-            } else if (event.detail.status === 'not-presenting') {
-                instructions.style.display = 'block';
+                console.log('🎉 AR session started');
+            } else if (event.detail.status === 'failed') {
+                showError('AR Failed', 'Could not start AR session. Make sure you have good lighting and a clear surface.');
             }
         });
 
         viewer.addEventListener('error', (event) => {
-            console.error('❌ Error:', event);
-            alert('Could not load model. Check file path.');
+            console.error('❌ Model error:', event);
+            hideLoading();
+            
+            const errorMsg = event.detail?.message || 'Unknown error';
+            
+            if (errorMsg.includes('404') || errorMsg.includes('Not Found')) {
+                showError('Model Not Found', 'The 3D model file could not be found. Please try another item.');
+            } else if (errorMsg.includes('network') || errorMsg.includes('fetch')) {
+                showError('Network Error', 'Could not load model. Please check your internet connection and try again.');
+            } else if (errorMsg.includes('format') || errorMsg.includes('parse')) {
+                showError('Invalid Model', 'The 3D model file appears to be corrupted. Please try another item.');
+            } else {
+                showError('Loading Error', 'Could not load the 3D model. Please try again or select another item.');
+            }
         });
 
         /* ═══════════════════════════════════════════════════════════════════
-           🚀 INITIALIZATION - Run when page loads
+           🚀 INITIALIZATION
            ═══════════════════════════════════════════════════════════════════ */
         
         function init() {
-            console.log('🚀 AR Menu Starting...');
+            console.log('🚀 AR Menu Platform Starting...');
             
-            // Detect device
             detectIOS();
-            
-            // Load saved data
             loadFavorites();
             loadTheme();
-            
-            // Render menus
+            checkInstructionsState();
             renderAllItems();
             renderFavorites();
             
-            // Select first item
-            const firstRestaurant = RESTAURANTS[0];
-            const firstCategory = firstRestaurant.categories[0];
-            const firstItem = firstCategory.items[0];
-            selectItem(firstItem, firstRestaurant, firstCategory);
+            // Check if URL has specific item
+            const urlItem = findItemByURL();
             
-            // Expand first restaurant
-            expandedRestaurants.push(firstRestaurant.id);
+            if (urlItem) {
+                // Load item from URL
+                selectItem(urlItem.item, urlItem.restaurant, urlItem.category);
+                expandedRestaurants.push(urlItem.restaurant.id);
+                console.log('🔗 Loaded item from URL');
+            } else {
+                // Select first item by default
+                const firstRestaurant = RESTAURANTS[0];
+                const firstCategory = firstRestaurant.categories[0];
+                const firstItem = firstCategory.items[0];
+                selectItem(firstItem, firstRestaurant, firstCategory);
+                expandedRestaurants.push(firstRestaurant.id);
+            }
+            
             renderAllItems();
             
             console.log('✅ AR Menu Ready!');
             console.log(`🏪 ${RESTAURANTS.length} restaurants loaded`);
+            console.log('📊 Analytics tracking enabled');
         }
 
-        // START THE APP!
         init();
     </script>
 
