@@ -744,12 +744,16 @@
         alt="3D model"
         ar
         ar-modes="webxr scene-viewer quick-look"
+        ar-scale="fixed"
         camera-controls
         shadow-intensity="1"
-        camera-orbit="0deg 75deg 2.5m"
+        camera-orbit="0deg 75deg 1m"
+        min-camera-orbit="auto auto 0.5m"
+        max-camera-orbit="auto auto 10m"
         environment-image="neutral"
         exposure="1"
-        shadow-softness="1">
+        shadow-softness="1"
+        interaction-prompt="none">
     </model-viewer>
 
     <!-- ==========================================
