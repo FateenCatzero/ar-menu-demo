@@ -106,17 +106,18 @@
             background-clip: text;
         }
 
-        /* Search Bar - Above navigation buttons */
+        /* Search Bar - Below navigation buttons */
         .search-container {
             position: fixed;
-            top: 50px;
+            top: 90px;
             left: 12px;
             right: 12px;
-            z-index: 96;
+            z-index: 89;
             max-width: 500px;
             margin: 0 auto;
             pointer-events: none;
             display: none;
+            transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .search-container.show {
@@ -991,7 +992,7 @@
         /* Push info card down when search is open - HIGHER SPECIFICITY */
         .info-card.search-active,
         .info-card.minimized.search-active {
-            top: 160px !important;
+            top: 200px !important;
         }
 
         .info-card-content {
@@ -1337,11 +1338,23 @@
             opacity: 0.8;
         }
 
-        /* AR Viewer with Grid Floor */
+        /* AR Viewer with Grid Floor - Positioned below info card */
         model-viewer {
             width: 100%;
             height: 100%;
             --poster-color: transparent;
+            padding-top: 200px;
+            transition: padding-top 0.3s ease;
+        }
+
+        /* Adjust when info card is minimized */
+        body.info-minimized model-viewer {
+            padding-top: 180px;
+        }
+
+        /* Adjust when search is active */
+        body.search-active model-viewer {
+            padding-top: 280px;
         }
 
         .grid-floor {
@@ -4156,13 +4169,15 @@
 
         function toggleInfoCard() {
             isInfoMinimized = !isInfoMinimized;
-            
+
             if (isInfoMinimized) {
                 infoCard.classList.add('minimized');
+                document.body.classList.add('info-minimized');
                 minimizeBtn.textContent = '▲';
                 minimizeBtn.title = 'Expand';
             } else {
                 infoCard.classList.remove('minimized');
+                document.body.classList.remove('info-minimized');
                 minimizeBtn.textContent = '▼';
                 minimizeBtn.title = 'Minimize';
             }
@@ -4194,6 +4209,7 @@
             searchResults.classList.remove('show');
             searchClear.classList.remove('show');
             infoCard.classList.remove('search-active');
+            document.body.classList.remove('search-active');
             // Save current search query
             saveSearchQuery(searchBar.value);
         }
@@ -4206,6 +4222,7 @@
                 searchContainer.classList.add('show');
                 searchBar.focus();
                 infoCard.classList.add('search-active');
+                document.body.classList.add('search-active');
                 // Restore previous search and trigger search if there was text
                 const savedQuery = loadSearchQuery();
                 if (savedQuery) {
@@ -4520,23 +4537,16 @@
             console.log(`📦 Loading: ${percent}%`);
         });
 
-        // Reset camera target after pan to maintain rotation origin
-        viewer.addEventListener('camera-change', () => {
-            // Reset camera target to center after any camera movement
-            // This ensures rotation always happens around the origin
-            if (viewer.getCameraTarget) {
-                const target = viewer.getCameraTarget();
-                if (target.x !== 0 || target.y !== 0 || target.z !== 0) {
-                    viewer.cameraTarget = '0m 0m 0m';
-                }
-            }
-        });
-
         // INITIALIZATION
         function init() {
             console.log('🚀 AR Menu MVP - Complete Version');
             console.log('✅ Cart System | ✅ User Auth | ✅ Checkout | ✅ iOS AR Fixed');
-            
+
+            // Set initial body class for minimized info card
+            if (isInfoMinimized) {
+                document.body.classList.add('info-minimized');
+            }
+
             detectIOS();
             loadFromStorage();
             loadTheme();
