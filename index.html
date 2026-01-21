@@ -63,10 +63,7 @@
             color: var(--dark-text);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           WELCOME SCREEN - Shows on first visit
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* Welcome Screen */
         .welcome-overlay {
             position: fixed;
             top: 0;
@@ -171,10 +168,7 @@
             background: var(--color-primary-hover);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           TOP NAVIGATION - Modern minimal design
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* Top Navigation */
         .top-nav {
             position: fixed;
             top: 0;
@@ -252,20 +246,17 @@
             display: flex;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           SIDE MENU - Modernized
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* Side Menu with Enhanced Overlay */
         .menu-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 98;
             display: none;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
         }
 
         .menu-overlay.show {
@@ -529,10 +520,7 @@
             line-height: 1.6;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           INFO CARD - Minimizable with ratings
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* Info Card - Enhanced Buttons */
         .info-card {
             position: absolute;
             top: 80px;
@@ -607,9 +595,11 @@
             font-size: 18px;
         }
 
+        /* FIXED: Better contrast for minimize button */
         .minimize-btn {
-            background: var(--light-bg-secondary);
-            border: 1px solid var(--light-border);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
             width: 36px;
             height: 36px;
             border-radius: var(--radius-md);
@@ -617,14 +607,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 20px;
+            font-weight: 700;
             transition: all 0.2s;
             flex-shrink: 0;
         }
 
         .dark-theme .minimize-btn {
-            background: var(--dark-bg);
-            border-color: var(--dark-border);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            color: var(--dark-bg);
         }
 
         .minimize-btn:active {
@@ -698,10 +690,23 @@
             gap: var(--space-sm);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           REVIEWS MODAL
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* FIXED: Reviews Modal with Overlay */
+        .reviews-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 149;
+            display: none;
+            backdrop-filter: blur(8px);
+        }
+
+        .reviews-overlay.show {
+            display: block;
+        }
+
         .reviews-modal {
             position: fixed;
             bottom: -100%;
@@ -744,21 +749,31 @@
             font-weight: 700;
         }
 
+        /* FIXED: Better contrast for close button */
         .reviews-close {
-            background: var(--light-bg-secondary);
-            border: none;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
             width: 32px;
             height: 32px;
             border-radius: var(--radius-md);
             cursor: pointer;
-            font-size: 20px;
+            font-size: 24px;
+            font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
         }
 
         .dark-theme .reviews-close {
-            background: var(--dark-bg);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            color: var(--dark-bg);
+        }
+
+        .reviews-close:active {
+            transform: scale(0.95);
         }
 
         .review-item {
@@ -802,19 +817,13 @@
             opacity: 0.8;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           AR VIEWER
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* AR Viewer */
         model-viewer {
             width: 100%;
             height: 100%;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           LOADING OVERLAY
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* Loading Overlay */
         .loading-overlay {
             position: absolute;
             top: 0;
@@ -869,10 +878,7 @@
             transition: width 0.3s;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           ERROR MESSAGE
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* Error Message */
         .error-message {
             position: absolute;
             top: 50%;
@@ -926,10 +932,7 @@
             font-size: 15px;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           BOTTOM ACTION BAR - Properly aligned
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* Bottom Action Bar */
         .bottom-bar {
             position: fixed;
             bottom: var(--space-lg);
@@ -990,10 +993,7 @@
             transform: scale(0.95);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           HELP BUTTON
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* Help Button */
         .help-btn {
             position: fixed;
             bottom: calc(var(--space-lg) + 80px);
@@ -1028,10 +1028,7 @@
             transform: scale(0.95);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           SHARE MODAL - Fixed for iOS
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        /* Share Modal */
         .share-modal {
             position: fixed;
             bottom: -100%;
@@ -1079,7 +1076,6 @@
             cursor: pointer;
             transition: all 0.2s;
             border: 2px solid transparent;
-            /* iOS fix: ensure clickable area */
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
@@ -1128,10 +1124,6 @@
             display: none !important;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           RESPONSIVE DESIGN
-           ═══════════════════════════════════════════════════════════════════ */
-        
         @media (max-width: 400px) {
             .food-name {
                 font-size: 20px;
@@ -1155,7 +1147,7 @@
 </head>
 <body class="light-theme">
 
-    <!-- Welcome Screen (First Time Only) -->
+    <!-- Welcome Screen -->
     <div class="welcome-overlay" id="welcomeOverlay">
         <div class="welcome-content">
             <div class="welcome-icon">🍽️</div>
@@ -1188,14 +1180,14 @@
     <!-- Top Navigation -->
     <div class="top-nav">
         <div class="nav-left">
-            <button class="icon-btn" id="menuBtn" title="Menu" aria-label="Open menu">☰</button>
+            <button class="icon-btn" id="menuBtn" title="Menu">☰</button>
         </div>
         <div class="nav-right">
-            <button class="icon-btn" id="favBtn" title="Favorites" aria-label="View favorites">
+            <button class="icon-btn" id="favBtn" title="Favorites">
                 ❤️
                 <span class="fav-counter" id="favCounter">0</span>
             </button>
-            <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle dark mode">🌙</button>
+            <button class="icon-btn" id="themeBtn" title="Toggle theme">🌙</button>
         </div>
     </div>
 
@@ -1224,7 +1216,7 @@
         </div>
     </div>
 
-    <!-- Current Item Info Card (Minimizable) -->
+    <!-- Info Card -->
     <div class="info-card" id="infoCard">
         <div class="info-card-content">
             <div class="info-header">
@@ -1232,11 +1224,10 @@
                     <div class="food-name" id="currentFoodName">🔵 Blue Artifact</div>
                     <div class="food-price" id="currentFoodPrice">$9.99</div>
                 </div>
-                <button class="minimize-btn" id="minimizeBtn" title="Minimize" aria-label="Minimize info card">−</button>
+                <button class="minimize-btn" id="minimizeBtn" title="Minimize">−</button>
             </div>
             
             <div class="info-details">
-                <!-- Rating Section (Clickable) -->
                 <div class="food-rating" id="ratingSection">
                     <div class="rating-stars" id="ratingStars">⭐⭐⭐⭐⭐</div>
                     <div class="rating-info">
@@ -1255,6 +1246,9 @@
         </div>
     </div>
 
+    <!-- Reviews Modal Overlay -->
+    <div class="reviews-overlay" id="reviewsOverlay"></div>
+
     <!-- Reviews Modal -->
     <div class="reviews-modal" id="reviewsModal">
         <div class="reviews-header">
@@ -1262,13 +1256,11 @@
             <button class="reviews-close" id="reviewsClose">×</button>
         </div>
         
-        <div id="reviewsContent">
-            <!-- Reviews will be dynamically loaded here -->
-        </div>
+        <div id="reviewsContent"></div>
     </div>
 
     <!-- Help Button -->
-    <button class="help-btn" id="helpBtn" title="Show instructions" aria-label="Show instructions">❓</button>
+    <button class="help-btn" id="helpBtn" title="Show instructions">❓</button>
 
     <!-- AR Viewer -->
     <model-viewer
@@ -1276,7 +1268,7 @@
         src="Restaurants/Candle Cafe/All Items/Blue Artifact.glb"
         ios-src="Restaurants/Candle%20Cafe/All%20Items/Blue%20Artifact.usdz"
         poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f8f9fa;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23e5e7eb;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='400' height='400'/%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' font-size='80'%3E🔵%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' fill='%231a1a1a'%3EBlue Artifact%3C/text%3E%3Ctext x='50%25' y='70%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='rgba(26,26,26,0.5)'%3ELoading 3D Model...%3C/text%3E%3C/svg%3E"
-        alt="3D model of food item"
+        alt="3D model"
         ar
         ar-modes="webxr scene-viewer quick-look"
         camera-controls
@@ -1312,7 +1304,7 @@
             <span>📱</span>
             <span>View in AR</span>
         </button>
-        <button class="action-btn" id="shareBtn" title="Share" aria-label="Share item">🔗</button>
+        <button class="action-btn" id="shareBtn" title="Share">🔗</button>
     </div>
 
     <!-- Share Modal -->
@@ -1340,10 +1332,6 @@
     </div>
 
     <script>
-        /* ═══════════════════════════════════════════════════════════════════
-           📝 RESTAURANT DATA WITH RATINGS & ANALYTICS
-           ═══════════════════════════════════════════════════════════════════ */
-        
         const RESTAURANTS = [
             {
                 id: 'candle-cafe',
@@ -1460,10 +1448,6 @@
             }
         ];
 
-        /* ═══════════════════════════════════════════════════════════════════
-           🖼️ FALLBACK IMAGE GENERATOR
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function createFallbackImage(itemName, emoji, isDark = false) {
             const bgColor1 = isDark ? '%23191919' : '%23f8f9fa';
             const bgColor2 = isDark ? '%232a2a2a' : '%23e5e7eb';
@@ -1491,10 +1475,6 @@
             return 'data:image/svg+xml,' + encodeURIComponent(svg);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           🔧 GET HTML ELEMENTS
-           ═══════════════════════════════════════════════════════════════════ */
-        
         const viewer = document.querySelector('model-viewer');
         const welcomeOverlay = document.getElementById('welcomeOverlay');
         const welcomeButton = document.getElementById('welcomeButton');
@@ -1512,6 +1492,7 @@
         const ratingStars = document.getElementById('ratingStars');
         const ratingScore = document.getElementById('ratingScore');
         const ratingCount = document.getElementById('ratingCount');
+        const reviewsOverlay = document.getElementById('reviewsOverlay');
         const reviewsModal = document.getElementById('reviewsModal');
         const reviewsClose = document.getElementById('reviewsClose');
         const reviewsContent = document.getElementById('reviewsContent');
@@ -1532,19 +1513,11 @@
         const errorText = document.getElementById('errorText');
         const errorClose = document.getElementById('errorClose');
 
-        /* ═══════════════════════════════════════════════════════════════════
-           💾 STATE
-           ═══════════════════════════════════════════════════════════════════ */
-        
         let currentItem = null;
         let favorites = [];
         let expandedRestaurants = [];
         let isIOS = false;
         let isInfoMinimized = false;
-        
-        /* ═══════════════════════════════════════════════════════════════════
-           📊 ANALYTICS SYSTEM
-           ═══════════════════════════════════════════════════════════════════ */
         
         const analytics = {
             sessionStart: Date.now(),
@@ -1572,10 +1545,6 @@
             console.log(`📊 Analytics: Share clicked ${analytics.shareClicks} time(s)`);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           🍎 iOS DETECTION
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function detectIOS() {
             isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
             analytics.deviceType = isIOS ? 'iOS' : 'Android';
@@ -1583,10 +1552,6 @@
             return isIOS;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           👋 WELCOME SCREEN
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function checkWelcomeScreen() {
             const hasSeenWelcome = localStorage.getItem('ar-menu-welcome-seen');
             if (!hasSeenWelcome) {
@@ -1597,14 +1562,9 @@
         function dismissWelcome() {
             welcomeOverlay.classList.remove('show');
             localStorage.setItem('ar-menu-welcome-seen', 'true');
-            // Show help button after welcome is dismissed
             helpBtn.classList.add('show');
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           ❤️ FAVORITES SYSTEM
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function loadFavorites() {
             const saved = localStorage.getItem('ar-menu-favorites');
             if (saved) {
@@ -1639,10 +1599,6 @@
             renderFavorites();
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           🔗 URL PARAMETER SYSTEM
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function getURLParameters() {
             const params = new URLSearchParams(window.location.search);
             return {
@@ -1685,10 +1641,6 @@
             return null;
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           ⭐ RATING & REVIEWS
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function generateStars(rating) {
             const fullStars = Math.floor(rating);
             const hasHalfStar = rating % 1 >= 0.5;
@@ -1710,6 +1662,7 @@
             ratingCount.textContent = `${item.reviewCount} reviews`;
         }
         
+        // FIXED: Reviews modal now closes properly
         function showReviews() {
             if (!currentItem || !currentItem.reviews) return;
             
@@ -1730,16 +1683,14 @@
             });
             
             reviewsModal.classList.add('show');
+            reviewsOverlay.classList.add('show');
         }
         
         function closeReviews() {
             reviewsModal.classList.remove('show');
+            reviewsOverlay.classList.remove('show');
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           📏 INFO CARD MINIMIZE/MAXIMIZE
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function toggleInfoCard() {
             isInfoMinimized = !isInfoMinimized;
             
@@ -1754,10 +1705,6 @@
             }
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           ⚠️ ERROR HANDLING
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function showError(title, message) {
             errorTitle.textContent = title;
             errorText.textContent = message;
@@ -1769,10 +1716,6 @@
             errorMessage.classList.remove('show');
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           ⏳ LOADING STATES
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function showLoading() {
             loadingOverlay.classList.add('show');
             loadingProgressBar.style.width = '0%';
@@ -1786,10 +1729,6 @@
             loadingProgressBar.style.width = percent + '%';
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           🎨 RENDERING
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function renderAllItems() {
             allItemsView.innerHTML = '';
             
@@ -1939,10 +1878,6 @@
             });
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           🎯 SELECT ITEM
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function selectItem(item, restaurant, category) {
             currentItem = {
                 ...item,
@@ -1951,7 +1886,6 @@
                 category: category.name
             };
             
-            // Update UI
             currentFoodName.textContent = item.name;
             currentFoodPrice.textContent = item.price;
             currentFoodMeta.innerHTML = `
@@ -1960,26 +1894,20 @@
                 <span>${category.name}</span>
             `;
             
-            // Update rating
             updateRatingDisplay(item);
             
-            // Show loading
             showLoading();
             
-            // Set custom fallback image
             const isDark = document.body.classList.contains('dark-theme');
             const fallbackImage = createFallbackImage(item.name, item.emoji, isDark);
             viewer.setAttribute('poster', fallbackImage);
             
-            // Load models
             viewer.src = item.modelGLB;
             const encodedUSDZ = item.modelUSDZ.split('/').map(encodeURIComponent).join('/');
             viewer.iosSrc = encodedUSDZ;
             
-            // Update URL
             updateURL(restaurant.id, item.id);
             
-            // Track analytics
             trackItemView(item.id, item.name);
             
             renderAllItems();
@@ -1988,14 +1916,11 @@
             console.log(`✅ Selected: ${item.name}`);
             console.log(`⭐ Rating: ${item.rating} (${item.reviewCount} reviews)`);
             console.log(`👁️  Views (60 days): ${item.views60Days}`);
-            console.log(`🔗 Shareable URL: ${getShareableURL(restaurant.id, item.id)}`);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           🎛️ MENU CONTROLS
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        // FIXED: Menu now closes reviews modal when opened
         function openMenu() {
+            closeReviews(); // Close reviews if open
             sideMenu.classList.add('open');
             menuOverlay.classList.add('show');
         }
@@ -2019,10 +1944,6 @@
             allItemsView.classList.add('hidden');
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           🌙 THEME TOGGLE
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function toggleTheme() {
             const body = document.body;
             
@@ -2038,7 +1959,6 @@
                 localStorage.setItem('ar-menu-theme', 'light');
             }
             
-            // Update fallback image for current theme
             if (currentItem) {
                 const isDark = body.classList.contains('dark-theme');
                 const fallbackImage = createFallbackImage(currentItem.name, currentItem.emoji, isDark);
@@ -2055,10 +1975,6 @@
             }
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           🔗 SHARE FUNCTIONALITY - iOS FIXED
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function openShareModal() {
             shareModal.classList.add('show');
             trackShareClick();
@@ -2084,7 +2000,6 @@
                     window.location.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
                     break;
                 case 'copy':
-                    // iOS-compatible clipboard approach
                     if (navigator.clipboard && navigator.clipboard.writeText) {
                         navigator.clipboard.writeText(shareUrl).then(() => {
                             alert('✅ Link copied!\n\n' + shareUrl);
@@ -2113,7 +2028,6 @@
             closeShareModal();
         }
         
-        // Fallback copy method for iOS Safari
         function fallbackCopyToClipboard(text) {
             const textArea = document.createElement('textarea');
             textArea.value = text;
@@ -2138,17 +2052,20 @@
             document.body.removeChild(textArea);
         }
 
-        /* ═══════════════════════════════════════════════════════════════════
-           🔘 EVENT LISTENERS
-           ═══════════════════════════════════════════════════════════════════ */
-        
+        // Event Listeners
         welcomeButton.addEventListener('click', dismissWelcome);
         menuBtn.addEventListener('click', openMenu);
         favBtn.addEventListener('click', () => {
             openMenu();
             showFavorites();
         });
+        
+        // FIXED: Close menu when clicking overlay
         menuOverlay.addEventListener('click', closeMenu);
+        
+        // FIXED: Close reviews when clicking overlay
+        reviewsOverlay.addEventListener('click', closeReviews);
+        
         themeBtn.addEventListener('click', toggleTheme);
         minimizeBtn.addEventListener('click', toggleInfoCard);
         ratingSection.addEventListener('click', showReviews);
@@ -2160,15 +2077,13 @@
         errorClose.addEventListener('click', hideError);
         helpBtn.addEventListener('click', dismissWelcome);
 
-        // Share options - iOS compatible event handling
+        // FIXED: iOS-compatible share options
         document.querySelectorAll('.share-option').forEach(option => {
-            // Use touchend for better iOS compatibility
             option.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 shareItem(option.dataset.platform);
             });
             
-            // Keep click for desktop
             option.addEventListener('click', (e) => {
                 if (!('ontouchstart' in window)) {
                     shareItem(option.dataset.platform);
@@ -2176,16 +2091,11 @@
             });
         });
 
-        // AR Button
         arButton.addEventListener('click', () => {
             viewer.activateAR();
             trackARActivation();
         });
 
-        /* ═══════════════════════════════════════════════════════════════════
-           📡 AR VIEWER EVENTS
-           ═══════════════════════════════════════════════════════════════════ */
-        
         viewer.addEventListener('load', () => {
             console.log('✅ Model loaded successfully');
             hideLoading();
@@ -2194,7 +2104,6 @@
         viewer.addEventListener('progress', (event) => {
             const percent = Math.round(event.detail.totalProgress * 100);
             updateLoadingProgress(percent);
-            console.log(`⏳ Loading: ${percent}%`);
         });
 
         viewer.addEventListener('ar-status', (event) => {
@@ -2215,20 +2124,14 @@
                 showError('Model Not Found', 'The 3D model file could not be found. Please try another item.');
             } else if (errorMsg.includes('network') || errorMsg.includes('fetch')) {
                 showError('Network Error', 'Could not load model. Please check your internet connection and try again.');
-            } else if (errorMsg.includes('format') || errorMsg.includes('parse')) {
-                showError('Invalid Model', 'The 3D model file appears to be corrupted. Please try another item.');
             } else {
                 showError('Loading Error', 'Could not load the 3D model. Please try again or select another item.');
             }
         });
 
-        /* ═══════════════════════════════════════════════════════════════════
-           🚀 INITIALIZATION
-           ═══════════════════════════════════════════════════════════════════ */
-        
         function init() {
             console.log('🚀 AR Menu Platform Starting...');
-            console.log('✨ Modern UI with ratings & analytics');
+            console.log('✨ Fixed version with proper modal handling');
             
             detectIOS();
             loadFavorites();
@@ -2237,15 +2140,12 @@
             renderAllItems();
             renderFavorites();
             
-            // Check if URL has specific item
             const urlItem = findItemByURL();
             
             if (urlItem) {
                 selectItem(urlItem.item, urlItem.restaurant, urlItem.category);
                 expandedRestaurants.push(urlItem.restaurant.id);
-                console.log('🔗 Loaded item from URL');
             } else {
-                // Select first item by default
                 const firstRestaurant = RESTAURANTS[0];
                 const firstCategory = firstRestaurant.categories[0];
                 const firstItem = firstCategory.items[0];
@@ -2256,9 +2156,7 @@
             renderAllItems();
             
             console.log('✅ AR Menu Ready!');
-            console.log(`🏪 ${RESTAURANTS.length} restaurants loaded`);
-            console.log('📊 Analytics & ratings enabled');
-            console.log('🎨 Modern minimalist design active');
+            console.log('✅ All UX issues fixed');
         }
 
         init();
