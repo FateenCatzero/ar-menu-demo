@@ -71,14 +71,20 @@
             color: var(--dark-text);
         }
 
-        /* ScaleXR Branding */
+        /* ScaleXR Branding - NOT FIXED, scrolls with page */
         .scalexr-branding {
-            position: fixed;
+            position: absolute;
             top: 12px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 100;
+            z-index: 10;
             pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Hide ScaleXR when menu is open */
+        .side-menu.open ~ .scalexr-branding {
+            opacity: 0;
         }
 
         .scalexr-logo {
@@ -106,15 +112,20 @@
             top: 50px;
             left: 12px;
             right: 12px;
-            z-index: 100;
+            z-index: 85;
             max-width: 500px;
             margin: 0 auto;
-            pointer-events: auto;
+            pointer-events: none;
             display: none;
         }
 
         .search-container.show {
             display: block;
+            pointer-events: auto;
+        }
+
+        .search-wrapper {
+            position: relative;
         }
 
         .search-bar {
@@ -2598,7 +2609,7 @@
     
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
-            <div class="menu-title">🍽️ AR Menu</div>
+            <div class="menu-title">ScaleXR Menus</div>
             <div class="menu-subtitle">Select an item to view in AR</div>
         </div>
 
@@ -2779,9 +2790,9 @@
     <!-- AR Viewer -->
     <model-viewer
         id="ar-viewer"
-        src="Restaurants/Candle Cafe/All Items/Blue Artifact.glb"
-        ios-src="Restaurants/Candle%20Cafe/All%20Items/Blue%20Artifact.usdz"
-        poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f8f9fa;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23e5e7eb;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='400' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-size='80'%3E🔵%3C/text%3E%3Ctext x='50%25' y='65%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%231a1a1a'%3ELoading...%3C/text%3E%3C/svg%3E"
+        src="Restaurants/Cheezious/Sandwich.glb"
+        ios-src="Restaurants/Cheezious/Sandwich.usdz"
+        poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f8f9fa;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23e5e7eb;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='400' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-size='80'%3E🥪%3C/text%3E%3Ctext x='50%25' y='65%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%231a1a1a'%3ELoading...%3C/text%3E%3C/svg%3E"
         alt="3D model"
         ar
         ar-modes="webxr scene-viewer quick-look"
@@ -2796,7 +2807,9 @@
         ar-scale="auto"
         ar-placement="floor"
         interaction-prompt="auto"
-        interaction-prompt-threshold="0">
+        interaction-prompt-threshold="0"
+        loading="eager"
+        reveal="auto">
     </model-viewer>
 
     <!-- Grid Floor -->
@@ -3578,7 +3591,7 @@
                     <div class="cart-item-icon">${item.emoji}</div>
                     <div class="cart-item-info">
                         <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-price">$${item.price.toFixed(2)} each</div>
+                        <div class="cart-item-price">${formatPrice(item.price)} each</div>
                     </div>
                     <div class="cart-item-controls">
                         <button class="cart-qty-btn" onclick="updateCartQuantity('${item.id}', -1)">−</button>
@@ -3591,10 +3604,10 @@
 
             const { subtotal, gst, gstRate, total } = calculateCartTotals();
 
-            document.getElementById('cartSubtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('cartGST').textContent = `$${gst.toFixed(2)}`;
+            document.getElementById('cartSubtotal').textContent = formatPrice(subtotal);
+            document.getElementById('cartGST').textContent = formatPrice(gst);
             document.getElementById('gstRate').textContent = gstRate;
-            document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('cartTotal').textContent = formatPrice(total);
 
             cartSummary.style.display = 'block';
             checkoutBtn.disabled = false;
@@ -3618,10 +3631,10 @@
             closeCart();
             
             const { subtotal, gst, gstRate, total } = calculateCartTotals();
-            document.getElementById('checkoutSubtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('checkoutGST').textContent = `$${gst.toFixed(2)}`;
+            document.getElementById('checkoutSubtotal').textContent = formatPrice(subtotal);
+            document.getElementById('checkoutGST').textContent = formatPrice(gst);
             document.getElementById('checkoutGSTRate').textContent = gstRate;
-            document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('checkoutTotal').textContent = formatPrice(total);
             
             checkoutModal.classList.add('show');
             cartOverlay.classList.add('show');
@@ -3666,7 +3679,7 @@
             document.getElementById('orderNumber').textContent = `#${orderNumber}`;
             document.getElementById('confirmTableNumber').textContent = table;
             document.getElementById('confirmPaymentMethod').textContent = paymentDisplay;
-            document.getElementById('confirmTotalAmount').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('confirmTotalAmount').textContent = formatPrice(total);
             
             closeCheckout();
             orderConfirmationOverlay.classList.add('show');
@@ -3990,19 +4003,38 @@
                 minimizeBtn.title = 'Minimize';
             }
             
+            // Show loading
             document.getElementById('loadingOverlay').classList.add('show');
+            document.getElementById('loadingProgressBar').style.width = '0%';
             
-            viewer.src = item.modelGLB;
-            const encodedUSDZ = item.modelUSDZ.split('/').map(encodeURIComponent).join('/');
+            // Clear any existing timeout
+            if (window.loadingTimeout) {
+                clearTimeout(window.loadingTimeout);
+            }
+            
+            // Set timeout for slow loading models (30 seconds)
+            window.loadingTimeout = setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.remove('show');
+                showToast('Model taking too long to load. Check your connection.', 'error');
+            }, 30000);
+            
+            // Properly encode file paths (handle spaces and special characters)
+            const encodedGLB = item.modelGLB;
+            const encodedUSDZ = item.modelUSDZ.split('/').map(part => encodeURIComponent(part)).join('/');
+            
+            // Set model sources WITHOUT cache busting for faster loads
+            viewer.src = encodedGLB;
             viewer.iosSrc = encodedUSDZ;
             
-            // FIXED: iOS AR placement
+            // FIXED: iOS AR placement settings
             viewer.setAttribute('ar-scale', 'auto');
             viewer.setAttribute('ar-placement', 'floor');
             viewer.setAttribute('camera-target', '0m 0m 0m');
             viewer.setAttribute('interaction-prompt', 'auto');
             viewer.setAttribute('interaction-prompt-threshold', '0');
+            viewer.setAttribute('loading', 'eager');
             
+            // Apply restaurant lighting
             applyRestaurantLighting(restaurant);
             
             renderAllItems();
@@ -4032,6 +4064,7 @@
                 `;
                 reviewsContent.appendChild(reviewDiv);
             });
+            // Ensure all functions and event listeners are properly closed
             
             reviewsModal.classList.add('show');
             reviewsOverlay.classList.add('show');
@@ -4120,13 +4153,17 @@
         }
 
         // SEARCH FUNCTIONS
+        function closeSearch() {
+            searchContainer.classList.remove('show');
+            searchBar.value = '';
+            searchResults.classList.remove('show');
+            searchClear.classList.remove('show');
+        }
+
         function toggleSearch() {
             const isVisible = searchContainer.classList.contains('show');
             if (isVisible) {
-                searchContainer.classList.remove('show');
-                searchBar.value = '';
-                searchResults.classList.remove('show');
-                searchClear.classList.remove('show');
+                closeSearch();
             } else {
                 searchContainer.classList.add('show');
                 searchBar.focus();
@@ -4320,11 +4357,24 @@
         loginForm.addEventListener('submit', handleLogin);
         signupForm.addEventListener('submit', handleSignup);
         authCloseBtn.addEventListener('click', closeAuth);
-        userBtn.addEventListener('click', openAuth);
+        userBtn.addEventListener('click', () => {
+            closeSearch();
+            openAuth();
+        });
 
-        menuBtn.addEventListener('click', openMenu);
-        cartBtn.addEventListener('click', openCart);
-        favBtn.addEventListener('click', () => { openMenu(); showFavorites(); });
+        menuBtn.addEventListener('click', () => {
+            closeSearch();
+            openMenu();
+        });
+        cartBtn.addEventListener('click', () => {
+            closeSearch();
+            openCart();
+        });
+        favBtn.addEventListener('click', () => {
+            closeSearch();
+            openMenu();
+            showFavorites();
+        });
         menuOverlay.addEventListener('click', () => { closeMenu(); closeCart(); closeCheckout(); });
         cartOverlay.addEventListener('click', () => { closeCart(); closeCheckout(); });
         
@@ -4356,9 +4406,9 @@
                 placeOrderBtn.disabled = !tableNumber.value.trim();
                 
                 const { subtotal, gst, gstRate, total } = calculateCartTotals();
-                document.getElementById('checkoutGST').textContent = `$${gst.toFixed(2)}`;
+                document.getElementById('checkoutGST').textContent = formatPrice(gst);
                 document.getElementById('checkoutGSTRate').textContent = gstRate;
-                document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
+                document.getElementById('checkoutTotal').textContent = formatPrice(total);
             });
         });
 
@@ -4393,11 +4443,27 @@
 
         viewer.addEventListener('load', () => {
             document.getElementById('loadingOverlay').classList.remove('show');
+            console.log('✅ Model loaded successfully');
+            if (window.loadingTimeout) {
+                clearTimeout(window.loadingTimeout);
+            }
+        });
+
+        viewer.addEventListener('error', (event) => {
+            document.getElementById('loadingOverlay').classList.remove('show');
+            console.error('❌ Model loading error:', event);
+            showToast('Failed to load 3D model. Check your internet connection.', 'error');
+            if (window.loadingTimeout) {
+                clearTimeout(window.loadingTimeout);
+            }
         });
 
         viewer.addEventListener('progress', (event) => {
             const percent = Math.round(event.detail.totalProgress * 100);
             document.getElementById('loadingProgressBar').style.width = percent + '%';
+            console.log(`📦 Loading: ${percent}%`);
+        });
+            console.log(`📊 Loading progress: ${percent}%`);
         });
 
         // INITIALIZATION
