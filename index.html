@@ -972,10 +972,15 @@
             z-index: 90;
             box-shadow: var(--shadow-lg);
             border: 1px solid var(--light-border);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
             max-width: 500px;
             margin: 0 auto;
+        }
+
+        /* Push info card down when search is open */
+        .info-card.search-active {
+            top: 230px;
         }
 
         .dark-theme .info-card {
@@ -3614,6 +3619,7 @@
         }
 
         function openCart() {
+            closeSearch();
             renderCart();
             cartModal.classList.add('show');
             cartOverlay.classList.add('show');
@@ -3695,9 +3701,24 @@
         }
 
         // USER FUNCTIONS
+        function updateProfileButton() {
+            const userBtn = document.getElementById('userBtn');
+            if (currentUser) {
+                // Show user's first initial instead of default icon
+                userBtn.textContent = currentUser.name.charAt(0).toUpperCase();
+                userBtn.style.fontWeight = '700';
+                userBtn.style.fontSize = '18px';
+            } else {
+                // Show default icon
+                userBtn.textContent = '👤';
+                userBtn.style.fontWeight = '';
+                userBtn.style.fontSize = '';
+            }
+        }
+
         function renderUserSection() {
             const userSection = document.getElementById('userSection');
-            
+
             if (currentUser) {
                 userSection.innerHTML = `
                     <div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div>
@@ -3714,6 +3735,9 @@
                     <button class="login-btn-small" onclick="openAuth()">Login</button>
                 `;
             }
+
+            // Sync the profile button
+            updateProfileButton();
         }
 
         function openAuth() {
@@ -4079,6 +4103,7 @@
         function openMenu() {
             closeReviews();
             closeCart();
+            closeSearch();
             sideMenu.classList.add('open');
             menuOverlay.classList.add('show');
         }
@@ -4158,6 +4183,7 @@
             searchBar.value = '';
             searchResults.classList.remove('show');
             searchClear.classList.remove('show');
+            infoCard.classList.remove('search-active');
         }
 
         function toggleSearch() {
@@ -4167,6 +4193,7 @@
             } else {
                 searchContainer.classList.add('show');
                 searchBar.focus();
+                infoCard.classList.add('search-active');
             }
         }
 
@@ -4359,7 +4386,13 @@
         authCloseBtn.addEventListener('click', closeAuth);
         userBtn.addEventListener('click', () => {
             closeSearch();
-            openAuth();
+            if (currentUser) {
+                // If logged in, open menu to show user section
+                openMenu();
+            } else {
+                // If not logged in, open auth modal
+                openAuth();
+            }
         });
 
         menuBtn.addEventListener('click', () => {
