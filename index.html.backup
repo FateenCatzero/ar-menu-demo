@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Food Menu</title>
+    
+    <!-- Google's Model Viewer Library -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+    
+    <style>
+        :root {
+            --light-bg: #E8E8E8FF;
+            --light-bg-secondary: #f5f5f5;
+            --light-text: #1a1a1a;
+            --dark-bg: #191919FF;
+            --dark-bg-secondary: #2a2a2a;
+            --dark-text: #ffffff;
+            --color-primary: #6366f1;
+            --color-secondary: #8b5cf6;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-favorite: #ef4444;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-full: 9999px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.3s ease;
+        }
+
+        body.light-theme {
+            background: linear-gradient(135deg, var(--light-bg) 0%, var(--light-bg-secondary) 100%);
+            color: var(--light-text);
+        }
+
+        body.dark-theme {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-secondary) 100%);
+            color: var(--dark-text);
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-left, .nav-right {
+            display: flex;
+            gap: var(--space-sm);
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            position: relative;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+        }
+
+        .fav-counter {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--color-favorite);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: bold;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(0, 0, 0, 0.8);
+        }
+
+        .fav-counter.show {
+            display: flex;
+        }
+
+        /* Side Menu */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 98;
+            display: none;
+            backdrop-filter: blur(4px);
+        }
+
+        .menu-overlay.show {
+            display: block;
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 85%;
+            max-width: 380px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            color: white;
+            z-index: 99;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            padding-bottom: 60px;
+        }
+
+        .side-menu.open {
+            left: 0;
+        }
+
+        .menu-header {
+            padding: var(--space-lg);
+            padding-top: 80px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .menu-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: var(--space-sm);
+        }
+
+        .menu-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .menu-tabs {
+            display: flex;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            background: rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 140px;
+            z-index: 9;
+        }
+
+        .menu-tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .menu-tab.active {
+            background: white;
+            color: var(--dark-bg);
+        }
+
+        .restaurant-section {
+            margin: var(--space-md);
+        }
+
+        .restaurant-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .restaurant-header:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .restaurant-icon {
+            font-size: 24px;
+        }
+
+        .restaurant-name {
+            font-size: 18px;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .expand-icon {
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+
+        .restaurant-header.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .category-section {
+            margin-left: var(--space-md);
+            margin-bottom: var(--space-md);
+            display: none;
+        }
+
+        .category-section.show {
+            display: block;
+        }
+
+        .category-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: var(--space-sm);
+            padding-left: var(--space-sm);
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.08);
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(4px);
+        }
+
+        .menu-item.active {
+            border-color: var(--color-success);
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .menu-item-content {
+            flex: 1;
+        }
+
+        .menu-item-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .menu-item-price {
+            font-size: 18px;
+            color: var(--color-warning);
+            font-weight: bold;
+        }
+
+        .item-fav-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: var(--space-sm);
+            transition: transform 0.2s;
+        }
+
+        .item-fav-btn:active {
+            transform: scale(1.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px var(--space-lg);
+            opacity: 0.6;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--space-md);
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+        }
+
+        /* Info Card */
+        .info-card {
+            position: absolute;
+            top: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            color: white;
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            z-index: 10;
+            min-width: 260px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .food-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: var(--space-sm);
+        }
+
+        .food-price {
+            font-size: 28px;
+            color: var(--color-warning);
+            font-weight: bold;
+            margin-bottom: var(--space-sm);
+        }
+
+        .food-meta {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: var(--space-sm);
+        }
+
+        /* AR Viewer */
+        model-viewer {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Loading Progress Bar */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .loading-progress {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            background: var(--color-success);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Error Message */
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(239, 68, 68, 0.95);
+            color: white;
+            padding: var(--space-lg) 30px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            z-index: 60;
+            max-width: 80%;
+            display: none;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .error-message.show {
+            display: flex;
+        }
+
+        .error-icon {
+            font-size: 48px;
+        }
+
+        .error-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .error-text {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .error-close {
+            background: white;
+            color: #ef4444;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: var(--space-lg);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: var(--space-md);
+            z-index: 10;
+        }
+
+        .ar-button {
+            background: linear-gradient(135deg, var(--color-success), #059669);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .ar-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Instructions Panel */
+        .instructions {
+            position: absolute;
+            bottom: 130px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            font-size: 14px;
+            z-index: 10;
+            max-width: 90%;
+            line-height: 1.6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .instructions.hidden {
+            display: none;
+        }
+
+        .instructions-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Help Button */
+        .help-btn {
+            position: fixed;
+            bottom: 200px;
+            right: var(--space-lg);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .help-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Share Modal */
+        .share-modal {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            padding: var(--space-lg);
+            z-index: 101;
+            transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-theme .share-modal {
+            background: var(--dark-bg-secondary);
+            color: white;
+        }
+
+        .share-modal.show {
+            bottom: 0;
+        }
+
+        .share-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: var(--space-lg);
+            text-align: center;
+        }
+
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dark-theme .share-option {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .share-option:active {
+            transform: scale(0.95);
+        }
+
+        .share-option-icon {
+            font-size: 32px;
+        }
+
+        .share-option-label {
+            font-size: 12px;
+        }
+
+        .share-close {
+            width: 100%;
+            padding: var(--space-md);
+            background: var(--dark-bg);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .dark-theme .share-close {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 400px) {
+            .food-name {
+                font-size: 20px;
+            }
+            
+            .ar-button {
+                padding: 16px 32px;
+                font-size: 16px;
+            }
+            
+            .share-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body class="light-theme">
+
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-left">
+            <button class="icon-btn" id="menuBtn" title="Menu">☰</button>
+        </div>
+        <div class="nav-right">
+            <button class="icon-btn" id="favBtn" title="Favorites">
+                ❤️
+                <span class="fav-counter" id="favCounter">0</span>
+            </button>
+            <button class="icon-btn" id="themeBtn" title="Theme">🌙</button>
+        </div>
+    </div>
+
+    <!-- Side Menu -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <div class="menu-title">🍽️ AR Food Menu</div>
+            <div class="menu-subtitle">Choose an item to view in AR</div>
+        </div>
+
+        <div class="menu-tabs">
+            <button class="menu-tab active" id="allTab">All Items</button>
+            <button class="menu-tab" id="favTab">Favorites</button>
+        </div>
+
+        <div id="allItemsView"></div>
+
+        <div id="favoritesView" class="hidden">
+            <div class="empty-state" id="emptyFavorites">
+                <div class="empty-state-icon">💔</div>
+                <div class="empty-state-text">No favorites yet!<br>Tap ❤️ on items to save them.</div>
+            </div>
+            <div id="favoritesContent"></div>
+        </div>
+    </div>
+
+    <!-- Current Item Info -->
+    <div class="info-card">
+        <div class="food-name" id="currentFoodName">🔵 Blue Artifact</div>
+        <div class="food-price" id="currentFoodPrice">$9.99</div>
+        <div class="food-meta" id="currentFoodMeta">Candle Cafe • All Items</div>
+    </div>
+
+    <!-- Instructions Panel -->
+    <div class="instructions" id="instructions">
+        <button class="instructions-close" id="instructionsClose">×</button>
+        <div>📱 Tap "View in AR" to place on your table</div>
+        <div><small>Move phone slowly to detect surfaces</small></div>
+    </div>
+
+    <!-- Help Button (appears after closing instructions) -->
+    <button class="help-btn hidden" id="helpBtn" title="Show Instructions">❓</button>
+
+    <!-- AR Viewer -->
+    <model-viewer
+        id="ar-viewer"
+        src="Restaurants/Candle Cafe/All Items/Blue Artifact.glb"
+        ios-src="Restaurants/Candle%20Cafe/All%20Items/Blue%20Artifact.usdz"
+        poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23191919;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%232a2a2a;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='400' height='400'/%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' font-size='80'%3E🔵%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' fill='white'%3EBlue Artifact Special%3C/text%3E%3Ctext x='50%25' y='70%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='rgba(255,255,255,0.6)'%3ELoading 3D Model...%3C/text%3E%3C/svg%3E"
+        alt="3D model"
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        camera-controls
+        shadow-intensity="1"
+        camera-orbit="0deg 75deg 2m"
+        min-camera-orbit="auto auto 0.3m"
+        max-camera-orbit="auto auto 10m"
+        environment-image="neutral"
+        exposure="1"
+        shadow-softness="1">
+    </model-viewer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading 3D Model...</div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar" id="loadingProgressBar"></div>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" id="errorMessage">
+        <div class="error-icon">⚠️</div>
+        <div class="error-title" id="errorTitle">Oops!</div>
+        <div class="error-text" id="errorText">Something went wrong</div>
+        <button class="error-close" id="errorClose">Try Again</button>
+    </div>
+
+    <!-- Bottom Action Bar -->
+    <div class="bottom-bar">
+        <button class="ar-button" id="arButton">
+            <span>📱</span>
+            <span>View in AR</span>
+        </button>
+        <button class="action-btn" id="shareBtn" title="Share">🔗</button>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-header">Share this item!</div>
+        <div class="share-options">
+            <div class="share-option" data-platform="whatsapp">
+                <div class="share-option-icon">💬</div>
+                <div class="share-option-label">WhatsApp</div>
+            </div>
+            <div class="share-option" data-platform="copy">
+                <div class="share-option-icon">📋</div>
+                <div class="share-option-label">Copy Link</div>
+            </div>
+            <div class="share-option" data-platform="twitter">
+                <div class="share-option-icon">🐦</div>
+                <div class="share-option-label">Twitter</div>
+            </div>
+            <div class="share-option" data-platform="native">
+                <div class="share-option-icon">📤</div>
+                <div class="share-option-label">More</div>
+            </div>
+        </div>
+        <button class="share-close" id="shareClose">Close</button>
+    </div>
+
+    <script>
+        /* ═══════════════════════════════════════════════════════════════════
+           📝 RESTAURANT DATA
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        /* ═══════════════════════════════════════════════════════════════════
+           🖼️ FALLBACK IMAGE GENERATOR
+           Creates custom loading images for each item
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function createFallbackImage(itemName, emoji) {
+            // Create a custom SVG with the item's emoji and name
+            const svg = `
+                <svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'>
+                    <defs>
+                        <linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'>
+                            <stop offset='0%' style='stop-color:#191919;stop-opacity:1' />
+                            <stop offset='100%' style='stop-color:#2a2a2a;stop-opacity:1' />
+                        </linearGradient>
+                    </defs>
+                    <rect fill='url(%23grad)' width='400' height='400'/>
+                    <text x='50%' y='40%' dominant-baseline='middle' text-anchor='middle' 
+                          font-size='80'>${emoji}</text>
+                    <text x='50%' y='60%' dominant-baseline='middle' text-anchor='middle' 
+                          font-family='sans-serif' font-size='18' fill='white'>${itemName}</text>
+                    <text x='50%' y='70%' dominant-baseline='middle' text-anchor='middle' 
+                          font-family='sans-serif' font-size='14' fill='rgba(255,255,255,0.6)'>Loading 3D Model...</text>
+                </svg>
+            `.trim();
+            
+            // Encode it for use in poster attribute
+            return 'data:image/svg+xml,' + encodeURIComponent(svg);
+        }
+        
+        const RESTAURANTS = [
+            {
+                id: 'candle-cafe',
+                name: '🕯️ Candle Cafe',
+                categories: [
+                    {
+                        id: 'all-items',
+                        name: 'All Items',
+                        items: [
+                            {
+                                id: 'blue-artifact',
+                                name: '🔵 Blue Artifact Special',
+                                price: '$9.99',
+                                emoji: '🔵',  // For fallback image
+                                modelGLB: 'Restaurants/Candle Cafe/All Items/Blue Artifact.glb',
+                                modelUSDZ: 'Restaurants/Candle Cafe/All Items/Blue Artifact.usdz'
+                            },
+                            {
+                                id: 'red-stand',
+                                name: '🔴 Red Stand Deluxe',
+                                price: '$12.99',
+                                emoji: '🔴',
+                                modelGLB: 'Restaurants/Candle Cafe/All Items/Red Stand.glb',
+                                modelUSDZ: 'Restaurants/Candle Cafe/All Items/Red Stand.usdz'
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'coffee-shop',
+                name: '☕ Coffee Shop',
+                categories: [
+                    {
+                        id: 'all-items',
+                        name: 'All Items',
+                        items: [
+                            {
+                                id: 'coffee-cup',
+                                name: '☕ Premium Coffee Cup',
+                                price: '$4.99',
+                                emoji: '☕',
+                                modelGLB: 'Restaurants/Coffee Shop/Coffee Cup.glb',
+                                modelUSDZ: 'Restaurants/Coffee Shop/Coffee Cup.usdz'
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'cube-cafe',
+                name: '◼️ Cube Cafe',
+                categories: [
+                    {
+                        id: 'all-items',
+                        name: 'All Items',
+                        items: [
+                            {
+                                id: 'blue-cube',
+                                name: '🔷 Blue Cube Delight',
+                                price: '$7.99',
+                                emoji: '🔷',
+                                modelGLB: 'Restaurants/Cube Cafe/Blue Cube.glb',
+                                modelUSDZ: 'Restaurants/Cube Cafe/Blue Cube.usdz'
+                            },
+                            {
+                                id: 'pink-cube',
+                                name: '🟪 Pink Cube Surprise',
+                                price: '$7.99',
+                                emoji: '🟪',
+                                modelGLB: 'Restaurants/Cube Cafe/Pink Cube.glb',
+                                modelUSDZ: 'Restaurants/Cube Cafe/Pink Cube.usdz'
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        /* ═══════════════════════════════════════════════════════════════════
+           🔧 GET HTML ELEMENTS
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        const viewer = document.querySelector('model-viewer');
+        const menuBtn = document.getElementById('menuBtn');
+        const favBtn = document.getElementById('favBtn');
+        const sideMenu = document.getElementById('sideMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const themeBtn = document.getElementById('themeBtn');
+        const currentFoodName = document.getElementById('currentFoodName');
+        const currentFoodPrice = document.getElementById('currentFoodPrice');
+        const currentFoodMeta = document.getElementById('currentFoodMeta');
+        const instructions = document.getElementById('instructions');
+        const instructionsClose = document.getElementById('instructionsClose');
+        const helpBtn = document.getElementById('helpBtn');
+        const arButton = document.getElementById('arButton');
+        const shareBtn = document.getElementById('shareBtn');
+        const shareModal = document.getElementById('shareModal');
+        const shareClose = document.getElementById('shareClose');
+        const allTab = document.getElementById('allTab');
+        const favTab = document.getElementById('favTab');
+        const allItemsView = document.getElementById('allItemsView');
+        const favoritesView = document.getElementById('favoritesView');
+        const favCounter = document.getElementById('favCounter');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingProgressBar = document.getElementById('loadingProgressBar');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorTitle = document.getElementById('errorTitle');
+        const errorText = document.getElementById('errorText');
+        const errorClose = document.getElementById('errorClose');
+
+        /* ═══════════════════════════════════════════════════════════════════
+           💾 STATE
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        let currentItem = null;
+        let favorites = [];
+        let expandedRestaurants = [];
+        let isIOS = false;
+        
+        /* ═══════════════════════════════════════════════════════════════════
+           📊 ANALYTICS SYSTEM
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        const analytics = {
+            sessionStart: Date.now(),
+            itemViews: {},
+            arActivations: 0,
+            shareClicks: 0,
+            deviceType: ''
+        };
+        
+        function trackItemView(itemId, itemName) {
+            if (!analytics.itemViews[itemId]) {
+                analytics.itemViews[itemId] = { name: itemName, count: 0 };
+            }
+            analytics.itemViews[itemId].count++;
+            console.log(`📊 Analytics: ${itemName} viewed ${analytics.itemViews[itemId].count} time(s)`);
+        }
+        
+        function trackARActivation() {
+            analytics.arActivations++;
+            console.log(`📊 Analytics: AR activated ${analytics.arActivations} time(s) this session`);
+        }
+        
+        function trackShareClick() {
+            analytics.shareClicks++;
+            console.log(`📊 Analytics: Share clicked ${analytics.shareClicks} time(s)`);
+        }
+        
+        function getAnalyticsSummary() {
+            const sessionDuration = Math.round((Date.now() - analytics.sessionStart) / 1000);
+            return {
+                sessionDuration,
+                deviceType: analytics.deviceType,
+                itemViews: analytics.itemViews,
+                arActivations: analytics.arActivations,
+                shareClicks: analytics.shareClicks
+            };
+        }
+        
+        // Log analytics on page close
+        window.addEventListener('beforeunload', () => {
+            console.log('📊 SESSION SUMMARY:', getAnalyticsSummary());
+        });
+
+        /* ═══════════════════════════════════════════════════════════════════
+           🍎 iOS DETECTION
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function detectIOS() {
+            isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+            analytics.deviceType = isIOS ? 'iOS' : 'Android';
+            console.log(isIOS ? '🍎 iOS device detected' : '🤖 Android device detected');
+            return isIOS;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           ❤️ FAVORITES SYSTEM
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function loadFavorites() {
+            const saved = localStorage.getItem('ar-menu-favorites');
+            if (saved) {
+                favorites = JSON.parse(saved);
+                updateFavoriteCounter();
+            }
+        }
+
+        function saveFavorites() {
+            localStorage.setItem('ar-menu-favorites', JSON.stringify(favorites));
+            updateFavoriteCounter();
+        }
+
+        function updateFavoriteCounter() {
+            if (favorites.length > 0) {
+                favCounter.textContent = favorites.length;
+                favCounter.classList.add('show');
+            } else {
+                favCounter.classList.remove('show');
+            }
+        }
+
+        function toggleFavorite(itemId) {
+            const index = favorites.indexOf(itemId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push(itemId);
+            }
+            saveFavorites();
+            renderAllItems();
+            renderFavorites();
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           🔗 URL PARAMETER SYSTEM - Unique URLs for each item
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function getURLParameters() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                restaurant: params.get('restaurant'),
+                item: params.get('item')
+            };
+        }
+        
+        function updateURL(restaurantId, itemId) {
+            const url = new URL(window.location);
+            url.searchParams.set('restaurant', restaurantId);
+            url.searchParams.set('item', itemId);
+            window.history.pushState({}, '', url);
+        }
+        
+        function getShareableURL(restaurantId, itemId) {
+            const url = new URL(window.location.origin + window.location.pathname);
+            url.searchParams.set('restaurant', restaurantId);
+            url.searchParams.set('item', itemId);
+            return url.toString();
+        }
+        
+        function findItemByURL() {
+            const { restaurant: restaurantId, item: itemId } = getURLParameters();
+            
+            if (!restaurantId || !itemId) return null;
+            
+            for (const restaurant of RESTAURANTS) {
+                if (restaurant.id === restaurantId) {
+                    for (const category of restaurant.categories) {
+                        for (const item of category.items) {
+                            if (item.id === itemId) {
+                                return { item, restaurant, category };
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return null;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           ⚠️ ERROR HANDLING
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function showError(title, message) {
+            errorTitle.textContent = title;
+            errorText.textContent = message;
+            errorMessage.classList.add('show');
+            loadingOverlay.classList.remove('show');
+        }
+        
+        function hideError() {
+            errorMessage.classList.remove('show');
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           ⏳ LOADING STATES
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function showLoading() {
+            loadingOverlay.classList.add('show');
+            loadingProgressBar.style.width = '0%';
+        }
+        
+        function hideLoading() {
+            loadingOverlay.classList.remove('show');
+        }
+        
+        function updateLoadingProgress(percent) {
+            loadingProgressBar.style.width = percent + '%';
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           📋 INSTRUCTIONS SYSTEM
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function hideInstructions() {
+            instructions.classList.add('hidden');
+            helpBtn.classList.remove('hidden');
+            localStorage.setItem('ar-instructions-dismissed', 'true');
+        }
+        
+        function showInstructions() {
+            instructions.classList.remove('hidden');
+            helpBtn.classList.add('hidden');
+        }
+        
+        function checkInstructionsState() {
+            const dismissed = localStorage.getItem('ar-instructions-dismissed');
+            if (dismissed === 'true') {
+                hideInstructions();
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           🎨 RENDERING
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function renderAllItems() {
+            allItemsView.innerHTML = '';
+            
+            RESTAURANTS.forEach(restaurant => {
+                const restaurantDiv = document.createElement('div');
+                restaurantDiv.className = 'restaurant-section';
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'restaurant-header';
+                if (expandedRestaurants.includes(restaurant.id)) {
+                    headerDiv.classList.add('expanded');
+                }
+                
+                headerDiv.innerHTML = `
+                    <span class="restaurant-icon">${restaurant.name.split(' ')[0]}</span>
+                    <span class="restaurant-name">${restaurant.name.substring(2)}</span>
+                    <span class="expand-icon">▼</span>
+                `;
+                
+                headerDiv.addEventListener('click', () => toggleRestaurant(restaurant.id));
+                restaurantDiv.appendChild(headerDiv);
+                
+                restaurant.categories.forEach(category => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category-section';
+                    if (expandedRestaurants.includes(restaurant.id)) {
+                        categoryDiv.classList.add('show');
+                    }
+                    
+                    const categoryHeader = document.createElement('div');
+                    categoryHeader.className = 'category-header';
+                    categoryHeader.textContent = category.name;
+                    categoryDiv.appendChild(categoryHeader);
+                    
+                    category.items.forEach(item => {
+                        const itemDiv = createMenuItem(item, restaurant, category);
+                        categoryDiv.appendChild(itemDiv);
+                    });
+                    
+                    restaurantDiv.appendChild(categoryDiv);
+                });
+                
+                allItemsView.appendChild(restaurantDiv);
+            });
+        }
+
+        function createMenuItem(item, restaurant, category) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'menu-item';
+            
+            if (currentItem && currentItem.id === item.id) {
+                itemDiv.classList.add('active');
+            }
+            
+            itemDiv.innerHTML = `
+                <div class="menu-item-content">
+                    <div class="menu-item-name">${item.name}</div>
+                    <div class="menu-item-price">${item.price}</div>
+                </div>
+                <button class="item-fav-btn">
+                    ${favorites.includes(item.id) ? '❤️' : '🤍'}
+                </button>
+            `;
+            
+            itemDiv.querySelector('.menu-item-content').addEventListener('click', () => {
+                selectItem(item, restaurant, category);
+                closeMenu();
+            });
+            
+            const favBtn = itemDiv.querySelector('.item-fav-btn');
+            favBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleFavorite(item.id);
+            });
+            
+            return itemDiv;
+        }
+
+        function toggleRestaurant(restaurantId) {
+            const index = expandedRestaurants.indexOf(restaurantId);
+            if (index > -1) {
+                expandedRestaurants.splice(index, 1);
+            } else {
+                expandedRestaurants.push(restaurantId);
+            }
+            renderAllItems();
+        }
+
+        function renderFavorites() {
+            const favoritesContent = document.getElementById('favoritesContent');
+            const emptyFavorites = document.getElementById('emptyFavorites');
+            
+            if (favorites.length === 0) {
+                emptyFavorites.classList.remove('hidden');
+                favoritesContent.innerHTML = '';
+                return;
+            }
+            
+            emptyFavorites.classList.add('hidden');
+            favoritesContent.innerHTML = '';
+            
+            RESTAURANTS.forEach(restaurant => {
+                let restaurantHasFavorites = false;
+                const restaurantDiv = document.createElement('div');
+                restaurantDiv.className = 'restaurant-section';
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'restaurant-header expanded';
+                headerDiv.innerHTML = `
+                    <span class="restaurant-icon">${restaurant.name.split(' ')[0]}</span>
+                    <span class="restaurant-name">${restaurant.name.substring(2)}</span>
+                `;
+                
+                restaurant.categories.forEach(category => {
+                    const favoriteItems = category.items.filter(item => favorites.includes(item.id));
+                    
+                    if (favoriteItems.length > 0) {
+                        restaurantHasFavorites = true;
+                        
+                        const categoryDiv = document.createElement('div');
+                        categoryDiv.className = 'category-section show';
+                        
+                        const categoryHeader = document.createElement('div');
+                        categoryHeader.className = 'category-header';
+                        categoryHeader.textContent = category.name;
+                        categoryDiv.appendChild(categoryHeader);
+                        
+                        favoriteItems.forEach(item => {
+                            const itemDiv = createMenuItem(item, restaurant, category);
+                            categoryDiv.appendChild(itemDiv);
+                        });
+                        
+                        restaurantDiv.appendChild(categoryDiv);
+                    }
+                });
+                
+                if (restaurantHasFavorites) {
+                    restaurantDiv.insertBefore(headerDiv, restaurantDiv.firstChild);
+                    favoritesContent.appendChild(restaurantDiv);
+                }
+            });
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           🎯 SELECT ITEM - Load 3D model
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function selectItem(item, restaurant, category) {
+            currentItem = {
+                ...item,
+                restaurant: restaurant.name,
+                restaurantId: restaurant.id,
+                category: category.name
+            };
+            
+            // Update UI
+            currentFoodName.textContent = item.name;
+            currentFoodPrice.textContent = item.price;
+            currentFoodMeta.textContent = `${restaurant.name} • ${category.name}`;
+            
+            // Show loading
+            showLoading();
+            
+            // Set custom fallback image for this specific item
+            const fallbackImage = createFallbackImage(item.name.substring(2), item.emoji);
+            viewer.setAttribute('poster', fallbackImage);
+            
+            // Load models
+            viewer.src = item.modelGLB;
+            const encodedUSDZ = item.modelUSDZ.split('/').map(encodeURIComponent).join('/');
+            viewer.iosSrc = encodedUSDZ;
+            
+            // Update URL for sharing
+            updateURL(restaurant.id, item.id);
+            
+            // Track analytics
+            trackItemView(item.id, item.name);
+            
+            renderAllItems();
+            renderFavorites();
+            
+            console.log(`✅ Selected: ${item.name}`);
+            console.log(`🖼️  Fallback image: Custom SVG with ${item.emoji}`);
+            console.log(`🔗 Shareable URL: ${getShareableURL(restaurant.id, item.id)}`);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           🎛️ MENU CONTROLS
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function openMenu() {
+            sideMenu.classList.add('open');
+            menuOverlay.classList.add('show');
+        }
+
+        function closeMenu() {
+            sideMenu.classList.remove('open');
+            menuOverlay.classList.remove('show');
+        }
+
+        function showAllItems() {
+            allTab.classList.add('active');
+            favTab.classList.remove('active');
+            allItemsView.classList.remove('hidden');
+            favoritesView.classList.add('hidden');
+        }
+
+        function showFavorites() {
+            favTab.classList.add('active');
+            allTab.classList.remove('active');
+            favoritesView.classList.remove('hidden');
+            allItemsView.classList.add('hidden');
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           🌙 THEME TOGGLE
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function toggleTheme() {
+            const body = document.body;
+            
+            if (body.classList.contains('light-theme')) {
+                body.classList.remove('light-theme');
+                body.classList.add('dark-theme');
+                themeBtn.textContent = '☀️';
+                localStorage.setItem('ar-menu-theme', 'dark');
+            } else {
+                body.classList.remove('dark-theme');
+                body.classList.add('light-theme');
+                themeBtn.textContent = '🌙';
+                localStorage.setItem('ar-menu-theme', 'light');
+            }
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('ar-menu-theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.remove('light-theme');
+                document.body.classList.add('dark-theme');
+                themeBtn.textContent = '☀️';
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           🔗 SHARE FUNCTIONALITY
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function openShareModal() {
+            shareModal.classList.add('show');
+            trackShareClick();
+        }
+
+        function closeShareModal() {
+            shareModal.classList.remove('show');
+        }
+
+        function shareItem(platform) {
+            if (!currentItem) return;
+            
+            const shareUrl = getShareableURL(currentItem.restaurantId, currentItem.id);
+            const shareText = `Check out ${currentItem.name} in AR! ${currentItem.price}`;
+            
+            switch(platform) {
+                case 'whatsapp':
+                    window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`);
+                    break;
+                case 'twitter':
+                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`);
+                    break;
+                case 'copy':
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        alert('✅ Link copied to clipboard!\n\n' + shareUrl);
+                    }).catch(() => {
+                        prompt('Copy this link:', shareUrl);
+                    });
+                    break;
+                case 'native':
+                    if (navigator.share) {
+                        navigator.share({
+                            title: currentItem.name,
+                            text: shareText,
+                            url: shareUrl
+                        });
+                    } else {
+                        alert('Share not supported on this browser');
+                    }
+                    break;
+            }
+            
+            closeShareModal();
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           🔘 EVENT LISTENERS
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        menuBtn.addEventListener('click', openMenu);
+        favBtn.addEventListener('click', () => {
+            openMenu();
+            showFavorites();
+        });
+        menuOverlay.addEventListener('click', closeMenu);
+        themeBtn.addEventListener('click', toggleTheme);
+        shareBtn.addEventListener('click', openShareModal);
+        shareClose.addEventListener('click', closeShareModal);
+        allTab.addEventListener('click', showAllItems);
+        favTab.addEventListener('click', showFavorites);
+        
+        // Instructions controls
+        instructionsClose.addEventListener('click', hideInstructions);
+        helpBtn.addEventListener('click', showInstructions);
+        
+        // Error close
+        errorClose.addEventListener('click', hideError);
+
+        // Share options
+        document.querySelectorAll('.share-option').forEach(option => {
+            option.addEventListener('click', () => {
+                shareItem(option.dataset.platform);
+            });
+        });
+
+        // AR Button
+        arButton.addEventListener('click', () => {
+            viewer.activateAR();
+            trackARActivation();
+        });
+
+        /* ═══════════════════════════════════════════════════════════════════
+           📡 AR VIEWER EVENTS
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        viewer.addEventListener('load', () => {
+            console.log('✅ Model loaded successfully');
+            hideLoading();
+        });
+        
+        viewer.addEventListener('progress', (event) => {
+            const percent = Math.round(event.detail.totalProgress * 100);
+            updateLoadingProgress(percent);
+            console.log(`⏳ Loading: ${percent}%`);
+        });
+
+        viewer.addEventListener('ar-status', (event) => {
+            if (event.detail.status === 'session-started') {
+                console.log('🎉 AR session started');
+            } else if (event.detail.status === 'failed') {
+                showError('AR Failed', 'Could not start AR session. Make sure you have good lighting and a clear surface.');
+            }
+        });
+
+        viewer.addEventListener('error', (event) => {
+            console.error('❌ Model error:', event);
+            hideLoading();
+            
+            const errorMsg = event.detail?.message || 'Unknown error';
+            
+            if (errorMsg.includes('404') || errorMsg.includes('Not Found')) {
+                showError('Model Not Found', 'The 3D model file could not be found. Please try another item.');
+            } else if (errorMsg.includes('network') || errorMsg.includes('fetch')) {
+                showError('Network Error', 'Could not load model. Please check your internet connection and try again.');
+            } else if (errorMsg.includes('format') || errorMsg.includes('parse')) {
+                showError('Invalid Model', 'The 3D model file appears to be corrupted. Please try another item.');
+            } else {
+                showError('Loading Error', 'Could not load the 3D model. Please try again or select another item.');
+            }
+        });
+
+        /* ═══════════════════════════════════════════════════════════════════
+           🚀 INITIALIZATION
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function init() {
+            console.log('🚀 AR Menu Platform Starting...');
+            
+            detectIOS();
+            loadFavorites();
+            loadTheme();
+            checkInstructionsState();
+            renderAllItems();
+            renderFavorites();
+            
+            // Check if URL has specific item
+            const urlItem = findItemByURL();
+            
+            if (urlItem) {
+                // Load item from URL
+                selectItem(urlItem.item, urlItem.restaurant, urlItem.category);
+                expandedRestaurants.push(urlItem.restaurant.id);
+                console.log('🔗 Loaded item from URL');
+            } else {
+                // Select first item by default
+                const firstRestaurant = RESTAURANTS[0];
+                const firstCategory = firstRestaurant.categories[0];
+                const firstItem = firstCategory.items[0];
+                selectItem(firstItem, firstRestaurant, firstCategory);
+                expandedRestaurants.push(firstRestaurant.id);
+            }
+            
+            renderAllItems();
+            
+            console.log('✅ AR Menu Ready!');
+            console.log(`🏪 ${RESTAURANTS.length} restaurants loaded`);
+            console.log('📊 Analytics tracking enabled');
+        }
+
+        init();
+    </script>
+
+</body>
+</html>
