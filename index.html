@@ -10,6 +10,8 @@
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
     
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
         :root {
             --light-bg: #ffffff;
             --light-bg-secondary: #f8f9fa;
@@ -51,7 +53,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             height: 100vh;
             overflow: hidden;
             transition: background 0.3s ease, color 0.3s ease;
@@ -67,6 +69,173 @@
         body.dark-theme {
             background: var(--dark-bg);
             color: var(--dark-text);
+        }
+
+        /* ScaleXR Branding */
+        .scalexr-branding {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .scalexr-logo {
+            font-family: 'Inter', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        .dark-theme .scalexr-logo {
+            background: linear-gradient(135deg, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: fixed;
+            top: 50px;
+            left: 12px;
+            right: 12px;
+            z-index: 100;
+            max-width: 500px;
+            margin: 0 auto;
+            pointer-events: auto;
+            display: none;
+        }
+
+        .search-container.show {
+            display: block;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--light-border);
+            border-radius: var(--radius-full);
+            font-size: 15px;
+            color: var(--light-text);
+            box-shadow: var(--shadow-lg);
+            transition: all 0.2s;
+        }
+
+        .dark-theme .search-bar {
+            background: rgba(26, 26, 26, 0.95);
+            border-color: var(--dark-border);
+            color: white;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            opacity: 0.5;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.1);
+            border: none;
+            color: var(--light-text);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dark-theme .search-clear {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .search-clear.show {
+            display: flex;
+        }
+
+        .search-results {
+            margin-top: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--light-border);
+            border-radius: var(--radius-lg);
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            display: none;
+        }
+
+        .dark-theme .search-results {
+            background: rgba(26, 26, 26, 0.95);
+            border-color: var(--dark-border);
+        }
+
+        .search-results.show {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--light-border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dark-theme .search-result-item {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-item:hover {
+            background: var(--light-bg-secondary);
+        }
+
+        .dark-theme .search-result-item:hover {
+            background: var(--dark-bg);
+        }
+
+        .search-result-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .search-result-meta {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        .search-no-results {
+            padding: 40px 20px;
+            text-align: center;
+            opacity: 0.5;
+            font-size: 14px;
         }
 
         /* Toast Notification */
@@ -324,7 +493,7 @@
         /* Top Navigation */
         .top-nav {
             position: fixed;
-            top: 0;
+            top: 48px;
             left: 0;
             right: 0;
             display: flex;
@@ -782,7 +951,7 @@
         /* Info Card - SLIGHTLY TRANSPARENT */
         .info-card {
             position: fixed;
-            top: 70px;
+            top: 118px;
             left: 12px;
             right: 12px;
             background: rgba(255, 255, 255, 0.95); /* Slightly transparent */
@@ -805,7 +974,7 @@
         }
 
         .info-card.minimized {
-            top: 70px;
+            top: 118px;
         }
 
         .info-card-content {
@@ -2083,7 +2252,7 @@
             background: rgba(255, 255, 255, 0.98);
             border-radius: var(--radius-xl) var(--radius-xl) 0 0;
             padding: var(--space-lg);
-            z-index: 151;
+            z-index: 201;
             transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.2);
         }
@@ -2095,6 +2264,22 @@
 
         .share-modal.show {
             bottom: 0;
+        }
+
+        .share-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 200;
+            display: none;
+            backdrop-filter: blur(8px);
+        }
+
+        .share-overlay.show {
+            display: block;
         }
 
         .share-header {
@@ -2190,6 +2375,21 @@
     </style>
 </head>
 <body class="light-theme">
+
+    <!-- ScaleXR Branding -->
+    <div class="scalexr-branding">
+        <div class="scalexr-logo">ScaleXR</div>
+    </div>
+
+    <!-- Search Container -->
+    <div class="search-container" id="searchContainer">
+        <div style="position: relative;">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-bar" id="searchBar" placeholder="Search restaurants or items...">
+            <button class="search-clear" id="searchClear">×</button>
+        </div>
+        <div class="search-results" id="searchResults"></div>
+    </div>
 
     <!-- Toast Notification -->
     <div class="toast" id="toast">
@@ -2376,6 +2576,7 @@
     <!-- Top Navigation -->
     <div class="top-nav">
         <div class="nav-left">
+            <button class="icon-btn" id="searchBtn" title="Search">🔍</button>
             <button class="icon-btn" id="menuBtn" title="Menu">☰</button>
         </div>
         <div class="nav-right">
@@ -2631,6 +2832,9 @@
         <button class="action-btn" id="shareBtn" title="Share">🔗</button>
     </div>
 
+    <!-- Share Modal Overlay -->
+    <div class="share-overlay" id="shareOverlay"></div>
+
     <!-- Share Modal -->
     <div class="share-modal" id="shareModal">
         <div class="share-header">Share this item!</div>
@@ -2659,12 +2863,12 @@
         // RESTAURANT DATA WITH CUSTOM LIGHTING
         const RESTAURANTS = [
             {
-                id: 'candle-cafe',
-                name: '🕯️ Candle Cafe',
+                id: 'cheezious',
+                name: '🧀 Cheezious',
                 lighting: {
-                    exposure: 1.2,
-                    shadowIntensity: 1.3,
-                    environmentImage: 'neutral', // Can be 'neutral', 'legacy', or custom HDRI URL
+                    exposure: 1.1,
+                    shadowIntensity: 1.0,
+                    environmentImage: 'neutral',
                     cameraOrbit: '0deg 75deg auto',
                     theme: 'warm'
                 },
@@ -2674,34 +2878,18 @@
                         name: 'All Items',
                         items: [
                             {
-                                id: 'blue-artifact',
-                                name: '🔵 Blue Artifact Special',
-                                price: 9.99,
-                                emoji: '🔵',
-                                rating: 4.8,
-                                reviewCount: 124,
-                                views60Days: 1847,
-                                modelGLB: 'Restaurants/Candle Cafe/All Items/Blue Artifact.glb',
-                                modelUSDZ: 'Restaurants/Candle Cafe/All Items/Blue Artifact.usdz',
-                                reviews: [
-                                    { author: 'Sarah M.', rating: 5, date: '2 days ago', text: 'Absolutely amazing! The AR experience makes it so much easier to visualize the dish.' },
-                                    { author: 'John D.', rating: 5, date: '1 week ago', text: 'Love the blue artifact special. Tastes as good as it looks in AR!' },
-                                    { author: 'Emma R.', rating: 4, date: '2 weeks ago', text: 'Great presentation and flavor. Highly recommend trying this.' }
-                                ]
-                            },
-                            {
-                                id: 'red-stand',
-                                name: '🔴 Red Stand Deluxe',
-                                price: 12.99,
-                                emoji: '🔴',
+                                id: 'sandwich',
+                                name: '🥪 Cheese Sandwich',
+                                price: 450,
+                                emoji: '🥪',
                                 rating: 4.6,
-                                reviewCount: 98,
-                                views60Days: 1432,
-                                modelGLB: 'Restaurants/Candle Cafe/All Items/Red Stand.glb',
-                                modelUSDZ: 'Restaurants/Candle Cafe/All Items/Red Stand.usdz',
+                                reviewCount: 89,
+                                views60Days: 1234,
+                                modelGLB: 'Restaurants/Cheezious/Sandwich.glb',
+                                modelUSDZ: 'Restaurants/Cheezious/Sandwich.usdz',
                                 reviews: [
-                                    { author: 'Michael P.', rating: 5, date: '3 days ago', text: 'The red stand is a showstopper! Perfect for special occasions.' },
-                                    { author: 'Lisa K.', rating: 4, date: '1 week ago', text: 'Delicious and beautifully presented. Worth every penny.' }
+                                    { author: 'Ahmed K.', rating: 5, date: '2 days ago', text: 'Best cheese sandwich in town! Fresh ingredients and great value for money.' },
+                                    { author: 'Sara M.', rating: 4, date: '1 week ago', text: 'Delicious and cheesy. Would recommend!' }
                                 ]
                             }
                         ]
@@ -2709,11 +2897,11 @@
                 ]
             },
             {
-                id: 'coffee-shop',
-                name: '☕ Coffee Shop',
+                id: 'chinese',
+                name: '🥢 Chinese',
                 lighting: {
-                    exposure: 0.9,
-                    shadowIntensity: 0.8,
+                    exposure: 1.0,
+                    shadowIntensity: 0.9,
                     environmentImage: 'legacy',
                     cameraOrbit: '0deg 80deg auto',
                     theme: 'cool'
@@ -2724,34 +2912,141 @@
                         name: 'All Items',
                         items: [
                             {
-                                id: 'coffee-cup',
-                                name: '☕ Premium Coffee Cup',
-                                price: 4.99,
-                                emoji: '☕',
+                                id: 'crab-platter',
+                                name: '🦀 Crab Platter',
+                                price: 1850,
+                                emoji: '🦀',
+                                rating: 4.9,
+                                reviewCount: 234,
+                                views60Days: 3421,
+                                modelGLB: 'Restaurants/Chinese/Crab Platter.glb',
+                                modelUSDZ: 'Restaurants/Chinese/Crab Platter.usdz',
+                                reviews: [
+                                    { author: 'Ali R.', rating: 5, date: '1 day ago', text: 'Amazing crab platter! Fresh and perfectly cooked.' },
+                                    { author: 'Fatima S.', rating: 5, date: '3 days ago', text: 'Best seafood experience. Highly recommended!' }
+                                ]
+                            },
+                            {
+                                id: 'crabs',
+                                name: '🦀 Steamed Crabs',
+                                price: 1650,
+                                emoji: '🦀',
+                                rating: 4.8,
+                                reviewCount: 198,
+                                views60Days: 2876,
+                                modelGLB: 'Restaurants/Chinese/Crabs.glb',
+                                modelUSDZ: 'Restaurants/Chinese/Crabs.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'fish-cut',
+                                name: '🐟 Fish Cut Special',
+                                price: 1200,
+                                emoji: '🐟',
+                                rating: 4.7,
+                                reviewCount: 176,
+                                views60Days: 2345,
+                                modelGLB: 'Restaurants/Chinese/Fish cut.glb',
+                                modelUSDZ: 'Restaurants/Chinese/Fish cut.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'fish-soup',
+                                name: '🍲 Hot Fish Soup',
+                                price: 950,
+                                emoji: '🍲',
+                                rating: 4.6,
+                                reviewCount: 143,
+                                views60Days: 1987,
+                                modelGLB: 'Restaurants/Chinese/Fish Soup.glb',
+                                modelUSDZ: 'Restaurants/Chinese/Fish Soup.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'fried-fish',
+                                name: '🐠 Crispy Fried Fish',
+                                price: 1100,
+                                emoji: '🐠',
+                                rating: 4.8,
+                                reviewCount: 189,
+                                views60Days: 2654,
+                                modelGLB: 'Restaurants/Chinese/Fried Fish.glb',
+                                modelUSDZ: 'Restaurants/Chinese/Fried Fish.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'prawns',
+                                name: '🍤 Jumbo Prawns',
+                                price: 1550,
+                                emoji: '🍤',
                                 rating: 4.9,
                                 reviewCount: 267,
-                                views60Days: 3421,
-                                modelGLB: 'Restaurants/Coffee Shop/Coffee Cup.glb',
-                                modelUSDZ: 'Restaurants/Coffee Shop/Coffee Cup.usdz',
-                                reviews: [
-                                    { author: 'Coffee Lover', rating: 5, date: '1 day ago', text: 'Best coffee in town! The AR view helped me choose the perfect size.' },
-                                    { author: 'Alex T.', rating: 5, date: '3 days ago', text: 'Rich flavor, perfect temperature. This is my daily go-to.' },
-                                    { author: 'Rachel B.', rating: 5, date: '1 week ago', text: 'Amazing coffee! The AR feature is so cool too.' }
-                                ]
+                                views60Days: 3198,
+                                modelGLB: 'Restaurants/Chinese/Prawns.glb',
+                                modelUSDZ: 'Restaurants/Chinese/Prawns.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'ramen',
+                                name: '🍜 Special Ramen',
+                                price: 850,
+                                emoji: '🍜',
+                                rating: 4.7,
+                                reviewCount: 198,
+                                views60Days: 2876,
+                                modelGLB: 'Restaurants/Chinese/Ramen.glb',
+                                modelUSDZ: 'Restaurants/Chinese/Ramen.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'shells',
+                                name: '🐚 Fresh Shells',
+                                price: 1350,
+                                emoji: '🐚',
+                                rating: 4.6,
+                                reviewCount: 145,
+                                views60Days: 2123,
+                                modelGLB: 'Restaurants/Chinese/Shells.glb',
+                                modelUSDZ: 'Restaurants/Chinese/Shells.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'shrimp-soup',
+                                name: '🍲 Shrimp Soup',
+                                price: 900,
+                                emoji: '🍲',
+                                rating: 4.7,
+                                reviewCount: 156,
+                                views60Days: 2234,
+                                modelGLB: 'Restaurants/Chinese/Shrimp Soup.glb',
+                                modelUSDZ: 'Restaurants/Chinese/Shrimp Soup.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'shrimps',
+                                name: '🦐 Grilled Shrimps',
+                                price: 1450,
+                                emoji: '🦐',
+                                rating: 4.8,
+                                reviewCount: 223,
+                                views60Days: 2987,
+                                modelGLB: 'Restaurants/Chinese/Shrimps.glb',
+                                modelUSDZ: 'Restaurants/Chinese/Shrimps.usdz',
+                                reviews: []
                             }
                         ]
                     }
                 ]
             },
             {
-                id: 'cube-cafe',
-                name: '◼️ Cube Cafe',
+                id: 'fries-project',
+                name: '🍟 Fries Project',
                 lighting: {
-                    exposure: 1.0,
+                    exposure: 1.1,
                     shadowIntensity: 1.0,
                     environmentImage: 'neutral',
-                    cameraOrbit: '0deg 70deg auto',
-                    theme: 'neutral'
+                    cameraOrbit: '0deg 75deg auto',
+                    theme: 'warm'
                 },
                 categories: [
                     {
@@ -2759,33 +3054,308 @@
                         name: 'All Items',
                         items: [
                             {
-                                id: 'blue-cube',
-                                name: '🔷 Blue Cube Delight',
-                                price: 7.99,
-                                emoji: '🔷',
-                                rating: 4.7,
-                                reviewCount: 156,
-                                views60Days: 2103,
-                                modelGLB: 'Restaurants/Cube Cafe/Blue Cube.glb',
-                                modelUSDZ: 'Restaurants/Cube Cafe/Blue Cube.usdz',
+                                id: 'masala-fries',
+                                name: '🍟 Masala Fries',
+                                price: 350,
+                                emoji: '🍟',
+                                rating: 4.5,
+                                reviewCount: 178,
+                                views60Days: 2456,
+                                modelGLB: 'Restaurants/Fries Project/Masala Fries.glb',
+                                modelUSDZ: 'Restaurants/Fries Project/Masala Fries.usdz',
                                 reviews: [
-                                    { author: 'David W.', rating: 5, date: '2 days ago', text: 'Unique presentation and great taste. The cube shape is fun!' },
-                                    { author: 'Nina S.', rating: 4, date: '5 days ago', text: 'Interesting concept and delicious flavor.' }
+                                    { author: 'Hamza A.', rating: 5, date: '1 day ago', text: 'Perfect spice level! Love these masala fries.' },
+                                    { author: 'Ayesha K.', rating: 4, date: '5 days ago', text: 'Crispy and tasty. Good portion size.' }
                                 ]
                             },
                             {
-                                id: 'pink-cube',
-                                name: '🟪 Pink Cube Surprise',
-                                price: 7.99,
-                                emoji: '🟪',
-                                rating: 4.5,
-                                reviewCount: 142,
-                                views60Days: 1876,
-                                modelGLB: 'Restaurants/Cube Cafe/Pink Cube.glb',
-                                modelUSDZ: 'Restaurants/Cube Cafe/Pink Cube.usdz',
+                                id: 'wrap',
+                                name: '🌯 Chicken Wrap',
+                                price: 450,
+                                emoji: '🌯',
+                                rating: 4.7,
+                                reviewCount: 156,
+                                views60Days: 2198,
+                                modelGLB: 'Restaurants/Fries Project/Wrap.glb',
+                                modelUSDZ: 'Restaurants/Fries Project/Wrap.usdz',
+                                reviews: []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'mc-donalds',
+                name: '🍔 McDonald\'s',
+                lighting: {
+                    exposure: 1.2,
+                    shadowIntensity: 1.1,
+                    environmentImage: 'neutral',
+                    cameraOrbit: '0deg 75deg auto',
+                    theme: 'bright'
+                },
+                categories: [
+                    {
+                        id: 'all-items',
+                        name: 'All Items',
+                        items: [
+                            {
+                                id: 'mc-classic-burger',
+                                name: '🍔 MC Classic Burger',
+                                price: 550,
+                                emoji: '🍔',
+                                rating: 4.7,
+                                reviewCount: 467,
+                                views60Days: 5432,
+                                modelGLB: 'Restaurants/Mc Donalds/MC Classic Burger.glb',
+                                modelUSDZ: 'Restaurants/Mc Donalds/MC Classic Burger.usdz',
                                 reviews: [
-                                    { author: 'Sophie L.', rating: 5, date: '4 days ago', text: 'So pretty and tasty! Perfect for Instagram.' },
-                                    { author: 'Tom H.', rating: 4, date: '1 week ago', text: 'Great surprise inside. Loved the pink cube!' }
+                                    { author: 'Usman M.', rating: 5, date: '1 day ago', text: 'Classic McDonald\'s taste. Always satisfying!' },
+                                    { author: 'Zara F.', rating: 4, date: '2 days ago', text: 'Good burger, fresh ingredients.' }
+                                ]
+                            },
+                            {
+                                id: 'mc-deal-1',
+                                name: '🍔 MC Deal 1',
+                                price: 850,
+                                emoji: '🍔',
+                                rating: 4.8,
+                                reviewCount: 389,
+                                views60Days: 4876,
+                                modelGLB: 'Restaurants/Mc Donalds/MC Deal 1.glb',
+                                modelUSDZ: 'Restaurants/Mc Donalds/MC Deal 1.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'mc-deal-2',
+                                name: '🍔 MC Deal 2',
+                                price: 1050,
+                                emoji: '🍔',
+                                rating: 4.9,
+                                reviewCount: 423,
+                                views60Days: 5123,
+                                modelGLB: 'Restaurants/Mc Donalds/MC Deal 2.glb',
+                                modelUSDZ: 'Restaurants/Mc Donalds/MC Deal 2.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'mc-deal-3',
+                                name: '🍔 MC Deal 3',
+                                price: 1250,
+                                emoji: '🍔',
+                                rating: 4.8,
+                                reviewCount: 378,
+                                views60Days: 4567,
+                                modelGLB: 'Restaurants/Mc Donalds/MC Deal 3.glb',
+                                modelUSDZ: 'Restaurants/Mc Donalds/MC Deal 3.usdz',
+                                reviews: []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'perk-cafe',
+                name: '☕ Perk Cafe',
+                lighting: {
+                    exposure: 1.1,
+                    shadowIntensity: 0.9,
+                    environmentImage: 'legacy',
+                    cameraOrbit: '0deg 80deg auto',
+                    theme: 'cozy'
+                },
+                categories: [
+                    {
+                        id: 'all-items',
+                        name: 'All Items',
+                        items: [
+                            {
+                                id: 'chicken-tikka-sandwich',
+                                name: '🥪 Chicken Tikka Sandwich',
+                                price: 550,
+                                emoji: '🥪',
+                                rating: 4.8,
+                                reviewCount: 234,
+                                views60Days: 3456,
+                                modelGLB: 'Restaurants/Perk Cafe/Chicken Tikka Sandwich.glb',
+                                modelUSDZ: 'Restaurants/Perk Cafe/Chicken Tikka Sandwich.usdz',
+                                reviews: [
+                                    { author: 'Bilal H.', rating: 5, date: '1 day ago', text: 'Best tikka sandwich ever! Perfectly spiced.' },
+                                    { author: 'Maryam K.', rating: 5, date: '3 days ago', text: 'Amazing flavor and generous portion.' }
+                                ]
+                            },
+                            {
+                                id: 'chocolate-cupcake',
+                                name: '🧁 Chocolate Cupcake',
+                                price: 250,
+                                emoji: '🧁',
+                                rating: 4.7,
+                                reviewCount: 189,
+                                views60Days: 2876,
+                                modelGLB: 'Restaurants/Perk Cafe/Chocolate Cupcake.glb',
+                                modelUSDZ: 'Restaurants/Perk Cafe/Chocolate Cupcake.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'coffee-cup',
+                                name: '☕ Premium Coffee',
+                                price: 350,
+                                emoji: '☕',
+                                rating: 4.9,
+                                reviewCount: 456,
+                                views60Days: 5234,
+                                modelGLB: 'Restaurants/Perk Cafe/Coffee Cup.glb',
+                                modelUSDZ: 'Restaurants/Perk Cafe/Coffee Cup.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'banana-bread',
+                                name: '🍌 Sliced Banana Bread',
+                                price: 400,
+                                emoji: '🍌',
+                                rating: 4.6,
+                                reviewCount: 167,
+                                views60Days: 2345,
+                                modelGLB: 'Restaurants/Perk Cafe/Sliced Banana Bread Loaf.glb',
+                                modelUSDZ: 'Restaurants/Perk Cafe/Sliced Banana Bread Loaf.usdz',
+                                reviews: []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'pizza-hut',
+                name: '🍕 Pizza Hut',
+                lighting: {
+                    exposure: 1.2,
+                    shadowIntensity: 1.0,
+                    environmentImage: 'neutral',
+                    cameraOrbit: '0deg 75deg auto',
+                    theme: 'warm'
+                },
+                categories: [
+                    {
+                        id: 'all-items',
+                        name: 'All Items',
+                        items: [
+                            {
+                                id: 'fajita-pizza',
+                                name: '🍕 Fajita Pizza',
+                                price: 1650,
+                                emoji: '🍕',
+                                rating: 4.9,
+                                reviewCount: 567,
+                                views60Days: 6543,
+                                modelGLB: 'Restaurants/Pizza Hut/Fajita Pizza.glb',
+                                modelUSDZ: 'Restaurants/Pizza Hut/Fajita Pizza.usdz',
+                                reviews: [
+                                    { author: 'Asad M.', rating: 5, date: '1 day ago', text: 'Best fajita pizza in Pakistan! Loaded with toppings.' },
+                                    { author: 'Hina A.', rating: 5, date: '2 days ago', text: 'Family favorite. We order this every week!' }
+                                ]
+                            },
+                            {
+                                id: 'pepperoni-pizza',
+                                name: '🍕 Pepperoni Pizza',
+                                price: 1550,
+                                emoji: '🍕',
+                                rating: 4.8,
+                                reviewCount: 489,
+                                views60Days: 5876,
+                                modelGLB: 'Restaurants/Pizza Hut/Peperoni Pizza.glb',
+                                modelUSDZ: 'Restaurants/Pizza Hut/Peperoni Pizza.usdz',
+                                reviews: []
+                            },
+                            {
+                                id: 'tikka-pizza',
+                                name: '🍕 Tikka Pizza',
+                                price: 1700,
+                                emoji: '🍕',
+                                rating: 4.9,
+                                reviewCount: 534,
+                                views60Days: 6234,
+                                modelGLB: 'Restaurants/Pizza Hut/Tikka Pizza.glb',
+                                modelUSDZ: 'Restaurants/Pizza Hut/Tikka Pizza.usdz',
+                                reviews: []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'steak-house',
+                name: '🥩 Steak House',
+                lighting: {
+                    exposure: 1.0,
+                    shadowIntensity: 1.2,
+                    environmentImage: 'neutral',
+                    cameraOrbit: '0deg 70deg auto',
+                    theme: 'elegant'
+                },
+                categories: [
+                    {
+                        id: 'all-items',
+                        name: 'All Items',
+                        items: [
+                            {
+                                id: 'classic-beef-burger',
+                                name: '🍔 Classic Beef Burger',
+                                price: 750,
+                                emoji: '🍔',
+                                rating: 4.8,
+                                reviewCount: 345,
+                                views60Days: 4321,
+                                modelGLB: 'Restaurants/Steak House/Classic Beef Burger.glb',
+                                modelUSDZ: 'Restaurants/Steak House/Classic Beef Burger.usdz',
+                                reviews: [
+                                    { author: 'Kamran S.', rating: 5, date: '2 days ago', text: 'Juicy and perfectly cooked. Best beef burger!' },
+                                    { author: 'Nida R.', rating: 4, date: '1 week ago', text: 'Great taste and quality meat.' }
+                                ]
+                            },
+                            {
+                                id: 'steak',
+                                name: '🥩 Premium Steak',
+                                price: 1950,
+                                emoji: '🥩',
+                                rating: 4.9,
+                                reviewCount: 278,
+                                views60Days: 3987,
+                                modelGLB: 'Restaurants/Steak House/Steak.glb',
+                                modelUSDZ: 'Restaurants/Steak House/Steak.usdz',
+                                reviews: []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'subway',
+                name: '🥖 Subway',
+                lighting: {
+                    exposure: 1.1,
+                    shadowIntensity: 1.0,
+                    environmentImage: 'neutral',
+                    cameraOrbit: '0deg 75deg auto',
+                    theme: 'fresh'
+                },
+                categories: [
+                    {
+                        id: 'all-items',
+                        name: 'All Items',
+                        items: [
+                            {
+                                id: 'subway-pepperoni',
+                                name: '🥖 Subway Pepperoni',
+                                price: 650,
+                                emoji: '🥖',
+                                rating: 4.7,
+                                reviewCount: 389,
+                                views60Days: 4876,
+                                modelGLB: 'Restaurants/Subway/Subway Peperoni.glb',
+                                modelUSDZ: 'Restaurants/Subway/Subway Peperoni.usdz',
+                                reviews: [
+                                    { author: 'Faisal K.', rating: 5, date: '1 day ago', text: 'Fresh ingredients and tasty pepperoni. Love it!' },
+                                    { author: 'Sana M.', rating: 4, date: '4 days ago', text: 'Good sub, always consistent quality.' }
                                 ]
                             }
                         ]
@@ -2861,10 +3431,16 @@
         const shareBtn = document.getElementById('shareBtn');
         const shareModal = document.getElementById('shareModal');
         const shareClose = document.getElementById('shareClose');
+        const shareOverlay = document.getElementById('shareOverlay');
         const allTab = document.getElementById('allTab');
         const favTab = document.getElementById('favTab');
         const allItemsView = document.getElementById('allItemsView');
         const favoritesView = document.getElementById('favoritesView');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchContainer = document.getElementById('searchContainer');
+        const searchBar = document.getElementById('searchBar');
+        const searchClear = document.getElementById('searchClear');
+        const searchResults = document.getElementById('searchResults');
 
         // UTILITY FUNCTIONS
         function showToast(message, type = 'success') {
@@ -3387,7 +3963,7 @@
             currentQuantity = 1;
             
             document.getElementById('currentFoodName').textContent = item.name;
-            document.getElementById('currentFoodPrice').textContent = `$${item.price.toFixed(2)}`;
+            document.getElementById('currentFoodPrice').textContent = formatPrice(item.price);
             document.getElementById('currentFoodMeta').innerHTML = `
                 <span>🏪 ${restaurant.name.substring(2)}</span>
                 <span>•</span>
@@ -3538,12 +4114,136 @@
             }
         }
 
+        // FORMAT PRICE IN PKR
+        function formatPrice(price) {
+            return `Rs. ${price.toLocaleString('en-PK')}`;
+        }
+
+        // SEARCH FUNCTIONS
+        function toggleSearch() {
+            const isVisible = searchContainer.classList.contains('show');
+            if (isVisible) {
+                searchContainer.classList.remove('show');
+                searchBar.value = '';
+                searchResults.classList.remove('show');
+                searchClear.classList.remove('show');
+            } else {
+                searchContainer.classList.add('show');
+                searchBar.focus();
+            }
+        }
+
+        function performSearch(query) {
+            if (!query || query.trim().length < 2) {
+                searchResults.classList.remove('show');
+                searchClear.classList.remove('show');
+                return;
+            }
+
+            searchClear.classList.add('show');
+            const results = [];
+            const lowerQuery = query.toLowerCase();
+
+            // Search through all restaurants and items
+            RESTAURANTS.forEach(restaurant => {
+                // Check if restaurant name matches
+                if (restaurant.name.toLowerCase().includes(lowerQuery)) {
+                    restaurant.categories.forEach(category => {
+                        category.items.forEach(item => {
+                            results.push({
+                                type: 'restaurant',
+                                item: item,
+                                restaurant: restaurant,
+                                category: category
+                            });
+                        });
+                    });
+                } else {
+                    // Search items
+                    restaurant.categories.forEach(category => {
+                        category.items.forEach(item => {
+                            if (item.name.toLowerCase().includes(lowerQuery)) {
+                                results.push({
+                                    type: 'item',
+                                    item: item,
+                                    restaurant: restaurant,
+                                    category: category
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+
+            renderSearchResults(results);
+        }
+
+        function renderSearchResults(results) {
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="search-no-results">No results found</div>';
+                searchResults.classList.add('show');
+                return;
+            }
+
+            searchResults.innerHTML = results.slice(0, 10).map(result => {
+                const { item, restaurant, category } = result;
+                return `
+                    <div class="search-result-item" data-item-id="${item.id}" data-restaurant-id="${restaurant.id}">
+                        <div class="search-result-name">${item.name}</div>
+                        <div class="search-result-meta">${formatPrice(item.price)} • ${restaurant.name.substring(2)}</div>
+                    </div>
+                `;
+            }).join('');
+
+            searchResults.classList.add('show');
+
+            // Add click handlers
+            document.querySelectorAll('.search-result-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const itemId = el.dataset.itemId;
+                    const restaurantId = el.dataset.restaurantId;
+                    selectItemFromSearch(itemId, restaurantId);
+                });
+            });
+        }
+
+        function selectItemFromSearch(itemId, restaurantId) {
+            const restaurant = RESTAURANTS.find(r => r.id === restaurantId);
+            if (!restaurant) return;
+
+            let foundItem = null;
+            let foundCategory = null;
+
+            restaurant.categories.forEach(category => {
+                const item = category.items.find(i => i.id === itemId);
+                if (item) {
+                    foundItem = item;
+                    foundCategory = category;
+                }
+            });
+
+            if (foundItem && foundCategory) {
+                selectItem(foundItem, restaurant, foundCategory);
+                toggleSearch(); // Close search
+            }
+        }
+
         // SHARE FUNCTIONS
+        function openShareModal() {
+            shareModal.classList.add('show');
+            shareOverlay.classList.add('show');
+        }
+
+        function closeShareModal() {
+            shareModal.classList.remove('show');
+            shareOverlay.classList.remove('show');
+        }
+
         function shareItem(platform) {
             if (!currentItem) return;
             
             const shareUrl = window.location.origin + window.location.pathname + `?restaurant=${currentRestaurant.id}&item=${currentItem.id}`;
-            const shareText = `Check out ${currentItem.name} in AR! $${currentItem.price.toFixed(2)}`;
+            const shareText = `Check out ${currentItem.name} in AR! ${formatPrice(currentItem.price)}`;
             
             switch(platform) {
                 case 'whatsapp':
@@ -3564,7 +4264,7 @@
                     break;
             }
             
-            shareModal.classList.remove('show');
+            closeShareModal();
         }
 
         function copyToClipboard(text) {
@@ -3668,8 +4368,21 @@
 
         arButton.addEventListener('click', () => viewer.activateAR());
         addToCartButton.addEventListener('click', () => addToCart(currentItem, currentQuantity));
-        shareBtn.addEventListener('click', () => shareModal.classList.add('show'));
-        shareClose.addEventListener('click', () => shareModal.classList.remove('show'));
+        shareBtn.addEventListener('click', openShareModal);
+        shareClose.addEventListener('click', closeShareModal);
+        shareOverlay.addEventListener('click', closeShareModal);
+        searchBtn.addEventListener('click', toggleSearch);
+        
+        searchBar.addEventListener('input', (e) => {
+            performSearch(e.target.value);
+        });
+        
+        searchClear.addEventListener('click', () => {
+            searchBar.value = '';
+            searchResults.classList.remove('show');
+            searchClear.classList.remove('show');
+            searchBar.focus();
+        });
 
         document.querySelectorAll('.share-option').forEach(option => {
             option.addEventListener('click', () => shareItem(option.dataset.platform));
