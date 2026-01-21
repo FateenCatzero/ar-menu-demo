@@ -978,11 +978,6 @@
             margin: 0 auto;
         }
 
-        /* Push info card down when search is open */
-        .info-card.search-active {
-            top: 230px;
-        }
-
         .dark-theme .info-card {
             background: rgba(26, 26, 26, 0.95); /* Slightly transparent */
             color: white;
@@ -991,6 +986,12 @@
 
         .info-card.minimized {
             top: 118px;
+        }
+
+        /* Push info card down when search is open - HIGHER SPECIFICITY */
+        .info-card.search-active,
+        .info-card.minimized.search-active {
+            top: 230px !important;
         }
 
         .info-card-content {
@@ -4178,12 +4179,22 @@
         }
 
         // SEARCH FUNCTIONS
+        function saveSearchQuery(query) {
+            localStorage.setItem('ar-menu-search-query', query);
+        }
+
+        function loadSearchQuery() {
+            return localStorage.getItem('ar-menu-search-query') || '';
+        }
+
         function closeSearch() {
             searchContainer.classList.remove('show');
-            searchBar.value = '';
+            // Don't clear search value - keep it for memory
             searchResults.classList.remove('show');
             searchClear.classList.remove('show');
             infoCard.classList.remove('search-active');
+            // Save current search query
+            saveSearchQuery(searchBar.value);
         }
 
         function toggleSearch() {
@@ -4194,10 +4205,19 @@
                 searchContainer.classList.add('show');
                 searchBar.focus();
                 infoCard.classList.add('search-active');
+                // Restore previous search and trigger search if there was text
+                const savedQuery = loadSearchQuery();
+                if (savedQuery) {
+                    searchBar.value = savedQuery;
+                    performSearch(savedQuery);
+                }
             }
         }
 
         function performSearch(query) {
+            // Save query to localStorage
+            saveSearchQuery(query);
+
             if (!query || query.trim().length < 2) {
                 searchResults.classList.remove('show');
                 searchClear.classList.remove('show');
@@ -4465,6 +4485,8 @@
             searchResults.classList.remove('show');
             searchClear.classList.remove('show');
             searchBar.focus();
+            // Clear saved search query
+            saveSearchQuery('');
         });
 
         document.querySelectorAll('.share-option').forEach(option => {
