@@ -4575,8 +4575,11 @@
             const hasSeenWelcome = localStorage.getItem('ar-menu-welcome-seen');
             if (!hasSeenWelcome) {
                 welcomeOverlay.classList.add('show');
+            } else {
+                // Show tutorial on every app load for returning users
+                tutorialOverlay.classList.add('show');
             }
-            
+
             const firstRestaurant = RESTAURANTS[0];
             const firstItem = firstRestaurant.categories[0].items[0];
             selectItem(firstItem, firstRestaurant, firstRestaurant.categories[0]);
