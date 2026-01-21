@@ -106,13 +106,13 @@
             background-clip: text;
         }
 
-        /* Search Bar - Below navigation buttons */
+        /* Search Bar - Below navigation buttons, above info card */
         .search-container {
             position: fixed;
             top: 120px;
             left: 12px;
             right: 12px;
-            z-index: 89;
+            z-index: 91;
             max-width: 500px;
             margin: 0 auto;
             pointer-events: none;
@@ -4505,6 +4505,20 @@
             searchBar.focus();
             // Clear saved search query
             saveSearchQuery('');
+        });
+
+        // Close search when clicking outside
+        document.addEventListener('click', (e) => {
+            const isSearchVisible = searchContainer.classList.contains('show');
+            if (!isSearchVisible) return;
+
+            // Check if click is outside search container and search button
+            const clickedInsideSearch = searchContainer.contains(e.target);
+            const clickedSearchBtn = searchBtn.contains(e.target);
+
+            if (!clickedInsideSearch && !clickedSearchBtn) {
+                closeSearch();
+            }
         });
 
         document.querySelectorAll('.share-option').forEach(option => {
