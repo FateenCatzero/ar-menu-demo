@@ -10,24 +10,34 @@
     
     <style>
         :root {
-            --light-bg: #E8E8E8FF;
-            --light-bg-secondary: #f5f5f5;
+            --light-bg: #ffffff;
+            --light-bg-secondary: #f8f9fa;
             --light-text: #1a1a1a;
-            --dark-bg: #191919FF;
-            --dark-bg-secondary: #2a2a2a;
+            --light-border: #e5e7eb;
+            --dark-bg: #0f0f0f;
+            --dark-bg-secondary: #1a1a1a;
             --dark-text: #ffffff;
-            --color-primary: #6366f1;
-            --color-secondary: #8b5cf6;
+            --dark-border: #2a2a2a;
+            --color-primary: #3b82f6;
+            --color-primary-hover: #2563eb;
             --color-success: #10b981;
             --color-warning: #f59e0b;
             --color-favorite: #ef4444;
+            --color-star: #fbbf24;
+            --space-xs: 4px;
             --space-sm: 8px;
             --space-md: 16px;
             --space-lg: 24px;
+            --space-xl: 32px;
             --radius-sm: 8px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
             --radius-full: 9999px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         * {
@@ -37,23 +47,134 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             height: 100vh;
             overflow: hidden;
-            transition: background 0.3s ease;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         body.light-theme {
-            background: linear-gradient(135deg, var(--light-bg) 0%, var(--light-bg-secondary) 100%);
+            background: var(--light-bg);
             color: var(--light-text);
         }
 
         body.dark-theme {
-            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-secondary) 100%);
+            background: var(--dark-bg);
             color: var(--dark-text);
         }
 
-        /* Top Navigation */
+        /* ═══════════════════════════════════════════════════════════════════
+           WELCOME SCREEN - Shows on first visit
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .welcome-overlay.show {
+            display: flex;
+        }
+
+        .welcome-content {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .dark-theme .welcome-content {
+            background: var(--dark-bg-secondary);
+            color: white;
+        }
+
+        .welcome-icon {
+            font-size: 80px;
+            margin-bottom: var(--space-lg);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: var(--space-md);
+        }
+
+        .welcome-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: var(--space-lg);
+            opacity: 0.8;
+        }
+
+        .welcome-steps {
+            text-align: left;
+            margin: var(--space-lg) 0;
+            padding: var(--space-lg);
+            background: var(--light-bg-secondary);
+            border-radius: var(--radius-md);
+        }
+
+        .dark-theme .welcome-steps {
+            background: var(--dark-bg);
+        }
+
+        .welcome-step {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+            font-size: 14px;
+        }
+
+        .welcome-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .welcome-step-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .welcome-button {
+            width: 100%;
+            padding: 16px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .welcome-button:active {
+            transform: scale(0.98);
+            background: var(--color-primary-hover);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           TOP NAVIGATION - Modern minimal design
+           ═══════════════════════════════════════════════════════════════════ */
+        
         .top-nav {
             position: fixed;
             top: 0;
@@ -63,10 +184,8 @@
             justify-content: space-between;
             align-items: center;
             padding: var(--space-md);
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(20px);
+            background: transparent;
             z-index: 100;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .nav-left, .nav-right {
@@ -76,12 +195,12 @@
         }
 
         .icon-btn {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius-full);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--light-border);
+            color: var(--light-text);
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
@@ -89,41 +208,61 @@
             justify-content: center;
             font-size: 20px;
             position: relative;
+            box-shadow: var(--shadow-md);
+            font-weight: 600;
+        }
+
+        .dark-theme .icon-btn {
+            background: rgba(26, 26, 26, 0.95);
+            border: 1px solid var(--dark-border);
+            color: white;
         }
 
         .icon-btn:active {
             transform: scale(0.95);
         }
 
+        .icon-btn:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
         .fav-counter {
             position: absolute;
-            top: -5px;
-            right: -5px;
+            top: -6px;
+            right: -6px;
             background: var(--color-favorite);
             color: white;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            font-size: 11px;
-            font-weight: bold;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 700;
             display: none;
             align-items: center;
             justify-content: center;
-            border: 2px solid rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--light-bg);
+        }
+
+        .dark-theme .fav-counter {
+            border-color: var(--dark-bg);
         }
 
         .fav-counter.show {
             display: flex;
         }
 
-        /* Side Menu */
+        /* ═══════════════════════════════════════════════════════════════════
+           SIDE MENU - Modernized
+           ═══════════════════════════════════════════════════════════════════ */
+        
         .menu-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 98;
             display: none;
             backdrop-filter: blur(4px);
@@ -140,13 +279,18 @@
             width: 85%;
             max-width: 380px;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(20px);
-            color: white;
+            background: white;
+            color: var(--light-text);
             z-index: 99;
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
             padding-bottom: 60px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .dark-theme .side-menu {
+            background: var(--dark-bg-secondary);
+            color: white;
         }
 
         .side-menu.open {
@@ -154,17 +298,18 @@
         }
 
         .menu-header {
-            padding: var(--space-lg);
+            padding: var(--space-xl);
             padding-top: 80px;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
             position: sticky;
             top: 0;
             z-index: 10;
+            color: white;
         }
 
         .menu-title {
             font-size: 28px;
-            font-weight: bold;
+            font-weight: 700;
             margin-bottom: var(--space-sm);
         }
 
@@ -177,18 +322,24 @@
             display: flex;
             gap: var(--space-sm);
             padding: var(--space-md);
-            background: rgba(0, 0, 0, 0.3);
+            background: var(--light-bg-secondary);
             position: sticky;
             top: 140px;
             z-index: 9;
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        .dark-theme .menu-tabs {
+            background: var(--dark-bg);
+            border-bottom-color: var(--dark-border);
         }
 
         .menu-tab {
             flex: 1;
             padding: 12px;
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
+            border: 1px solid var(--light-border);
+            color: var(--light-text);
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s;
@@ -196,9 +347,15 @@
             font-weight: 600;
         }
 
+        .dark-theme .menu-tab {
+            border-color: var(--dark-border);
+            color: white;
+        }
+
         .menu-tab.active {
-            background: white;
-            color: var(--dark-bg);
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
         }
 
         .restaurant-section {
@@ -208,32 +365,39 @@
         .restaurant-header {
             display: flex;
             align-items: center;
-            gap: var(--space-sm);
+            gap: var(--space-md);
             padding: var(--space-md);
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--light-bg-secondary);
             border-radius: var(--radius-md);
             margin-bottom: var(--space-sm);
             cursor: pointer;
             transition: all 0.2s;
+            border: 1px solid var(--light-border);
+        }
+
+        .dark-theme .restaurant-header {
+            background: var(--dark-bg);
+            border-color: var(--dark-border);
         }
 
         .restaurant-header:hover {
-            background: rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow-sm);
         }
 
         .restaurant-icon {
-            font-size: 24px;
+            font-size: 28px;
         }
 
         .restaurant-name {
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 600;
             flex: 1;
         }
 
         .expand-icon {
-            font-size: 20px;
+            font-size: 18px;
             transition: transform 0.3s;
+            color: var(--color-primary);
         }
 
         .restaurant-header.expanded .expand-icon {
@@ -251,52 +415,89 @@
         }
 
         .category-header {
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-primary);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: var(--space-sm);
+            margin-bottom: var(--space-md);
             padding-left: var(--space-sm);
         }
 
         .menu-item {
-            background: rgba(255, 255, 255, 0.08);
+            background: white;
             padding: var(--space-md);
             margin-bottom: var(--space-sm);
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s;
-            border: 2px solid transparent;
+            border: 2px solid var(--light-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: var(--space-md);
+        }
+
+        .dark-theme .menu-item {
+            background: var(--dark-bg);
+            border-color: var(--dark-border);
         }
 
         .menu-item:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
 
         .menu-item.active {
             border-color: var(--color-success);
-            background: rgba(16, 185, 129, 0.2);
+            background: rgba(16, 185, 129, 0.05);
         }
 
         .menu-item-content {
             flex: 1;
         }
 
+        .menu-item-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+        }
+
         .menu-item-name {
             font-size: 16px;
             font-weight: 600;
-            margin-bottom: 4px;
+            flex: 1;
+        }
+
+        .menu-item-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-star);
+        }
+
+        .menu-item-details {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-md);
         }
 
         .menu-item-price {
             font-size: 18px;
-            color: var(--color-warning);
-            font-weight: bold;
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        .menu-item-views {
+            font-size: 11px;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .item-fav-btn {
@@ -309,13 +510,13 @@
         }
 
         .item-fav-btn:active {
-            transform: scale(1.3);
+            transform: scale(1.2);
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px var(--space-lg);
-            opacity: 0.6;
+            padding: 60px var(--space-lg);
+            opacity: 0.5;
         }
 
         .empty-state-icon {
@@ -325,59 +526,302 @@
 
         .empty-state-text {
             font-size: 16px;
+            line-height: 1.6;
         }
 
-        /* Info Card */
+        /* ═══════════════════════════════════════════════════════════════════
+           INFO CARD - Minimizable with ratings
+           ═══════════════════════════════════════════════════════════════════ */
+        
         .info-card {
             position: absolute;
-            top: 90px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
+            top: 80px;
+            left: var(--space-md);
+            right: var(--space-md);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            color: white;
-            padding: var(--space-lg);
+            color: var(--light-text);
             border-radius: var(--radius-lg);
-            text-align: center;
             z-index: 10;
-            min-width: 260px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--light-border);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .dark-theme .info-card {
+            background: rgba(26, 26, 26, 0.95);
+            color: white;
+            border-color: var(--dark-border);
+        }
+
+        .info-card.minimized {
+            top: 80px;
+        }
+
+        .info-card-content {
+            padding: var(--space-lg);
+            transition: all 0.3s ease;
+        }
+
+        .info-card.minimized .info-card-content {
+            padding: var(--space-md);
+        }
+
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-md);
+        }
+
+        .info-card.minimized .info-header {
+            margin-bottom: 0;
+            align-items: center;
+        }
+
+        .info-main {
+            flex: 1;
         }
 
         .food-name {
             font-size: 24px;
-            font-weight: bold;
+            font-weight: 700;
             margin-bottom: var(--space-sm);
+            transition: font-size 0.3s;
+        }
+
+        .info-card.minimized .food-name {
+            font-size: 16px;
+            margin-bottom: 0;
         }
 
         .food-price {
             font-size: 28px;
-            color: var(--color-warning);
-            font-weight: bold;
-            margin-bottom: var(--space-sm);
+            color: var(--color-primary);
+            font-weight: 700;
+            transition: font-size 0.3s;
+        }
+
+        .info-card.minimized .food-price {
+            font-size: 18px;
+        }
+
+        .minimize-btn {
+            background: var(--light-bg-secondary);
+            border: 1px solid var(--light-border);
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .dark-theme .minimize-btn {
+            background: var(--dark-bg);
+            border-color: var(--dark-border);
+        }
+
+        .minimize-btn:active {
+            transform: scale(0.95);
+        }
+
+        .info-details {
+            opacity: 1;
+            max-height: 500px;
+            transition: all 0.3s ease;
+        }
+
+        .info-card.minimized .info-details {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .food-rating {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+            padding: var(--space-md);
+            background: var(--light-bg-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dark-theme .food-rating {
+            background: var(--dark-bg);
+        }
+
+        .food-rating:hover {
+            box-shadow: var(--shadow-sm);
+        }
+
+        .rating-stars {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 20px;
+        }
+
+        .rating-info {
+            flex: 1;
+        }
+
+        .rating-score {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-star);
+        }
+
+        .rating-count {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        .rating-arrow {
+            font-size: 18px;
+            opacity: 0.4;
         }
 
         .food-meta {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-top: var(--space-sm);
+            font-size: 13px;
+            opacity: 0.6;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
         }
 
-        /* AR Viewer */
+        /* ═══════════════════════════════════════════════════════════════════
+           REVIEWS MODAL
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        .reviews-modal {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            max-height: 80vh;
+            background: white;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            padding: var(--space-xl);
+            z-index: 150;
+            transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+        }
+
+        .dark-theme .reviews-modal {
+            background: var(--dark-bg-secondary);
+            color: white;
+        }
+
+        .reviews-modal.show {
+            bottom: 0;
+        }
+
+        .reviews-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        .dark-theme .reviews-header {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .reviews-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .reviews-close {
+            background: var(--light-bg-secondary);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dark-theme .reviews-close {
+            background: var(--dark-bg);
+        }
+
+        .review-item {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        .dark-theme .review-item {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-sm);
+        }
+
+        .review-author {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .review-stars {
+            color: var(--color-star);
+        }
+
+        .review-date {
+            font-size: 12px;
+            opacity: 0.5;
+            margin-bottom: var(--space-sm);
+        }
+
+        .review-text {
+            font-size: 14px;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           AR VIEWER
+           ═══════════════════════════════════════════════════════════════════ */
+        
         model-viewer {
             width: 100%;
             height: 100%;
         }
 
-        /* Loading Progress Bar */
+        /* ═══════════════════════════════════════════════════════════════════
+           LOADING OVERLAY
+           ═══════════════════════════════════════════════════════════════════ */
+        
         .loading-overlay {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             display: none;
             align-items: center;
             justify-content: center;
@@ -406,7 +850,7 @@
 
         .loading-text {
             color: white;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
         }
 
@@ -414,7 +858,7 @@
             width: 200px;
             height: 4px;
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
+            border-radius: var(--radius-full);
             overflow: hidden;
         }
 
@@ -425,22 +869,31 @@
             transition: width 0.3s;
         }
 
-        /* Error Message */
+        /* ═══════════════════════════════════════════════════════════════════
+           ERROR MESSAGE
+           ═══════════════════════════════════════════════════════════════════ */
+        
         .error-message {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(239, 68, 68, 0.95);
-            color: white;
-            padding: var(--space-lg) 30px;
-            border-radius: var(--radius-lg);
+            background: white;
+            color: var(--light-text);
+            padding: var(--space-xl);
+            border-radius: var(--radius-xl);
             text-align: center;
             z-index: 60;
             max-width: 80%;
             display: none;
             flex-direction: column;
             gap: var(--space-md);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .dark-theme .error-message {
+            background: var(--dark-bg-secondary);
+            color: white;
         }
 
         .error-message.show {
@@ -453,152 +906,140 @@
 
         .error-title {
             font-size: 20px;
-            font-weight: bold;
+            font-weight: 700;
         }
 
         .error-text {
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.6;
+            opacity: 0.7;
         }
 
         .error-close {
-            background: white;
-            color: #ef4444;
+            background: var(--color-primary);
+            color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 14px 24px;
             border-radius: var(--radius-md);
             font-weight: 600;
             cursor: pointer;
+            font-size: 15px;
         }
 
-        /* Bottom Bar */
+        /* ═══════════════════════════════════════════════════════════════════
+           BOTTOM ACTION BAR - Properly aligned
+           ═══════════════════════════════════════════════════════════════════ */
+        
         .bottom-bar {
             position: fixed;
             bottom: var(--space-lg);
-            left: 50%;
-            transform: translateX(-50%);
+            left: var(--space-md);
+            right: var(--space-md);
             display: flex;
             gap: var(--space-md);
             z-index: 10;
+            align-items: center;
+            justify-content: center;
         }
 
         .ar-button {
-            background: linear-gradient(135deg, var(--color-success), #059669);
+            background: var(--color-success);
             color: white;
             border: none;
-            padding: 18px 40px;
-            font-size: 18px;
-            font-weight: bold;
+            padding: 16px 32px;
+            font-size: 17px;
+            font-weight: 700;
             border-radius: var(--radius-full);
             cursor: pointer;
-            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
-            transition: all 0.3s;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: var(--space-sm);
+            flex: 1;
+            max-width: 280px;
+            justify-content: center;
         }
 
         .ar-button:active {
-            transform: translateY(0) scale(0.98);
+            transform: scale(0.98);
         }
 
         .action-btn {
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
+            background: white;
+            border: 1px solid var(--light-border);
             width: 56px;
             height: 56px;
             border-radius: var(--radius-full);
             cursor: pointer;
-            font-size: 24px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s;
+            font-size: 22px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .dark-theme .action-btn {
+            background: var(--dark-bg-secondary);
+            border-color: var(--dark-border);
         }
 
         .action-btn:active {
             transform: scale(0.95);
         }
 
-        /* Instructions Panel */
-        .instructions {
-            position: absolute;
-            bottom: 130px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: var(--space-md) var(--space-lg);
-            border-radius: var(--radius-lg);
-            text-align: center;
-            font-size: 14px;
-            z-index: 10;
-            max-width: 90%;
-            line-height: 1.6;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-sm);
-        }
-
-        .instructions.hidden {
-            display: none;
-        }
-
-        .instructions-close {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Help Button */
+        /* ═══════════════════════════════════════════════════════════════════
+           HELP BUTTON
+           ═══════════════════════════════════════════════════════════════════ */
+        
         .help-btn {
             position: fixed;
-            bottom: 200px;
-            right: var(--space-lg);
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            width: 50px;
-            height: 50px;
+            bottom: calc(var(--space-lg) + 80px);
+            right: var(--space-md);
+            background: white;
+            border: 1px solid var(--light-border);
+            color: var(--light-text);
+            width: 56px;
+            height: 56px;
             border-radius: var(--radius-full);
             cursor: pointer;
             font-size: 24px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow-md);
             z-index: 10;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
+            transition: all 0.2s;
+        }
+
+        .dark-theme .help-btn {
+            background: var(--dark-bg-secondary);
+            border-color: var(--dark-border);
+            color: white;
+        }
+
+        .help-btn.show {
+            display: flex;
         }
 
         .help-btn:active {
             transform: scale(0.95);
         }
 
-        /* Share Modal */
+        /* ═══════════════════════════════════════════════════════════════════
+           SHARE MODAL - Fixed for iOS
+           ═══════════════════════════════════════════════════════════════════ */
+        
         .share-modal {
             position: fixed;
             bottom: -100%;
             left: 0;
             right: 0;
             background: white;
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            padding: var(--space-lg);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            padding: var(--space-xl);
             z-index: 101;
             transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.2);
@@ -615,8 +1056,8 @@
 
         .share-header {
             font-size: 20px;
-            font-weight: bold;
-            margin-bottom: var(--space-lg);
+            font-weight: 700;
+            margin-bottom: var(--space-xl);
             text-align: center;
         }
 
@@ -624,7 +1065,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: var(--space-md);
-            margin-bottom: var(--space-lg);
+            margin-bottom: var(--space-xl);
         }
 
         .share-option {
@@ -632,19 +1073,24 @@
             flex-direction: column;
             align-items: center;
             gap: var(--space-sm);
-            padding: var(--space-md);
-            background: rgba(0, 0, 0, 0.05);
+            padding: var(--space-lg) var(--space-md);
+            background: var(--light-bg-secondary);
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s;
+            border: 2px solid transparent;
+            /* iOS fix: ensure clickable area */
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .dark-theme .share-option {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--dark-bg);
         }
 
         .share-option:active {
             transform: scale(0.95);
+            border-color: var(--color-primary);
         }
 
         .share-option-icon {
@@ -653,57 +1099,103 @@
 
         .share-option-label {
             font-size: 12px;
+            font-weight: 600;
         }
 
         .share-close {
             width: 100%;
-            padding: var(--space-md);
-            background: var(--dark-bg);
-            color: white;
+            padding: 16px;
+            background: var(--light-bg-secondary);
+            color: var(--light-text);
             border: none;
             border-radius: var(--radius-md);
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
+            transition: all 0.2s;
         }
 
         .dark-theme .share-close {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--dark-bg);
+            color: white;
+        }
+
+        .share-close:active {
+            transform: scale(0.98);
         }
 
         .hidden {
             display: none !important;
         }
 
+        /* ═══════════════════════════════════════════════════════════════════
+           RESPONSIVE DESIGN
+           ═══════════════════════════════════════════════════════════════════ */
+        
         @media (max-width: 400px) {
             .food-name {
                 font-size: 20px;
             }
             
             .ar-button {
-                padding: 16px 32px;
+                padding: 14px 24px;
                 font-size: 16px;
             }
             
             .share-options {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .action-btn {
+                width: 50px;
+                height: 50px;
             }
         }
     </style>
 </head>
 <body class="light-theme">
 
+    <!-- Welcome Screen (First Time Only) -->
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="welcome-content">
+            <div class="welcome-icon">🍽️</div>
+            <div class="welcome-title">Welcome to AR Menu!</div>
+            <div class="welcome-text">View food items in augmented reality on your table</div>
+            
+            <div class="welcome-steps">
+                <div class="welcome-step">
+                    <span class="welcome-step-icon">📱</span>
+                    <span>Browse menu items and select what you'd like to view</span>
+                </div>
+                <div class="welcome-step">
+                    <span class="welcome-step-icon">👆</span>
+                    <span>Tap "View in AR" to place 3D models on your surface</span>
+                </div>
+                <div class="welcome-step">
+                    <span class="welcome-step-icon">🔄</span>
+                    <span>Move slowly to help your camera detect surfaces</span>
+                </div>
+                <div class="welcome-step">
+                    <span class="welcome-step-icon">❤️</span>
+                    <span>Add items to favorites and share with friends!</span>
+                </div>
+            </div>
+            
+            <button class="welcome-button" id="welcomeButton">Get Started</button>
+        </div>
+    </div>
+
     <!-- Top Navigation -->
     <div class="top-nav">
         <div class="nav-left">
-            <button class="icon-btn" id="menuBtn" title="Menu">☰</button>
+            <button class="icon-btn" id="menuBtn" title="Menu" aria-label="Open menu">☰</button>
         </div>
         <div class="nav-right">
-            <button class="icon-btn" id="favBtn" title="Favorites">
+            <button class="icon-btn" id="favBtn" title="Favorites" aria-label="View favorites">
                 ❤️
                 <span class="fav-counter" id="favCounter">0</span>
             </button>
-            <button class="icon-btn" id="themeBtn" title="Theme">🌙</button>
+            <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle dark mode">🌙</button>
         </div>
     </div>
 
@@ -712,8 +1204,8 @@
     
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
-            <div class="menu-title">🍽️ AR Food Menu</div>
-            <div class="menu-subtitle">Choose an item to view in AR</div>
+            <div class="menu-title">🍽️ AR Menu</div>
+            <div class="menu-subtitle">Select an item to view in AR</div>
         </div>
 
         <div class="menu-tabs">
@@ -732,30 +1224,59 @@
         </div>
     </div>
 
-    <!-- Current Item Info -->
-    <div class="info-card">
-        <div class="food-name" id="currentFoodName">🔵 Blue Artifact</div>
-        <div class="food-price" id="currentFoodPrice">$9.99</div>
-        <div class="food-meta" id="currentFoodMeta">Candle Cafe • All Items</div>
+    <!-- Current Item Info Card (Minimizable) -->
+    <div class="info-card" id="infoCard">
+        <div class="info-card-content">
+            <div class="info-header">
+                <div class="info-main">
+                    <div class="food-name" id="currentFoodName">🔵 Blue Artifact</div>
+                    <div class="food-price" id="currentFoodPrice">$9.99</div>
+                </div>
+                <button class="minimize-btn" id="minimizeBtn" title="Minimize" aria-label="Minimize info card">−</button>
+            </div>
+            
+            <div class="info-details">
+                <!-- Rating Section (Clickable) -->
+                <div class="food-rating" id="ratingSection">
+                    <div class="rating-stars" id="ratingStars">⭐⭐⭐⭐⭐</div>
+                    <div class="rating-info">
+                        <div class="rating-score" id="ratingScore">4.8</div>
+                        <div class="rating-count" id="ratingCount">124 reviews</div>
+                    </div>
+                    <div class="rating-arrow">›</div>
+                </div>
+                
+                <div class="food-meta" id="currentFoodMeta">
+                    <span>🏪 Candle Cafe</span>
+                    <span>•</span>
+                    <span>All Items</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Instructions Panel -->
-    <div class="instructions" id="instructions">
-        <button class="instructions-close" id="instructionsClose">×</button>
-        <div>📱 Tap "View in AR" to place on your table</div>
-        <div><small>Move phone slowly to detect surfaces</small></div>
+    <!-- Reviews Modal -->
+    <div class="reviews-modal" id="reviewsModal">
+        <div class="reviews-header">
+            <div class="reviews-title">Customer Reviews</div>
+            <button class="reviews-close" id="reviewsClose">×</button>
+        </div>
+        
+        <div id="reviewsContent">
+            <!-- Reviews will be dynamically loaded here -->
+        </div>
     </div>
 
-    <!-- Help Button (appears after closing instructions) -->
-    <button class="help-btn hidden" id="helpBtn" title="Show Instructions">❓</button>
+    <!-- Help Button -->
+    <button class="help-btn" id="helpBtn" title="Show instructions" aria-label="Show instructions">❓</button>
 
     <!-- AR Viewer -->
     <model-viewer
         id="ar-viewer"
         src="Restaurants/Candle Cafe/All Items/Blue Artifact.glb"
         ios-src="Restaurants/Candle%20Cafe/All%20Items/Blue%20Artifact.usdz"
-        poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23191919;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%232a2a2a;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='400' height='400'/%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' font-size='80'%3E🔵%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' fill='white'%3EBlue Artifact Special%3C/text%3E%3Ctext x='50%25' y='70%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='rgba(255,255,255,0.6)'%3ELoading 3D Model...%3C/text%3E%3C/svg%3E"
-        alt="3D model"
+        poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f8f9fa;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23e5e7eb;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='400' height='400'/%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' font-size='80'%3E🔵%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' fill='%231a1a1a'%3EBlue Artifact%3C/text%3E%3Ctext x='50%25' y='70%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='rgba(26,26,26,0.5)'%3ELoading 3D Model...%3C/text%3E%3C/svg%3E"
+        alt="3D model of food item"
         ar
         ar-modes="webxr scene-viewer quick-look"
         camera-controls
@@ -791,7 +1312,7 @@
             <span>📱</span>
             <span>View in AR</span>
         </button>
-        <button class="action-btn" id="shareBtn" title="Share">🔗</button>
+        <button class="action-btn" id="shareBtn" title="Share" aria-label="Share item">🔗</button>
     </div>
 
     <!-- Share Modal -->
@@ -820,37 +1341,8 @@
 
     <script>
         /* ═══════════════════════════════════════════════════════════════════
-           📝 RESTAURANT DATA
+           📝 RESTAURANT DATA WITH RATINGS & ANALYTICS
            ═══════════════════════════════════════════════════════════════════ */
-        
-        /* ═══════════════════════════════════════════════════════════════════
-           🖼️ FALLBACK IMAGE GENERATOR
-           Creates custom loading images for each item
-           ═══════════════════════════════════════════════════════════════════ */
-        
-        function createFallbackImage(itemName, emoji) {
-            // Create a custom SVG with the item's emoji and name
-            const svg = `
-                <svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'>
-                    <defs>
-                        <linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'>
-                            <stop offset='0%' style='stop-color:#191919;stop-opacity:1' />
-                            <stop offset='100%' style='stop-color:#2a2a2a;stop-opacity:1' />
-                        </linearGradient>
-                    </defs>
-                    <rect fill='url(%23grad)' width='400' height='400'/>
-                    <text x='50%' y='40%' dominant-baseline='middle' text-anchor='middle' 
-                          font-size='80'>${emoji}</text>
-                    <text x='50%' y='60%' dominant-baseline='middle' text-anchor='middle' 
-                          font-family='sans-serif' font-size='18' fill='white'>${itemName}</text>
-                    <text x='50%' y='70%' dominant-baseline='middle' text-anchor='middle' 
-                          font-family='sans-serif' font-size='14' fill='rgba(255,255,255,0.6)'>Loading 3D Model...</text>
-                </svg>
-            `.trim();
-            
-            // Encode it for use in poster attribute
-            return 'data:image/svg+xml,' + encodeURIComponent(svg);
-        }
         
         const RESTAURANTS = [
             {
@@ -865,17 +1357,32 @@
                                 id: 'blue-artifact',
                                 name: '🔵 Blue Artifact Special',
                                 price: '$9.99',
-                                emoji: '🔵',  // For fallback image
+                                emoji: '🔵',
+                                rating: 4.8,
+                                reviewCount: 124,
+                                views60Days: 1847,
                                 modelGLB: 'Restaurants/Candle Cafe/All Items/Blue Artifact.glb',
-                                modelUSDZ: 'Restaurants/Candle Cafe/All Items/Blue Artifact.usdz'
+                                modelUSDZ: 'Restaurants/Candle Cafe/All Items/Blue Artifact.usdz',
+                                reviews: [
+                                    { author: 'Sarah M.', rating: 5, date: '2 days ago', text: 'Absolutely amazing! The AR experience makes it so much easier to visualize the dish.' },
+                                    { author: 'John D.', rating: 5, date: '1 week ago', text: 'Love the blue artifact special. Tastes as good as it looks in AR!' },
+                                    { author: 'Emma R.', rating: 4, date: '2 weeks ago', text: 'Great presentation and flavor. Highly recommend trying this.' }
+                                ]
                             },
                             {
                                 id: 'red-stand',
                                 name: '🔴 Red Stand Deluxe',
                                 price: '$12.99',
                                 emoji: '🔴',
+                                rating: 4.6,
+                                reviewCount: 98,
+                                views60Days: 1432,
                                 modelGLB: 'Restaurants/Candle Cafe/All Items/Red Stand.glb',
-                                modelUSDZ: 'Restaurants/Candle Cafe/All Items/Red Stand.usdz'
+                                modelUSDZ: 'Restaurants/Candle Cafe/All Items/Red Stand.usdz',
+                                reviews: [
+                                    { author: 'Michael P.', rating: 5, date: '3 days ago', text: 'The red stand is a showstopper! Perfect for special occasions.' },
+                                    { author: 'Lisa K.', rating: 4, date: '1 week ago', text: 'Delicious and beautifully presented. Worth every penny.' }
+                                ]
                             }
                         ]
                     }
@@ -894,8 +1401,16 @@
                                 name: '☕ Premium Coffee Cup',
                                 price: '$4.99',
                                 emoji: '☕',
+                                rating: 4.9,
+                                reviewCount: 267,
+                                views60Days: 3421,
                                 modelGLB: 'Restaurants/Coffee Shop/Coffee Cup.glb',
-                                modelUSDZ: 'Restaurants/Coffee Shop/Coffee Cup.usdz'
+                                modelUSDZ: 'Restaurants/Coffee Shop/Coffee Cup.usdz',
+                                reviews: [
+                                    { author: 'Coffee Lover', rating: 5, date: '1 day ago', text: 'Best coffee in town! The AR view helped me choose the perfect size.' },
+                                    { author: 'Alex T.', rating: 5, date: '3 days ago', text: 'Rich flavor, perfect temperature. This is my daily go-to.' },
+                                    { author: 'Rachel B.', rating: 5, date: '1 week ago', text: 'Amazing coffee! The AR feature is so cool too.' }
+                                ]
                             }
                         ]
                     }
@@ -914,16 +1429,30 @@
                                 name: '🔷 Blue Cube Delight',
                                 price: '$7.99',
                                 emoji: '🔷',
+                                rating: 4.7,
+                                reviewCount: 156,
+                                views60Days: 2103,
                                 modelGLB: 'Restaurants/Cube Cafe/Blue Cube.glb',
-                                modelUSDZ: 'Restaurants/Cube Cafe/Blue Cube.usdz'
+                                modelUSDZ: 'Restaurants/Cube Cafe/Blue Cube.usdz',
+                                reviews: [
+                                    { author: 'David W.', rating: 5, date: '2 days ago', text: 'Unique presentation and great taste. The cube shape is fun!' },
+                                    { author: 'Nina S.', rating: 4, date: '5 days ago', text: 'Interesting concept and delicious flavor.' }
+                                ]
                             },
                             {
                                 id: 'pink-cube',
                                 name: '🟪 Pink Cube Surprise',
                                 price: '$7.99',
                                 emoji: '🟪',
+                                rating: 4.5,
+                                reviewCount: 142,
+                                views60Days: 1876,
                                 modelGLB: 'Restaurants/Cube Cafe/Pink Cube.glb',
-                                modelUSDZ: 'Restaurants/Cube Cafe/Pink Cube.usdz'
+                                modelUSDZ: 'Restaurants/Cube Cafe/Pink Cube.usdz',
+                                reviews: [
+                                    { author: 'Sophie L.', rating: 5, date: '4 days ago', text: 'So pretty and tasty! Perfect for Instagram.' },
+                                    { author: 'Tom H.', rating: 4, date: '1 week ago', text: 'Great surprise inside. Loved the pink cube!' }
+                                ]
                             }
                         ]
                     }
@@ -932,20 +1461,60 @@
         ];
 
         /* ═══════════════════════════════════════════════════════════════════
+           🖼️ FALLBACK IMAGE GENERATOR
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function createFallbackImage(itemName, emoji, isDark = false) {
+            const bgColor1 = isDark ? '%23191919' : '%23f8f9fa';
+            const bgColor2 = isDark ? '%232a2a2a' : '%23e5e7eb';
+            const textColor = isDark ? 'white' : '%231a1a1a';
+            const subtextColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(26,26,26,0.5)';
+            
+            const svg = `
+                <svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'>
+                    <defs>
+                        <linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'>
+                            <stop offset='0%' style='stop-color:${bgColor1};stop-opacity:1' />
+                            <stop offset='100%' style='stop-color:${bgColor2};stop-opacity:1' />
+                        </linearGradient>
+                    </defs>
+                    <rect fill='url(%23grad)' width='400' height='400'/>
+                    <text x='50%' y='40%' dominant-baseline='middle' text-anchor='middle' 
+                          font-size='80'>${emoji}</text>
+                    <text x='50%' y='60%' dominant-baseline='middle' text-anchor='middle' 
+                          font-family='sans-serif' font-size='18' fill='${textColor}'>${itemName.substring(2)}</text>
+                    <text x='50%' y='70%' dominant-baseline='middle' text-anchor='middle' 
+                          font-family='sans-serif' font-size='14' fill='${subtextColor}'>Loading 3D Model...</text>
+                </svg>
+            `.trim();
+            
+            return 'data:image/svg+xml,' + encodeURIComponent(svg);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
            🔧 GET HTML ELEMENTS
            ═══════════════════════════════════════════════════════════════════ */
         
         const viewer = document.querySelector('model-viewer');
+        const welcomeOverlay = document.getElementById('welcomeOverlay');
+        const welcomeButton = document.getElementById('welcomeButton');
         const menuBtn = document.getElementById('menuBtn');
         const favBtn = document.getElementById('favBtn');
         const sideMenu = document.getElementById('sideMenu');
         const menuOverlay = document.getElementById('menuOverlay');
         const themeBtn = document.getElementById('themeBtn');
+        const infoCard = document.getElementById('infoCard');
+        const minimizeBtn = document.getElementById('minimizeBtn');
         const currentFoodName = document.getElementById('currentFoodName');
         const currentFoodPrice = document.getElementById('currentFoodPrice');
         const currentFoodMeta = document.getElementById('currentFoodMeta');
-        const instructions = document.getElementById('instructions');
-        const instructionsClose = document.getElementById('instructionsClose');
+        const ratingSection = document.getElementById('ratingSection');
+        const ratingStars = document.getElementById('ratingStars');
+        const ratingScore = document.getElementById('ratingScore');
+        const ratingCount = document.getElementById('ratingCount');
+        const reviewsModal = document.getElementById('reviewsModal');
+        const reviewsClose = document.getElementById('reviewsClose');
+        const reviewsContent = document.getElementById('reviewsContent');
         const helpBtn = document.getElementById('helpBtn');
         const arButton = document.getElementById('arButton');
         const shareBtn = document.getElementById('shareBtn');
@@ -971,6 +1540,7 @@
         let favorites = [];
         let expandedRestaurants = [];
         let isIOS = false;
+        let isInfoMinimized = false;
         
         /* ═══════════════════════════════════════════════════════════════════
            📊 ANALYTICS SYSTEM
@@ -1001,22 +1571,6 @@
             analytics.shareClicks++;
             console.log(`📊 Analytics: Share clicked ${analytics.shareClicks} time(s)`);
         }
-        
-        function getAnalyticsSummary() {
-            const sessionDuration = Math.round((Date.now() - analytics.sessionStart) / 1000);
-            return {
-                sessionDuration,
-                deviceType: analytics.deviceType,
-                itemViews: analytics.itemViews,
-                arActivations: analytics.arActivations,
-                shareClicks: analytics.shareClicks
-            };
-        }
-        
-        // Log analytics on page close
-        window.addEventListener('beforeunload', () => {
-            console.log('📊 SESSION SUMMARY:', getAnalyticsSummary());
-        });
 
         /* ═══════════════════════════════════════════════════════════════════
            🍎 iOS DETECTION
@@ -1027,6 +1581,24 @@
             analytics.deviceType = isIOS ? 'iOS' : 'Android';
             console.log(isIOS ? '🍎 iOS device detected' : '🤖 Android device detected');
             return isIOS;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           👋 WELCOME SCREEN
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function checkWelcomeScreen() {
+            const hasSeenWelcome = localStorage.getItem('ar-menu-welcome-seen');
+            if (!hasSeenWelcome) {
+                welcomeOverlay.classList.add('show');
+            }
+        }
+        
+        function dismissWelcome() {
+            welcomeOverlay.classList.remove('show');
+            localStorage.setItem('ar-menu-welcome-seen', 'true');
+            // Show help button after welcome is dismissed
+            helpBtn.classList.add('show');
         }
 
         /* ═══════════════════════════════════════════════════════════════════
@@ -1068,7 +1640,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════════════
-           🔗 URL PARAMETER SYSTEM - Unique URLs for each item
+           🔗 URL PARAMETER SYSTEM
            ═══════════════════════════════════════════════════════════════════ */
         
         function getURLParameters() {
@@ -1114,6 +1686,75 @@
         }
 
         /* ═══════════════════════════════════════════════════════════════════
+           ⭐ RATING & REVIEWS
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function generateStars(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            let stars = '';
+            
+            for (let i = 0; i < fullStars; i++) {
+                stars += '⭐';
+            }
+            if (hasHalfStar) {
+                stars += '⭐';
+            }
+            
+            return stars;
+        }
+        
+        function updateRatingDisplay(item) {
+            ratingStars.textContent = generateStars(item.rating);
+            ratingScore.textContent = item.rating.toFixed(1);
+            ratingCount.textContent = `${item.reviewCount} reviews`;
+        }
+        
+        function showReviews() {
+            if (!currentItem || !currentItem.reviews) return;
+            
+            reviewsContent.innerHTML = '';
+            
+            currentItem.reviews.forEach(review => {
+                const reviewDiv = document.createElement('div');
+                reviewDiv.className = 'review-item';
+                reviewDiv.innerHTML = `
+                    <div class="review-header">
+                        <span class="review-author">${review.author}</span>
+                        <span class="review-stars">${generateStars(review.rating)}</span>
+                    </div>
+                    <div class="review-date">${review.date}</div>
+                    <div class="review-text">${review.text}</div>
+                `;
+                reviewsContent.appendChild(reviewDiv);
+            });
+            
+            reviewsModal.classList.add('show');
+        }
+        
+        function closeReviews() {
+            reviewsModal.classList.remove('show');
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           📏 INFO CARD MINIMIZE/MAXIMIZE
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        function toggleInfoCard() {
+            isInfoMinimized = !isInfoMinimized;
+            
+            if (isInfoMinimized) {
+                infoCard.classList.add('minimized');
+                minimizeBtn.textContent = '+';
+                minimizeBtn.title = 'Maximize';
+            } else {
+                infoCard.classList.remove('minimized');
+                minimizeBtn.textContent = '−';
+                minimizeBtn.title = 'Minimize';
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
            ⚠️ ERROR HANDLING
            ═══════════════════════════════════════════════════════════════════ */
         
@@ -1143,28 +1784,6 @@
         
         function updateLoadingProgress(percent) {
             loadingProgressBar.style.width = percent + '%';
-        }
-
-        /* ═══════════════════════════════════════════════════════════════════
-           📋 INSTRUCTIONS SYSTEM
-           ═══════════════════════════════════════════════════════════════════ */
-        
-        function hideInstructions() {
-            instructions.classList.add('hidden');
-            helpBtn.classList.remove('hidden');
-            localStorage.setItem('ar-instructions-dismissed', 'true');
-        }
-        
-        function showInstructions() {
-            instructions.classList.remove('hidden');
-            helpBtn.classList.add('hidden');
-        }
-        
-        function checkInstructionsState() {
-            const dismissed = localStorage.getItem('ar-instructions-dismissed');
-            if (dismissed === 'true') {
-                hideInstructions();
-            }
         }
 
         /* ═══════════════════════════════════════════════════════════════════
@@ -1227,8 +1846,14 @@
             
             itemDiv.innerHTML = `
                 <div class="menu-item-content">
-                    <div class="menu-item-name">${item.name}</div>
-                    <div class="menu-item-price">${item.price}</div>
+                    <div class="menu-item-header">
+                        <div class="menu-item-name">${item.name}</div>
+                        <div class="menu-item-rating">${generateStars(item.rating)} ${item.rating}</div>
+                    </div>
+                    <div class="menu-item-details">
+                        <div class="menu-item-price">${item.price}</div>
+                        <div class="menu-item-views">👁️ ${item.views60Days.toLocaleString()} views</div>
+                    </div>
                 </div>
                 <button class="item-fav-btn">
                     ${favorites.includes(item.id) ? '❤️' : '🤍'}
@@ -1315,7 +1940,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════════════
-           🎯 SELECT ITEM - Load 3D model
+           🎯 SELECT ITEM
            ═══════════════════════════════════════════════════════════════════ */
         
         function selectItem(item, restaurant, category) {
@@ -1329,13 +1954,21 @@
             // Update UI
             currentFoodName.textContent = item.name;
             currentFoodPrice.textContent = item.price;
-            currentFoodMeta.textContent = `${restaurant.name} • ${category.name}`;
+            currentFoodMeta.innerHTML = `
+                <span>🏪 ${restaurant.name.substring(2)}</span>
+                <span>•</span>
+                <span>${category.name}</span>
+            `;
+            
+            // Update rating
+            updateRatingDisplay(item);
             
             // Show loading
             showLoading();
             
-            // Set custom fallback image for this specific item
-            const fallbackImage = createFallbackImage(item.name.substring(2), item.emoji);
+            // Set custom fallback image
+            const isDark = document.body.classList.contains('dark-theme');
+            const fallbackImage = createFallbackImage(item.name, item.emoji, isDark);
             viewer.setAttribute('poster', fallbackImage);
             
             // Load models
@@ -1343,7 +1976,7 @@
             const encodedUSDZ = item.modelUSDZ.split('/').map(encodeURIComponent).join('/');
             viewer.iosSrc = encodedUSDZ;
             
-            // Update URL for sharing
+            // Update URL
             updateURL(restaurant.id, item.id);
             
             // Track analytics
@@ -1353,7 +1986,8 @@
             renderFavorites();
             
             console.log(`✅ Selected: ${item.name}`);
-            console.log(`🖼️  Fallback image: Custom SVG with ${item.emoji}`);
+            console.log(`⭐ Rating: ${item.rating} (${item.reviewCount} reviews)`);
+            console.log(`👁️  Views (60 days): ${item.views60Days}`);
             console.log(`🔗 Shareable URL: ${getShareableURL(restaurant.id, item.id)}`);
         }
 
@@ -1403,6 +2037,13 @@
                 themeBtn.textContent = '🌙';
                 localStorage.setItem('ar-menu-theme', 'light');
             }
+            
+            // Update fallback image for current theme
+            if (currentItem) {
+                const isDark = body.classList.contains('dark-theme');
+                const fallbackImage = createFallbackImage(currentItem.name, currentItem.emoji, isDark);
+                viewer.setAttribute('poster', fallbackImage);
+            }
         }
 
         function loadTheme() {
@@ -1415,7 +2056,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════════════
-           🔗 SHARE FUNCTIONALITY
+           🔗 SHARE FUNCTIONALITY - iOS FIXED
            ═══════════════════════════════════════════════════════════════════ */
         
         function openShareModal() {
@@ -1433,19 +2074,26 @@
             const shareUrl = getShareableURL(currentItem.restaurantId, currentItem.id);
             const shareText = `Check out ${currentItem.name} in AR! ${currentItem.price}`;
             
+            console.log(`📤 Share clicked: ${platform}`);
+            
             switch(platform) {
                 case 'whatsapp':
-                    window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`);
+                    window.location.href = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
                     break;
                 case 'twitter':
-                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`);
+                    window.location.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
                     break;
                 case 'copy':
-                    navigator.clipboard.writeText(shareUrl).then(() => {
-                        alert('✅ Link copied to clipboard!\n\n' + shareUrl);
-                    }).catch(() => {
-                        prompt('Copy this link:', shareUrl);
-                    });
+                    // iOS-compatible clipboard approach
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(shareUrl).then(() => {
+                            alert('✅ Link copied!\n\n' + shareUrl);
+                        }).catch(() => {
+                            fallbackCopyToClipboard(shareUrl);
+                        });
+                    } else {
+                        fallbackCopyToClipboard(shareUrl);
+                    }
                     break;
                 case 'native':
                     if (navigator.share) {
@@ -1453,20 +2101,48 @@
                             title: currentItem.name,
                             text: shareText,
                             url: shareUrl
+                        }).catch((err) => {
+                            console.log('Share cancelled or failed', err);
                         });
                     } else {
-                        alert('Share not supported on this browser');
+                        alert('Native sharing not supported on this device.\n\nLink: ' + shareUrl);
                     }
                     break;
             }
             
             closeShareModal();
         }
+        
+        // Fallback copy method for iOS Safari
+        function fallbackCopyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    alert('✅ Link copied!\n\n' + text);
+                } else {
+                    prompt('Copy this link:', text);
+                }
+            } catch (err) {
+                prompt('Copy this link:', text);
+            }
+            
+            document.body.removeChild(textArea);
+        }
 
         /* ═══════════════════════════════════════════════════════════════════
            🔘 EVENT LISTENERS
            ═══════════════════════════════════════════════════════════════════ */
         
+        welcomeButton.addEventListener('click', dismissWelcome);
         menuBtn.addEventListener('click', openMenu);
         favBtn.addEventListener('click', () => {
             openMenu();
@@ -1474,22 +2150,29 @@
         });
         menuOverlay.addEventListener('click', closeMenu);
         themeBtn.addEventListener('click', toggleTheme);
+        minimizeBtn.addEventListener('click', toggleInfoCard);
+        ratingSection.addEventListener('click', showReviews);
+        reviewsClose.addEventListener('click', closeReviews);
         shareBtn.addEventListener('click', openShareModal);
         shareClose.addEventListener('click', closeShareModal);
         allTab.addEventListener('click', showAllItems);
         favTab.addEventListener('click', showFavorites);
-        
-        // Instructions controls
-        instructionsClose.addEventListener('click', hideInstructions);
-        helpBtn.addEventListener('click', showInstructions);
-        
-        // Error close
         errorClose.addEventListener('click', hideError);
+        helpBtn.addEventListener('click', dismissWelcome);
 
-        // Share options
+        // Share options - iOS compatible event handling
         document.querySelectorAll('.share-option').forEach(option => {
-            option.addEventListener('click', () => {
+            // Use touchend for better iOS compatibility
+            option.addEventListener('touchend', (e) => {
+                e.preventDefault();
                 shareItem(option.dataset.platform);
+            });
+            
+            // Keep click for desktop
+            option.addEventListener('click', (e) => {
+                if (!('ontouchstart' in window)) {
+                    shareItem(option.dataset.platform);
+                }
             });
         });
 
@@ -1545,11 +2228,12 @@
         
         function init() {
             console.log('🚀 AR Menu Platform Starting...');
+            console.log('✨ Modern UI with ratings & analytics');
             
             detectIOS();
             loadFavorites();
             loadTheme();
-            checkInstructionsState();
+            checkWelcomeScreen();
             renderAllItems();
             renderFavorites();
             
@@ -1557,7 +2241,6 @@
             const urlItem = findItemByURL();
             
             if (urlItem) {
-                // Load item from URL
                 selectItem(urlItem.item, urlItem.restaurant, urlItem.category);
                 expandedRestaurants.push(urlItem.restaurant.id);
                 console.log('🔗 Loaded item from URL');
@@ -1574,7 +2257,8 @@
             
             console.log('✅ AR Menu Ready!');
             console.log(`🏪 ${RESTAURANTS.length} restaurants loaded`);
-            console.log('📊 Analytics tracking enabled');
+            console.log('📊 Analytics & ratings enabled');
+            console.log('🎨 Modern minimalist design active');
         }
 
         init();
