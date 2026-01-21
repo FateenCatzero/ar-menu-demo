@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Food Menu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>AR Food Menu - Order Now</title>
     
-    <!-- Google's Model Viewer Library -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
     
     <style>
@@ -22,8 +23,10 @@
             --color-primary-hover: #2563eb;
             --color-success: #10b981;
             --color-warning: #f59e0b;
+            --color-danger: #ef4444;
             --color-favorite: #ef4444;
             --color-star: #fbbf24;
+            --color-cart: #8b5cf6;
             --space-xs: 4px;
             --space-sm: 8px;
             --space-md: 16px;
@@ -44,6 +47,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -51,6 +55,8 @@
             height: 100vh;
             overflow: hidden;
             transition: background 0.3s ease, color 0.3s ease;
+            position: fixed;
+            width: 100%;
         }
 
         body.light-theme {
@@ -61,6 +67,41 @@
         body.dark-theme {
             background: var(--dark-bg);
             color: var(--dark-text);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--radius-full);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: var(--shadow-xl);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: var(--color-success);
+        }
+
+        .toast.error {
+            background: var(--color-danger);
         }
 
         /* Welcome Screen */
@@ -76,6 +117,7 @@
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(10px);
+            padding: var(--space-lg);
         }
 
         .welcome-overlay.show {
@@ -98,8 +140,8 @@
         }
 
         .welcome-icon {
-            font-size: 80px;
-            margin-bottom: var(--space-lg);
+            font-size: 64px;
+            margin-bottom: var(--space-md);
             animation: bounce 2s infinite;
         }
 
@@ -109,13 +151,13 @@
         }
 
         .welcome-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: var(--space-md);
+            margin-bottom: var(--space-sm);
         }
 
         .welcome-text {
-            font-size: 16px;
+            font-size: 14px;
             line-height: 1.6;
             margin-bottom: var(--space-lg);
             opacity: 0.8;
@@ -124,7 +166,7 @@
         .welcome-steps {
             text-align: left;
             margin: var(--space-lg) 0;
-            padding: var(--space-lg);
+            padding: var(--space-md);
             background: var(--light-bg-secondary);
             border-radius: var(--radius-md);
         }
@@ -136,9 +178,10 @@
         .welcome-step {
             display: flex;
             align-items: flex-start;
-            gap: var(--space-md);
-            margin-bottom: var(--space-md);
-            font-size: 14px;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            font-size: 13px;
+            line-height: 1.5;
         }
 
         .welcome-step:last-child {
@@ -146,18 +189,18 @@
         }
 
         .welcome-step-icon {
-            font-size: 24px;
+            font-size: 20px;
             flex-shrink: 0;
         }
 
         .welcome-button {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: var(--color-primary);
             color: white;
             border: none;
             border-radius: var(--radius-md);
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -166,6 +209,116 @@
         .welcome-button:active {
             transform: scale(0.98);
             background: var(--color-primary-hover);
+        }
+
+        /* Tutorial Modal */
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 199;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            padding: var(--space-lg);
+        }
+
+        .tutorial-overlay.show {
+            display: flex;
+        }
+
+        .tutorial-content {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            max-width: 90%;
+            width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .dark-theme .tutorial-content {
+            background: var(--dark-bg-secondary);
+            color: white;
+        }
+
+        .tutorial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 2px solid var(--light-border);
+        }
+
+        .dark-theme .tutorial-header {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .tutorial-title {
+            font-size: 22px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tutorial-close {
+            background: rgba(0, 0, 0, 0.8);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dark-theme .tutorial-close {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark-bg);
+        }
+
+        .tutorial-step {
+            display: flex;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+            padding: var(--space-md);
+            background: var(--light-bg-secondary);
+            border-radius: var(--radius-md);
+        }
+
+        .dark-theme .tutorial-step {
+            background: var(--dark-bg);
+        }
+
+        .tutorial-step-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .tutorial-step-content {
+            flex: 1;
+        }
+
+        .tutorial-step-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .tutorial-step-text {
+            font-size: 13px;
+            line-height: 1.5;
+            opacity: 0.8;
         }
 
         /* Top Navigation */
@@ -177,30 +330,32 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: var(--space-md);
+            padding: 12px;
             background: transparent;
-            z-index: 100;
+            z-index: 95;
+            pointer-events: none;
         }
 
         .nav-left, .nav-right {
             display: flex;
-            gap: var(--space-sm);
+            gap: 8px;
             align-items: center;
+            pointer-events: auto;
         }
 
         .icon-btn {
             background: rgba(255, 255, 255, 0.95);
             border: 1px solid var(--light-border);
             color: var(--light-text);
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
             position: relative;
             box-shadow: var(--shadow-md);
             font-weight: 600;
@@ -216,21 +371,17 @@
             transform: scale(0.95);
         }
 
-        .icon-btn:hover {
-            box-shadow: var(--shadow-lg);
-        }
-
-        .fav-counter {
+        .counter-badge {
             position: absolute;
             top: -6px;
             right: -6px;
-            background: var(--color-favorite);
+            background: var(--color-danger);
             color: white;
-            min-width: 22px;
-            height: 22px;
-            padding: 0 6px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 5px;
             border-radius: var(--radius-full);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             display: none;
             align-items: center;
@@ -238,15 +389,19 @@
             border: 2px solid var(--light-bg);
         }
 
-        .dark-theme .fav-counter {
+        .dark-theme .counter-badge {
             border-color: var(--dark-bg);
         }
 
-        .fav-counter.show {
+        .counter-badge.show {
             display: flex;
         }
 
-        /* Side Menu with Enhanced Overlay */
+        .counter-badge.cart-badge {
+            background: var(--color-cart);
+        }
+
+        /* Side Menu */
         .menu-overlay {
             position: fixed;
             top: 0;
@@ -268,7 +423,7 @@
             top: 0;
             left: -100%;
             width: 85%;
-            max-width: 380px;
+            max-width: 360px;
             height: 100%;
             background: white;
             color: var(--light-text);
@@ -289,8 +444,8 @@
         }
 
         .menu-header {
-            padding: var(--space-xl);
-            padding-top: 80px;
+            padding: var(--space-lg);
+            padding-top: 60px;
             background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
             position: sticky;
             top: 0;
@@ -299,23 +454,92 @@
         }
 
         .menu-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: var(--space-sm);
+            margin-bottom: 6px;
         }
 
         .menu-subtitle {
-            font-size: 14px;
+            font-size: 13px;
             opacity: 0.9;
+        }
+
+        /* User Section in Menu */
+        .user-section {
+            padding: var(--space-md);
+            background: var(--light-bg-secondary);
+            border-bottom: 1px solid var(--light-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dark-theme .user-section {
+            background: var(--dark-bg);
+            border-bottom-color: var(--dark-border);
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-full);
+            background: var(--color-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .user-email {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        .login-prompt {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .login-btn-small {
+            padding: 8px 16px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .logout-btn {
+            padding: 6px 12px;
+            background: var(--color-danger);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         .menu-tabs {
             display: flex;
-            gap: var(--space-sm);
+            gap: 8px;
             padding: var(--space-md);
             background: var(--light-bg-secondary);
             position: sticky;
-            top: 140px;
+            top: 115px;
             z-index: 9;
             border-bottom: 1px solid var(--light-border);
         }
@@ -327,14 +551,14 @@
 
         .menu-tab {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             background: transparent;
             border: 1px solid var(--light-border);
             color: var(--light-text);
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
         }
 
@@ -357,10 +581,10 @@
             display: flex;
             align-items: center;
             gap: var(--space-md);
-            padding: var(--space-md);
+            padding: 12px;
             background: var(--light-bg-secondary);
             border-radius: var(--radius-md);
-            margin-bottom: var(--space-sm);
+            margin-bottom: 8px;
             cursor: pointer;
             transition: all 0.2s;
             border: 1px solid var(--light-border);
@@ -371,22 +595,18 @@
             border-color: var(--dark-border);
         }
 
-        .restaurant-header:hover {
-            box-shadow: var(--shadow-sm);
-        }
-
         .restaurant-icon {
-            font-size: 28px;
+            font-size: 24px;
         }
 
         .restaurant-name {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             flex: 1;
         }
 
         .expand-icon {
-            font-size: 18px;
+            font-size: 16px;
             transition: transform 0.3s;
             color: var(--color-primary);
         }
@@ -396,8 +616,8 @@
         }
 
         .category-section {
-            margin-left: var(--space-md);
-            margin-bottom: var(--space-md);
+            margin-left: 12px;
+            margin-bottom: 12px;
             display: none;
         }
 
@@ -406,19 +626,19 @@
         }
 
         .category-header {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--color-primary);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: var(--space-md);
-            padding-left: var(--space-sm);
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding-left: 8px;
         }
 
         .menu-item {
             background: white;
-            padding: var(--space-md);
-            margin-bottom: var(--space-sm);
+            padding: 12px;
+            margin-bottom: 8px;
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s;
@@ -426,7 +646,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: var(--space-md);
+            gap: 12px;
         }
 
         .dark-theme .menu-item {
@@ -434,14 +654,18 @@
             border-color: var(--dark-border);
         }
 
-        .menu-item:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
+        .menu-item:active {
+            transform: scale(0.98);
         }
 
         .menu-item.active {
             border-color: var(--color-success);
             background: rgba(16, 185, 129, 0.05);
+        }
+
+        .menu-item.in-cart {
+            border-color: var(--color-cart);
+            background: rgba(139, 92, 246, 0.05);
         }
 
         .menu-item-content {
@@ -451,12 +675,12 @@
         .menu-item-header {
             display: flex;
             align-items: center;
-            gap: var(--space-sm);
-            margin-bottom: var(--space-sm);
+            gap: 8px;
+            margin-bottom: 6px;
         }
 
         .menu-item-name {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             flex: 1;
         }
@@ -464,39 +688,46 @@
         .menu-item-rating {
             display: flex;
             align-items: center;
-            gap: 4px;
-            font-size: 12px;
+            gap: 3px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--color-star);
+            white-space: nowrap;
         }
 
         .menu-item-details {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: var(--space-md);
+            gap: 12px;
         }
 
         .menu-item-price {
-            font-size: 18px;
+            font-size: 16px;
             color: var(--color-primary);
             font-weight: 700;
         }
 
         .menu-item-views {
-            font-size: 11px;
+            font-size: 10px;
             color: #6b7280;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
+        }
+
+        .menu-item-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
 
         .item-fav-btn {
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 22px;
             cursor: pointer;
-            padding: var(--space-sm);
+            padding: 8px;
             transition: transform 0.2s;
         }
 
@@ -504,63 +735,94 @@
             transform: scale(1.2);
         }
 
+        .quick-add-btn {
+            background: var(--color-success);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .quick-add-btn:active {
+            transform: scale(0.95);
+        }
+
+        .cart-qty-badge {
+            background: var(--color-cart);
+            color: white;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-size: 10px;
+            font-weight: 700;
+        }
+
         .empty-state {
             text-align: center;
-            padding: 60px var(--space-lg);
+            padding: 40px var(--space-md);
             opacity: 0.5;
         }
 
         .empty-state-icon {
-            font-size: 64px;
+            font-size: 56px;
             margin-bottom: var(--space-md);
         }
 
         .empty-state-text {
-            font-size: 16px;
+            font-size: 14px;
             line-height: 1.6;
         }
 
-        /* Info Card - Enhanced Buttons */
+        /* Info Card - SLIGHTLY TRANSPARENT */
         .info-card {
-            position: absolute;
-            top: 80px;
-            left: var(--space-md);
-            right: var(--space-md);
-            background: rgba(255, 255, 255, 0.95);
+            position: fixed;
+            top: 70px;
+            left: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.95); /* Slightly transparent */
             backdrop-filter: blur(20px);
             color: var(--light-text);
             border-radius: var(--radius-lg);
-            z-index: 10;
+            z-index: 90;
             box-shadow: var(--shadow-lg);
             border: 1px solid var(--light-border);
             transition: all 0.3s ease;
             overflow: hidden;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         .dark-theme .info-card {
-            background: rgba(26, 26, 26, 0.95);
+            background: rgba(26, 26, 26, 0.95); /* Slightly transparent */
             color: white;
             border-color: var(--dark-border);
         }
 
         .info-card.minimized {
-            top: 80px;
+            top: 70px;
         }
 
         .info-card-content {
-            padding: var(--space-lg);
+            padding: 16px;
             transition: all 0.3s ease;
         }
 
         .info-card.minimized .info-card-content {
-            padding: var(--space-md);
+            padding: 12px 16px;
         }
 
         .info-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: var(--space-md);
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .info-card.minimized .info-header {
@@ -570,44 +832,45 @@
 
         .info-main {
             flex: 1;
+            min-width: 0;
         }
 
         .food-name {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: var(--space-sm);
+            margin-bottom: 4px;
             transition: font-size 0.3s;
+            line-height: 1.3;
         }
 
         .info-card.minimized .food-name {
-            font-size: 16px;
+            font-size: 14px;
             margin-bottom: 0;
         }
 
         .food-price {
-            font-size: 28px;
+            font-size: 22px;
             color: var(--color-primary);
             font-weight: 700;
             transition: font-size 0.3s;
         }
 
         .info-card.minimized .food-price {
-            font-size: 18px;
+            font-size: 16px;
         }
 
-        /* FIXED: Better contrast for minimize button */
         .minimize-btn {
             background: rgba(0, 0, 0, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: var(--radius-md);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             transition: all 0.2s;
             flex-shrink: 0;
@@ -635,12 +898,73 @@
             overflow: hidden;
         }
 
+        /* Quantity Selector in Info Card */
+        .qty-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 12px 0;
+            padding: 12px;
+            background: var(--light-bg-secondary);
+            border-radius: var(--radius-md);
+        }
+
+        .dark-theme .qty-selector {
+            background: var(--dark-bg);
+        }
+
+        .qty-label {
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0.7;
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+
+        .qty-btn {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .qty-btn:active {
+            transform: scale(0.95);
+        }
+
+        .qty-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .qty-display {
+            font-size: 18px;
+            font-weight: 700;
+            min-width: 30px;
+            text-align: center;
+        }
+
         .food-rating {
             display: flex;
             align-items: center;
-            gap: var(--space-md);
-            margin: var(--space-lg) 0;
-            padding: var(--space-md);
+            gap: 12px;
+            margin: 12px 0;
+            padding: 12px;
             background: var(--light-bg-secondary);
             border-radius: var(--radius-md);
             cursor: pointer;
@@ -651,15 +975,15 @@
             background: var(--dark-bg);
         }
 
-        .food-rating:hover {
-            box-shadow: var(--shadow-sm);
+        .food-rating:active {
+            transform: scale(0.98);
         }
 
         .rating-stars {
             display: flex;
             align-items: center;
             gap: 2px;
-            font-size: 20px;
+            font-size: 16px;
         }
 
         .rating-info {
@@ -667,30 +991,33 @@
         }
 
         .rating-score {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--color-star);
+            line-height: 1;
         }
 
         .rating-count {
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.6;
+            margin-top: 2px;
         }
 
         .rating-arrow {
-            font-size: 18px;
+            font-size: 16px;
             opacity: 0.4;
         }
 
         .food-meta {
-            font-size: 13px;
+            font-size: 12px;
             opacity: 0.6;
             display: flex;
             align-items: center;
-            gap: var(--space-sm);
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
-        /* FIXED: Reviews Modal with Overlay */
+        /* Reviews Modal */
         .reviews-overlay {
             position: fixed;
             top: 0;
@@ -713,9 +1040,9 @@
             left: 0;
             right: 0;
             max-height: 80vh;
-            background: white;
+            background: rgba(255, 255, 255, 0.98); /* Slightly transparent */
             border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-            padding: var(--space-xl);
+            padding: var(--space-lg);
             z-index: 150;
             transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.2);
@@ -723,7 +1050,7 @@
         }
 
         .dark-theme .reviews-modal {
-            background: var(--dark-bg-secondary);
+            background: rgba(26, 26, 26, 0.98); /* Slightly transparent */
             color: white;
         }
 
@@ -745,11 +1072,10 @@
         }
 
         .reviews-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
         }
 
-        /* FIXED: Better contrast for close button */
         .reviews-close {
             background: rgba(0, 0, 0, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -777,7 +1103,7 @@
         }
 
         .review-item {
-            padding: var(--space-lg);
+            padding: var(--space-md);
             border-bottom: 1px solid var(--light-border);
         }
 
@@ -793,34 +1119,81 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--space-sm);
+            margin-bottom: 6px;
         }
 
         .review-author {
             font-weight: 600;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .review-stars {
             color: var(--color-star);
+            font-size: 14px;
         }
 
         .review-date {
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.5;
-            margin-bottom: var(--space-sm);
+            margin-bottom: 8px;
         }
 
         .review-text {
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.6;
             opacity: 0.8;
         }
 
-        /* AR Viewer */
+        /* AR Viewer with Grid Floor */
         model-viewer {
             width: 100%;
             height: 100%;
+            --poster-color: transparent;
+        }
+
+        .grid-floor {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30%;
+            background: 
+                linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.02) 100%),
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0,0,0,0.03) 0px,
+                    transparent 1px,
+                    transparent 20px,
+                    rgba(0,0,0,0.03) 21px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(0,0,0,0.03) 0px,
+                    transparent 1px,
+                    transparent 20px,
+                    rgba(0,0,0,0.03) 21px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .dark-theme .grid-floor {
+            background: 
+                linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.02) 100%),
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(255,255,255,0.05) 0px,
+                    transparent 1px,
+                    transparent 20px,
+                    rgba(255,255,255,0.05) 21px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.05) 0px,
+                    transparent 1px,
+                    transparent 20px,
+                    rgba(255,255,255,0.05) 21px
+                );
         }
 
         /* Loading Overlay */
@@ -844,8 +1217,8 @@
         }
 
         .loading-spinner {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border: 4px solid rgba(255, 255, 255, 0.1);
             border-top: 4px solid white;
             border-radius: 50%;
@@ -859,12 +1232,12 @@
 
         .loading-text {
             color: white;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
         }
 
         .loading-progress {
-            width: 200px;
+            width: 180px;
             height: 4px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: var(--radius-full);
@@ -886,7 +1259,7 @@
             transform: translate(-50%, -50%);
             background: white;
             color: var(--light-text);
-            padding: var(--space-xl);
+            padding: var(--space-lg);
             border-radius: var(--radius-xl);
             text-align: center;
             z-index: 60;
@@ -907,16 +1280,16 @@
         }
 
         .error-icon {
-            font-size: 48px;
+            font-size: 42px;
         }
 
         .error-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
         }
 
         .error-text {
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.6;
             opacity: 0.7;
         }
@@ -925,32 +1298,34 @@
             background: var(--color-primary);
             color: white;
             border: none;
-            padding: 14px 24px;
+            padding: 12px 20px;
             border-radius: var(--radius-md);
             font-weight: 600;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         /* Bottom Action Bar */
         .bottom-bar {
             position: fixed;
-            bottom: var(--space-lg);
-            left: var(--space-md);
-            right: var(--space-md);
+            bottom: 20px;
+            left: 12px;
+            right: 12px;
             display: flex;
-            gap: var(--space-md);
-            z-index: 10;
+            gap: 12px;
+            z-index: 85;
             align-items: center;
             justify-content: center;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         .ar-button {
-            background: var(--color-success);
+            background: var(--color-primary);
             color: white;
             border: none;
-            padding: 16px 32px;
-            font-size: 17px;
+            padding: 14px 24px;
+            font-size: 15px;
             font-weight: 700;
             border-radius: var(--radius-full);
             cursor: pointer;
@@ -958,9 +1333,9 @@
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: var(--space-sm);
+            gap: 8px;
             flex: 1;
-            max-width: 280px;
+            max-width: 200px;
             justify-content: center;
         }
 
@@ -968,14 +1343,20 @@
             transform: scale(0.98);
         }
 
+        .add-to-cart-button {
+            background: var(--color-success);
+            flex: 1;
+            max-width: none;
+        }
+
         .action-btn {
             background: white;
             border: 1px solid var(--light-border);
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             border-radius: var(--radius-full);
             cursor: pointer;
-            font-size: 22px;
+            font-size: 20px;
             box-shadow: var(--shadow-md);
             transition: all 0.2s;
             display: flex;
@@ -993,22 +1374,22 @@
             transform: scale(0.95);
         }
 
-        /* Help Button */
+        /* Help Button - ALWAYS VISIBLE */
         .help-btn {
             position: fixed;
-            bottom: calc(var(--space-lg) + 80px);
-            right: var(--space-md);
+            bottom: 88px;
+            right: 12px;
             background: white;
             border: 1px solid var(--light-border);
             color: var(--light-text);
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             border-radius: var(--radius-full);
             cursor: pointer;
-            font-size: 24px;
+            font-size: 22px;
             box-shadow: var(--shadow-md);
-            z-index: 10;
-            display: none;
+            z-index: 85;
+            display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
@@ -1020,30 +1401,681 @@
             color: white;
         }
 
-        .help-btn.show {
-            display: flex;
-        }
-
         .help-btn:active {
             transform: scale(0.95);
         }
 
-        /* Share Modal */
+        /* Cart Modal */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 149;
+            display: none;
+            backdrop-filter: blur(8px);
+        }
+
+        .cart-overlay.show {
+            display: block;
+        }
+
+        .cart-modal {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            max-height: 85vh;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            padding: var(--space-lg);
+            z-index: 150;
+            transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dark-theme .cart-modal {
+            background: rgba(26, 26, 26, 0.98);
+            color: white;
+        }
+
+        .cart-modal.show {
+            bottom: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--light-border);
+            flex-shrink: 0;
+        }
+
+        .dark-theme .cart-header {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .cart-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-close {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .dark-theme .cart-close {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            color: var(--dark-bg);
+        }
+
+        .cart-close:active {
+            transform: scale(0.95);
+        }
+
+        .cart-items-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: var(--space-lg);
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: var(--space-md);
+            background: var(--light-bg-secondary);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-sm);
+        }
+
+        .dark-theme .cart-item {
+            background: var(--dark-bg);
+        }
+
+        .cart-item-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .cart-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .cart-item-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .cart-item-price {
+            font-size: 13px;
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-qty-btn {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-qty-btn:active {
+            transform: scale(0.95);
+        }
+
+        .cart-qty-display {
+            font-size: 15px;
+            font-weight: 700;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .cart-remove-btn {
+            background: var(--color-danger);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .cart-remove-btn:active {
+            transform: scale(0.95);
+        }
+
+        .cart-summary {
+            padding: var(--space-md);
+            background: var(--light-bg-secondary);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-md);
+            flex-shrink: 0;
+        }
+
+        .dark-theme .cart-summary {
+            background: var(--dark-bg);
+        }
+
+        .cart-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .cart-summary-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .cart-summary-label {
+            opacity: 0.7;
+        }
+
+        .cart-summary-value {
+            font-weight: 700;
+        }
+
+        .cart-total {
+            font-size: 18px;
+            color: var(--color-success);
+            padding-top: 8px;
+            border-top: 1px solid var(--light-border);
+            margin-top: 8px;
+        }
+
+        .dark-theme .cart-total {
+            border-top-color: var(--dark-border);
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--color-success);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .checkout-btn:active {
+            transform: scale(0.98);
+        }
+
+        .checkout-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Checkout Modal */
+        .checkout-modal {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            max-height: 90vh;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            padding: var(--space-lg);
+            z-index: 160;
+            transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+        }
+
+        .dark-theme .checkout-modal {
+            background: rgba(26, 26, 26, 0.98);
+            color: white;
+        }
+
+        .checkout-modal.show {
+            bottom: 0;
+        }
+
+        .checkout-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        .dark-theme .checkout-header {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .checkout-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .checkout-section {
+            margin-bottom: var(--space-lg);
+        }
+
+        .checkout-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: var(--space-sm);
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--light-bg-secondary);
+            border: 1px solid var(--light-border);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            color: var(--light-text);
+        }
+
+        .dark-theme .form-input {
+            background: var(--dark-bg);
+            border-color: var(--dark-border);
+            color: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .payment-method {
+            padding: 16px;
+            background: var(--light-bg-secondary);
+            border: 2px solid var(--light-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .dark-theme .payment-method {
+            background: var(--dark-bg);
+            border-color: var(--dark-border);
+        }
+
+        .payment-method.active {
+            border-color: var(--color-success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .payment-method-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .payment-method-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .order-summary-mini {
+            padding: var(--space-md);
+            background: var(--light-bg-secondary);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .dark-theme .order-summary-mini {
+            background: var(--dark-bg);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-total {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--color-success);
+            border-top: 1px solid var(--light-border);
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        .dark-theme .summary-total {
+            border-top-color: var(--dark-border);
+        }
+
+        .place-order-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--color-success);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .place-order-btn:active {
+            transform: scale(0.98);
+        }
+
+        .place-order-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Order Confirmation Modal */
+        .order-confirmation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 199;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            padding: var(--space-lg);
+        }
+
+        .order-confirmation-overlay.show {
+            display: flex;
+        }
+
+        .order-confirmation-content {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .dark-theme .order-confirmation-content {
+            background: var(--dark-bg-secondary);
+            color: white;
+        }
+
+        .confirmation-icon {
+            font-size: 80px;
+            margin-bottom: var(--space-md);
+            animation: bounce 1s;
+        }
+
+        .confirmation-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: var(--space-sm);
+            color: var(--color-success);
+        }
+
+        .confirmation-text {
+            font-size: 14px;
+            line-height: 1.6;
+            opacity: 0.8;
+            margin-bottom: var(--space-lg);
+        }
+
+        .order-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin: var(--space-lg) 0;
+        }
+
+        .confirmation-details {
+            padding: var(--space-md);
+            background: var(--light-bg-secondary);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+            text-align: left;
+        }
+
+        .dark-theme .confirmation-details {
+            background: var(--dark-bg);
+        }
+
+        .confirmation-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .confirmation-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .confirmation-button {
+            width: 100%;
+            padding: 14px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .confirmation-button:active {
+            transform: scale(0.98);
+        }
+
+        /* Login/Signup Modal */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 199;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            padding: var(--space-lg);
+        }
+
+        .auth-overlay.show {
+            display: flex;
+        }
+
+        .auth-content {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            max-width: 90%;
+            width: 400px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .dark-theme .auth-content {
+            background: var(--dark-bg-secondary);
+            color: white;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .auth-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: var(--space-sm);
+        }
+
+        .auth-subtitle {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: var(--space-lg);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid var(--light-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .dark-theme .auth-tab {
+            border-color: var(--dark-border);
+        }
+
+        .auth-tab.active {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 14px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .auth-button:active {
+            transform: scale(0.98);
+        }
+
+        .auth-divider {
+            text-align: center;
+            margin: var(--space-lg) 0;
+            opacity: 0.5;
+            font-size: 13px;
+        }
+
+        .auth-close-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--light-bg-secondary);
+            color: var(--light-text);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .dark-theme .auth-close-btn {
+            background: var(--dark-bg);
+            color: white;
+        }
+
         .share-modal {
             position: fixed;
             bottom: -100%;
             left: 0;
             right: 0;
-            background: white;
+            background: rgba(255, 255, 255, 0.98);
             border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-            padding: var(--space-xl);
-            z-index: 101;
+            padding: var(--space-lg);
+            z-index: 151;
             transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.2);
         }
 
         .dark-theme .share-modal {
-            background: var(--dark-bg-secondary);
+            background: rgba(26, 26, 26, 0.98);
             color: white;
         }
 
@@ -1052,32 +2084,30 @@
         }
 
         .share-header {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: var(--space-xl);
+            margin-bottom: var(--space-lg);
             text-align: center;
         }
 
         .share-options {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: var(--space-md);
-            margin-bottom: var(--space-xl);
+            gap: 12px;
+            margin-bottom: var(--space-lg);
         }
 
         .share-option {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: var(--space-sm);
-            padding: var(--space-lg) var(--space-md);
+            gap: 8px;
+            padding: 16px 8px;
             background: var(--light-bg-secondary);
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s;
             border: 2px solid transparent;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
         }
 
         .dark-theme .share-option {
@@ -1090,23 +2120,23 @@
         }
 
         .share-option-icon {
-            font-size: 32px;
+            font-size: 28px;
         }
 
         .share-option-label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
         }
 
         .share-close {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: var(--light-bg-secondary);
             color: var(--light-text);
             border: none;
             border-radius: var(--radius-md);
             cursor: pointer;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             transition: all 0.2s;
         }
@@ -1124,56 +2154,192 @@
             display: none !important;
         }
 
-        @media (max-width: 400px) {
+        @media (max-width: 380px) {
             .food-name {
-                font-size: 20px;
+                font-size: 16px;
             }
             
-            .ar-button {
-                padding: 14px 24px;
-                font-size: 16px;
+            .ar-button, .add-to-cart-button {
+                padding: 12px 20px;
+                font-size: 14px;
             }
             
             .share-options {
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .action-btn {
-                width: 50px;
-                height: 50px;
+            .action-btn, .help-btn {
+                width: 48px;
+                height: 48px;
             }
         }
     </style>
 </head>
 <body class="light-theme">
 
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toastIcon">✓</span>
+        <span id="toastMessage">Item added to cart!</span>
+    </div>
+
     <!-- Welcome Screen -->
     <div class="welcome-overlay" id="welcomeOverlay">
         <div class="welcome-content">
             <div class="welcome-icon">🍽️</div>
             <div class="welcome-title">Welcome to AR Menu!</div>
-            <div class="welcome-text">View food items in augmented reality on your table</div>
+            <div class="welcome-text">View food items in augmented reality and order easily</div>
             
             <div class="welcome-steps">
                 <div class="welcome-step">
                     <span class="welcome-step-icon">📱</span>
-                    <span>Browse menu items and select what you'd like to view</span>
+                    <span>Browse menu and view items in AR</span>
                 </div>
                 <div class="welcome-step">
-                    <span class="welcome-step-icon">👆</span>
-                    <span>Tap "View in AR" to place 3D models on your surface</span>
+                    <span class="welcome-step-icon">🛒</span>
+                    <span>Add items to cart with custom quantities</span>
                 </div>
                 <div class="welcome-step">
-                    <span class="welcome-step-icon">🔄</span>
-                    <span>Move slowly to help your camera detect surfaces</span>
-                </div>
-                <div class="welcome-step">
-                    <span class="welcome-step-icon">❤️</span>
-                    <span>Add items to favorites and share with friends!</span>
+                    <span class="welcome-step-icon">📋</span>
+                    <span>Enter table number and place your order</span>
                 </div>
             </div>
             
             <button class="welcome-button" id="welcomeButton">Get Started</button>
+        </div>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div class="tutorial-overlay" id="tutorialOverlay">
+        <div class="tutorial-content">
+            <div class="tutorial-header">
+                <div class="tutorial-title">📖 App Guide</div>
+                <button class="tutorial-close" id="tutorialClose">×</button>
+            </div>
+
+            <div class="tutorial-step">
+                <div class="tutorial-step-icon">☰</div>
+                <div class="tutorial-step-content">
+                    <div class="tutorial-step-title">Browse Menu</div>
+                    <div class="tutorial-step-text">Tap the menu button to view all available items from different restaurants</div>
+                </div>
+            </div>
+
+            <div class="tutorial-step">
+                <div class="tutorial-step-icon">🛒</div>
+                <div class="tutorial-step-content">
+                    <div class="tutorial-step-title">Add to Cart</div>
+                    <div class="tutorial-step-text">Use + button to quick add from menu, or adjust quantity before adding from item view</div>
+                </div>
+            </div>
+
+            <div class="tutorial-step">
+                <div class="tutorial-step-icon">📱</div>
+                <div class="tutorial-step-content">
+                    <div class="tutorial-step-title">View in AR</div>
+                    <div class="tutorial-step-text">Tap "View in AR" to place food on your table using your camera</div>
+                </div>
+            </div>
+
+            <div class="tutorial-step">
+                <div class="tutorial-step-icon">🔢</div>
+                <div class="tutorial-step-content">
+                    <div class="tutorial-step-title">Adjust Quantity</div>
+                    <div class="tutorial-step-text">Use +/- buttons to change quantity before adding to cart or in the cart itself</div>
+                </div>
+            </div>
+
+            <div class="tutorial-step">
+                <div class="tutorial-step-icon">📋</div>
+                <div class="tutorial-step-content">
+                    <div class="tutorial-step-title">Place Order</div>
+                    <div class="tutorial-step-text">Enter your table number, choose payment method (Cash/Card), and place your order</div>
+                </div>
+            </div>
+
+            <div class="tutorial-step">
+                <div class="tutorial-step-icon">⭐</div>
+                <div class="tutorial-step-content">
+                    <div class="tutorial-step-title">Login for More</div>
+                    <div class="tutorial-step-text">Login to save favorites, add ratings, and track your order history</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login/Signup Modal -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-content">
+            <div class="auth-header">
+                <div class="auth-title">👤 Account</div>
+                <div class="auth-subtitle">Login or create an account</div>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="loginTab">Login</button>
+                <button class="auth-tab" id="signupTab">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="loginEmail" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="auth-button">Login</button>
+            </form>
+
+            <!-- Signup Form -->
+            <form class="auth-form" id="signupForm">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-input" id="signupName" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="signupEmail" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="signupPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="auth-button">Sign Up</button>
+            </form>
+
+            <div class="auth-divider">───</div>
+            <button class="auth-close-btn" id="authCloseBtn">Continue as Guest</button>
+        </div>
+    </div>
+
+    <!-- Order Confirmation Modal -->
+    <div class="order-confirmation-overlay" id="orderConfirmationOverlay">
+        <div class="order-confirmation-content">
+            <div class="confirmation-icon">🎉</div>
+            <div class="confirmation-title">Order Placed!</div>
+            <div class="confirmation-text">Your order has been sent to the kitchen</div>
+            
+            <div class="order-number" id="orderNumber">#0000</div>
+            
+            <div class="confirmation-details">
+                <div class="confirmation-row">
+                    <span>Table Number:</span>
+                    <strong id="confirmTableNumber">-</strong>
+                </div>
+                <div class="confirmation-row">
+                    <span>Payment Method:</span>
+                    <strong id="confirmPaymentMethod">-</strong>
+                </div>
+                <div class="confirmation-row">
+                    <span>Total Amount:</span>
+                    <strong id="confirmTotalAmount">$0.00</strong>
+                </div>
+            </div>
+            
+            <button class="confirmation-button" id="confirmationDone">Done</button>
         </div>
     </div>
 
@@ -1183,9 +2349,14 @@
             <button class="icon-btn" id="menuBtn" title="Menu">☰</button>
         </div>
         <div class="nav-right">
+            <button class="icon-btn" id="userBtn" title="Account">👤</button>
+            <button class="icon-btn" id="cartBtn" title="Cart">
+                🛒
+                <span class="counter-badge cart-badge" id="cartCounter">0</span>
+            </button>
             <button class="icon-btn" id="favBtn" title="Favorites">
                 ❤️
-                <span class="fav-counter" id="favCounter">0</span>
+                <span class="counter-badge" id="favCounter">0</span>
             </button>
             <button class="icon-btn" id="themeBtn" title="Toggle theme">🌙</button>
         </div>
@@ -1198,6 +2369,11 @@
         <div class="menu-header">
             <div class="menu-title">🍽️ AR Menu</div>
             <div class="menu-subtitle">Select an item to view in AR</div>
+        </div>
+
+        <!-- User Section -->
+        <div class="user-section" id="userSection">
+            <!-- Will be populated by JavaScript -->
         </div>
 
         <div class="menu-tabs">
@@ -1228,6 +2404,16 @@
             </div>
             
             <div class="info-details">
+                <!-- Quantity Selector -->
+                <div class="qty-selector">
+                    <span class="qty-label">Quantity</span>
+                    <div class="qty-controls">
+                        <button class="qty-btn" id="qtyMinus">−</button>
+                        <span class="qty-display" id="qtyDisplay">1</span>
+                        <button class="qty-btn" id="qtyPlus">+</button>
+                    </div>
+                </div>
+
                 <div class="food-rating" id="ratingSection">
                     <div class="rating-stars" id="ratingStars">⭐⭐⭐⭐⭐</div>
                     <div class="rating-info">
@@ -1259,27 +2445,121 @@
         <div id="reviewsContent"></div>
     </div>
 
-    <!-- Help Button -->
-    <button class="help-btn" id="helpBtn" title="Show instructions">❓</button>
+    <!-- Cart Modal Overlay -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-header">
+            <div class="cart-title">🛒 Your Cart</div>
+            <button class="cart-close" id="cartClose">×</button>
+        </div>
+        
+        <div class="cart-items-container" id="cartItems">
+            <div class="empty-state">
+                <div class="empty-state-icon">🛒</div>
+                <div class="empty-state-text">Your cart is empty<br>Add items to get started!</div>
+            </div>
+        </div>
+
+        <div class="cart-summary" id="cartSummary" style="display: none;">
+            <div class="cart-summary-row">
+                <span class="cart-summary-label">Subtotal:</span>
+                <span class="cart-summary-value" id="cartSubtotal">$0.00</span>
+            </div>
+            <div class="cart-summary-row">
+                <span class="cart-summary-label">GST (<span id="gstRate">5</span>%):</span>
+                <span class="cart-summary-value" id="cartGST">$0.00</span>
+            </div>
+            <div class="cart-summary-row cart-total">
+                <span class="cart-summary-label">Total:</span>
+                <span class="cart-summary-value" id="cartTotal">$0.00</span>
+            </div>
+        </div>
+
+        <button class="checkout-btn" id="checkoutBtn" disabled>Proceed to Checkout</button>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="checkout-header">
+            <div class="checkout-title">📋 Checkout</div>
+            <button class="cart-close" id="checkoutClose">×</button>
+        </div>
+
+        <form id="checkoutForm">
+            <div class="checkout-section">
+                <div class="checkout-section-title">Table Information</div>
+                <div class="form-group">
+                    <label class="form-label">Table Number *</label>
+                    <input type="text" class="form-input" id="tableNumber" placeholder="Enter your table number" required>
+                </div>
+            </div>
+
+            <div class="checkout-section">
+                <div class="checkout-section-title">Payment Method *</div>
+                <div class="payment-methods">
+                    <div class="payment-method" data-method="cash">
+                        <div class="payment-method-icon">💵</div>
+                        <div class="payment-method-name">Cash</div>
+                    </div>
+                    <div class="payment-method" data-method="card">
+                        <div class="payment-method-icon">💳</div>
+                        <div class="payment-method-name">Card</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkout-section">
+                <div class="checkout-section-title">Order Summary</div>
+                <div class="order-summary-mini">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="checkoutSubtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>GST (<span id="checkoutGSTRate">5</span>%):</span>
+                        <span id="checkoutGST">$0.00</span>
+                    </div>
+                    <div class="summary-row summary-total">
+                        <span>Total:</span>
+                        <span id="checkoutTotal">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="place-order-btn" id="placeOrderBtn" disabled>Place Order</button>
+        </form>
+    </div>
+
+    <!-- Help Button - ALWAYS VISIBLE -->
+    <button class="help-btn" id="helpBtn" title="Help">❓</button>
 
     <!-- AR Viewer -->
     <model-viewer
         id="ar-viewer"
         src="Restaurants/Candle Cafe/All Items/Blue Artifact.glb"
         ios-src="Restaurants/Candle%20Cafe/All%20Items/Blue%20Artifact.usdz"
-        poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f8f9fa;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23e5e7eb;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='400' height='400'/%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' font-size='80'%3E🔵%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' fill='%231a1a1a'%3EBlue Artifact%3C/text%3E%3Ctext x='50%25' y='70%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='rgba(26,26,26,0.5)'%3ELoading 3D Model...%3C/text%3E%3C/svg%3E"
+        poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f8f9fa;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23e5e7eb;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='400' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-size='80'%3E🔵%3C/text%3E%3Ctext x='50%25' y='65%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%231a1a1a'%3ELoading...%3C/text%3E%3C/svg%3E"
         alt="3D model"
         ar
         ar-modes="webxr scene-viewer quick-look"
         camera-controls
         shadow-intensity="1"
-        camera-orbit="0deg 75deg 2m"
-        min-camera-orbit="auto auto 0.3m"
-        max-camera-orbit="auto auto 10m"
+        camera-orbit="0deg 75deg auto"
+        min-camera-orbit="auto auto 5%"
+        max-camera-orbit="auto auto 500%"
         environment-image="neutral"
         exposure="1"
-        shadow-softness="1">
+        shadow-softness="1"
+        ar-scale="auto"
+        ar-placement="floor"
+        interaction-prompt="auto"
+        interaction-prompt-threshold="0">
     </model-viewer>
+
+    <!-- Grid Floor -->
+    <div class="grid-floor"></div>
 
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
@@ -1303,6 +2583,10 @@
         <button class="ar-button" id="arButton">
             <span>📱</span>
             <span>View in AR</span>
+        </button>
+        <button class="ar-button add-to-cart-button" id="addToCartButton">
+            <span>🛒</span>
+            <span>Add to Cart</span>
         </button>
         <button class="action-btn" id="shareBtn" title="Share">🔗</button>
     </div>
@@ -1332,10 +2616,18 @@
     </div>
 
     <script>
+        // RESTAURANT DATA WITH CUSTOM LIGHTING
         const RESTAURANTS = [
             {
                 id: 'candle-cafe',
                 name: '🕯️ Candle Cafe',
+                lighting: {
+                    exposure: 1.2,
+                    shadowIntensity: 1.3,
+                    environmentImage: 'neutral', // Can be 'neutral', 'legacy', or custom HDRI URL
+                    cameraOrbit: '0deg 75deg auto',
+                    theme: 'warm'
+                },
                 categories: [
                     {
                         id: 'all-items',
@@ -1344,7 +2636,7 @@
                             {
                                 id: 'blue-artifact',
                                 name: '🔵 Blue Artifact Special',
-                                price: '$9.99',
+                                price: 9.99,
                                 emoji: '🔵',
                                 rating: 4.8,
                                 reviewCount: 124,
@@ -1360,7 +2652,7 @@
                             {
                                 id: 'red-stand',
                                 name: '🔴 Red Stand Deluxe',
-                                price: '$12.99',
+                                price: 12.99,
                                 emoji: '🔴',
                                 rating: 4.6,
                                 reviewCount: 98,
@@ -1379,6 +2671,13 @@
             {
                 id: 'coffee-shop',
                 name: '☕ Coffee Shop',
+                lighting: {
+                    exposure: 0.9,
+                    shadowIntensity: 0.8,
+                    environmentImage: 'legacy',
+                    cameraOrbit: '0deg 80deg auto',
+                    theme: 'cool'
+                },
                 categories: [
                     {
                         id: 'all-items',
@@ -1387,7 +2686,7 @@
                             {
                                 id: 'coffee-cup',
                                 name: '☕ Premium Coffee Cup',
-                                price: '$4.99',
+                                price: 4.99,
                                 emoji: '☕',
                                 rating: 4.9,
                                 reviewCount: 267,
@@ -1407,6 +2706,13 @@
             {
                 id: 'cube-cafe',
                 name: '◼️ Cube Cafe',
+                lighting: {
+                    exposure: 1.0,
+                    shadowIntensity: 1.0,
+                    environmentImage: 'neutral',
+                    cameraOrbit: '0deg 70deg auto',
+                    theme: 'neutral'
+                },
                 categories: [
                     {
                         id: 'all-items',
@@ -1415,7 +2721,7 @@
                             {
                                 id: 'blue-cube',
                                 name: '🔷 Blue Cube Delight',
-                                price: '$7.99',
+                                price: 7.99,
                                 emoji: '🔷',
                                 rating: 4.7,
                                 reviewCount: 156,
@@ -1430,7 +2736,7 @@
                             {
                                 id: 'pink-cube',
                                 name: '🟪 Pink Cube Surprise',
-                                price: '$7.99',
+                                price: 7.99,
                                 emoji: '🟪',
                                 rating: 4.5,
                                 reviewCount: 142,
@@ -1448,56 +2754,68 @@
             }
         ];
 
-        function createFallbackImage(itemName, emoji, isDark = false) {
-            const bgColor1 = isDark ? '%23191919' : '%23f8f9fa';
-            const bgColor2 = isDark ? '%232a2a2a' : '%23e5e7eb';
-            const textColor = isDark ? 'white' : '%231a1a1a';
-            const subtextColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(26,26,26,0.5)';
-            
-            const svg = `
-                <svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'>
-                    <defs>
-                        <linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'>
-                            <stop offset='0%' style='stop-color:${bgColor1};stop-opacity:1' />
-                            <stop offset='100%' style='stop-color:${bgColor2};stop-opacity:1' />
-                        </linearGradient>
-                    </defs>
-                    <rect fill='url(%23grad)' width='400' height='400'/>
-                    <text x='50%' y='40%' dominant-baseline='middle' text-anchor='middle' 
-                          font-size='80'>${emoji}</text>
-                    <text x='50%' y='60%' dominant-baseline='middle' text-anchor='middle' 
-                          font-family='sans-serif' font-size='18' fill='${textColor}'>${itemName.substring(2)}</text>
-                    <text x='50%' y='70%' dominant-baseline='middle' text-anchor='middle' 
-                          font-family='sans-serif' font-size='14' fill='${subtextColor}'>Loading 3D Model...</text>
-                </svg>
-            `.trim();
-            
-            return 'data:image/svg+xml,' + encodeURIComponent(svg);
-        }
+        // GLOBAL STATE
+        let currentItem = null;
+        let currentRestaurant = null;
+        let currentQuantity = 1;
+        let favorites = [];
+        let cart = [];
+        let currentUser = null;
+        let selectedPaymentMethod = null;
+        let expandedRestaurants = [];
+        let isIOS = false;
+        let isInfoMinimized = false;
 
+        // DOM ELEMENTS
         const viewer = document.querySelector('model-viewer');
+        const toast = document.getElementById('toast');
+        const toastIcon = document.getElementById('toastIcon');
+        const toastMessage = document.getElementById('toastMessage');
         const welcomeOverlay = document.getElementById('welcomeOverlay');
         const welcomeButton = document.getElementById('welcomeButton');
+        const tutorialOverlay = document.getElementById('tutorialOverlay');
+        const tutorialClose = document.getElementById('tutorialClose');
+        const helpBtn = document.getElementById('helpBtn');
+        const authOverlay = document.getElementById('authOverlay');
+        const authCloseBtn = document.getElementById('authCloseBtn');
+        const loginTab = document.getElementById('loginTab');
+        const signupTab = document.getElementById('signupTab');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const userBtn = document.getElementById('userBtn');
         const menuBtn = document.getElementById('menuBtn');
+        const cartBtn = document.getElementById('cartBtn');
         const favBtn = document.getElementById('favBtn');
         const sideMenu = document.getElementById('sideMenu');
         const menuOverlay = document.getElementById('menuOverlay');
         const themeBtn = document.getElementById('themeBtn');
         const infoCard = document.getElementById('infoCard');
         const minimizeBtn = document.getElementById('minimizeBtn');
-        const currentFoodName = document.getElementById('currentFoodName');
-        const currentFoodPrice = document.getElementById('currentFoodPrice');
-        const currentFoodMeta = document.getElementById('currentFoodMeta');
+        const qtyMinus = document.getElementById('qtyMinus');
+        const qtyPlus = document.getElementById('qtyPlus');
+        const qtyDisplay = document.getElementById('qtyDisplay');
         const ratingSection = document.getElementById('ratingSection');
-        const ratingStars = document.getElementById('ratingStars');
-        const ratingScore = document.getElementById('ratingScore');
-        const ratingCount = document.getElementById('ratingCount');
         const reviewsOverlay = document.getElementById('reviewsOverlay');
         const reviewsModal = document.getElementById('reviewsModal');
         const reviewsClose = document.getElementById('reviewsClose');
         const reviewsContent = document.getElementById('reviewsContent');
-        const helpBtn = document.getElementById('helpBtn');
+        const cartOverlay = document.getElementById('cartOverlay');
+        const cartModal = document.getElementById('cartModal');
+        const cartClose = document.getElementById('cartClose');
+        const cartItems = document.getElementById('cartItems');
+        const cartSummary = document.getElementById('cartSummary');
+        const cartCounter = document.getElementById('cartCounter');
+        const favCounter = document.getElementById('favCounter');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const checkoutModal = document.getElementById('checkoutModal');
+        const checkoutClose = document.getElementById('checkoutClose');
+        const checkoutForm = document.getElementById('checkoutForm');
+        const tableNumber = document.getElementById('tableNumber');
+        const placeOrderBtn = document.getElementById('placeOrderBtn');
+        const orderConfirmationOverlay = document.getElementById('orderConfirmationOverlay');
+        const confirmationDone = document.getElementById('confirmationDone');
         const arButton = document.getElementById('arButton');
+        const addToCartButton = document.getElementById('addToCartButton');
         const shareBtn = document.getElementById('shareBtn');
         const shareModal = document.getElementById('shareModal');
         const shareClose = document.getElementById('shareClose');
@@ -1505,80 +2823,50 @@
         const favTab = document.getElementById('favTab');
         const allItemsView = document.getElementById('allItemsView');
         const favoritesView = document.getElementById('favoritesView');
-        const favCounter = document.getElementById('favCounter');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const loadingProgressBar = document.getElementById('loadingProgressBar');
-        const errorMessage = document.getElementById('errorMessage');
-        const errorTitle = document.getElementById('errorTitle');
-        const errorText = document.getElementById('errorText');
-        const errorClose = document.getElementById('errorClose');
 
-        let currentItem = null;
-        let favorites = [];
-        let expandedRestaurants = [];
-        let isIOS = false;
-        let isInfoMinimized = false;
-        
-        const analytics = {
-            sessionStart: Date.now(),
-            itemViews: {},
-            arActivations: 0,
-            shareClicks: 0,
-            deviceType: ''
-        };
-        
-        function trackItemView(itemId, itemName) {
-            if (!analytics.itemViews[itemId]) {
-                analytics.itemViews[itemId] = { name: itemName, count: 0 };
-            }
-            analytics.itemViews[itemId].count++;
-            console.log(`📊 Analytics: ${itemName} viewed ${analytics.itemViews[itemId].count} time(s)`);
-        }
-        
-        function trackARActivation() {
-            analytics.arActivations++;
-            console.log(`📊 Analytics: AR activated ${analytics.arActivations} time(s) this session`);
-        }
-        
-        function trackShareClick() {
-            analytics.shareClicks++;
-            console.log(`📊 Analytics: Share clicked ${analytics.shareClicks} time(s)`);
+        // UTILITY FUNCTIONS
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            toast.className = 'toast show ' + type;
+            toastIcon.textContent = type === 'success' ? '✓' : '⚠';
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
         function detectIOS() {
             isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-            analytics.deviceType = isIOS ? 'iOS' : 'Android';
-            console.log(isIOS ? '🍎 iOS device detected' : '🤖 Android device detected');
             return isIOS;
         }
 
-        function checkWelcomeScreen() {
-            const hasSeenWelcome = localStorage.getItem('ar-menu-welcome-seen');
-            if (!hasSeenWelcome) {
-                welcomeOverlay.classList.add('show');
-            }
-        }
-        
-        function dismissWelcome() {
-            welcomeOverlay.classList.remove('show');
-            localStorage.setItem('ar-menu-welcome-seen', 'true');
-            helpBtn.classList.add('show');
-        }
-
-        function loadFavorites() {
-            const saved = localStorage.getItem('ar-menu-favorites');
-            if (saved) {
-                favorites = JSON.parse(saved);
-                updateFavoriteCounter();
-            }
+        function loadFromStorage() {
+            const savedFavorites = localStorage.getItem('ar-menu-favorites');
+            if (savedFavorites) favorites = JSON.parse(savedFavorites);
+            
+            const savedCart = localStorage.getItem('ar-menu-cart');
+            if (savedCart) cart = JSON.parse(savedCart);
+            
+            const savedUser = localStorage.getItem('ar-menu-user');
+            if (savedUser) currentUser = JSON.parse(savedUser);
+            
+            updateCounters();
         }
 
-        function saveFavorites() {
+        function saveToStorage() {
             localStorage.setItem('ar-menu-favorites', JSON.stringify(favorites));
-            updateFavoriteCounter();
+            localStorage.setItem('ar-menu-cart', JSON.stringify(cart));
+            if (currentUser) {
+                localStorage.setItem('ar-menu-user', JSON.stringify(currentUser));
+            }
         }
 
-        function updateFavoriteCounter() {
+        function updateCounters() {
+            if (cart.length > 0) {
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                cartCounter.textContent = totalItems;
+                cartCounter.classList.add('show');
+            } else {
+                cartCounter.classList.remove('show');
+            }
+
             if (favorites.length > 0) {
                 favCounter.textContent = favorites.length;
                 favCounter.classList.add('show');
@@ -1587,146 +2875,278 @@
             }
         }
 
-        function toggleFavorite(itemId) {
-            const index = favorites.indexOf(itemId);
-            if (index > -1) {
-                favorites.splice(index, -1);
+        // CART FUNCTIONS
+        function addToCart(item, quantity = 1) {
+            const existingItem = cart.find(i => i.id === item.id);
+            
+            if (existingItem) {
+                existingItem.quantity += quantity;
             } else {
-                favorites.push(itemId);
+                cart.push({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    emoji: item.emoji,
+                    quantity: quantity,
+                    restaurantId: currentRestaurant.id
+                });
             }
-            saveFavorites();
+            
+            saveToStorage();
+            updateCounters();
+            renderCart();
+            renderAllItems();
+            renderFavorites();
+            showToast(`${item.emoji} ${item.name} added to cart!`, 'success');
+        }
+
+        function updateCartQuantity(itemId, change) {
+            const item = cart.find(i => i.id === itemId);
+            if (!item) return;
+            
+            item.quantity += change;
+            
+            if (item.quantity <= 0) {
+                removeFromCart(itemId);
+                return;
+            }
+            
+            saveToStorage();
+            updateCounters();
+            renderCart();
             renderAllItems();
             renderFavorites();
         }
 
-        function getURLParameters() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                restaurant: params.get('restaurant'),
-                item: params.get('item')
-            };
-        }
-        
-        function updateURL(restaurantId, itemId) {
-            const url = new URL(window.location);
-            url.searchParams.set('restaurant', restaurantId);
-            url.searchParams.set('item', itemId);
-            window.history.pushState({}, '', url);
-        }
-        
-        function getShareableURL(restaurantId, itemId) {
-            const url = new URL(window.location.origin + window.location.pathname);
-            url.searchParams.set('restaurant', restaurantId);
-            url.searchParams.set('item', itemId);
-            return url.toString();
-        }
-        
-        function findItemByURL() {
-            const { restaurant: restaurantId, item: itemId } = getURLParameters();
-            
-            if (!restaurantId || !itemId) return null;
-            
-            for (const restaurant of RESTAURANTS) {
-                if (restaurant.id === restaurantId) {
-                    for (const category of restaurant.categories) {
-                        for (const item of category.items) {
-                            if (item.id === itemId) {
-                                return { item, restaurant, category };
-                            }
-                        }
-                    }
-                }
-            }
-            
-            return null;
+        function removeFromCart(itemId) {
+            cart = cart.filter(i => i.id !== itemId);
+            saveToStorage();
+            updateCounters();
+            renderCart();
+            renderAllItems();
+            renderFavorites();
+            showToast('Item removed from cart', 'success');
         }
 
+        function getCartItemQuantity(itemId) {
+            const item = cart.find(i => i.id === itemId);
+            return item ? item.quantity : 0;
+        }
+
+        function calculateCartTotals() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const gstRate = selectedPaymentMethod === 'cash' ? 0.05 : 0.08; // 5% for cash, 8% for card
+            const gst = subtotal * gstRate;
+            const total = subtotal + gst;
+            
+            return { subtotal, gst, gstRate: gstRate * 100, total };
+        }
+
+        function renderCart() {
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🛒</div>
+                        <div class="empty-state-text">Your cart is empty<br>Add items to get started!</div>
+                    </div>
+                `;
+                cartSummary.style.display = 'none';
+                checkoutBtn.disabled = true;
+                return;
+            }
+
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-icon">${item.emoji}</div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">$${item.price.toFixed(2)} each</div>
+                    </div>
+                    <div class="cart-item-controls">
+                        <button class="cart-qty-btn" onclick="updateCartQuantity('${item.id}', -1)">−</button>
+                        <span class="cart-qty-display">${item.quantity}</span>
+                        <button class="cart-qty-btn" onclick="updateCartQuantity('${item.id}', 1)">+</button>
+                        <button class="cart-remove-btn" onclick="removeFromCart('${item.id}')">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const { subtotal, gst, gstRate, total } = calculateCartTotals();
+
+            document.getElementById('cartSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('cartGST').textContent = `$${gst.toFixed(2)}`;
+            document.getElementById('gstRate').textContent = gstRate;
+            document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+
+            cartSummary.style.display = 'block';
+            checkoutBtn.disabled = false;
+        }
+
+        function openCart() {
+            renderCart();
+            cartModal.classList.add('show');
+            cartOverlay.classList.add('show');
+        }
+
+        function closeCart() {
+            cartModal.classList.remove('show');
+            cartOverlay.classList.remove('show');
+        }
+
+        // CHECKOUT FUNCTIONS
+        function openCheckout() {
+            if (cart.length === 0) return;
+            
+            closeCart();
+            
+            const { subtotal, gst, gstRate, total } = calculateCartTotals();
+            document.getElementById('checkoutSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('checkoutGST').textContent = `$${gst.toFixed(2)}`;
+            document.getElementById('checkoutGSTRate').textContent = gstRate;
+            document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
+            
+            checkoutModal.classList.add('show');
+            cartOverlay.classList.add('show');
+        }
+
+        function closeCheckout() {
+            checkoutModal.classList.remove('show');
+            cartOverlay.classList.remove('show');
+        }
+
+        function placeOrder(event) {
+            event.preventDefault();
+            
+            if (!selectedPaymentMethod) {
+                showToast('Please select a payment method', 'error');
+                return;
+            }
+            
+            const table = tableNumber.value.trim();
+            if (!table) {
+                showToast('Please enter your table number', 'error');
+                return;
+            }
+
+            const orderNumber = Math.floor(1000 + Math.random() * 9000);
+            const { total } = calculateCartTotals();
+            
+            document.getElementById('orderNumber').textContent = `#${orderNumber}`;
+            document.getElementById('confirmTableNumber').textContent = table;
+            document.getElementById('confirmPaymentMethod').textContent = selectedPaymentMethod === 'cash' ? 'Cash' : 'Card';
+            document.getElementById('confirmTotalAmount').textContent = `$${total.toFixed(2)}`;
+            
+            closeCheckout();
+            orderConfirmationOverlay.classList.add('show');
+            
+            // Clear cart and form
+            cart = [];
+            saveToStorage();
+            updateCounters();
+            tableNumber.value = '';
+            selectedPaymentMethod = null;
+            document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('active'));
+        }
+
+        // USER FUNCTIONS
+        function renderUserSection() {
+            const userSection = document.getElementById('userSection');
+            
+            if (currentUser) {
+                userSection.innerHTML = `
+                    <div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div>
+                    <div class="user-info">
+                        <div class="user-name">${currentUser.name}</div>
+                        <div class="user-email">${currentUser.email}</div>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                `;
+            } else {
+                userSection.innerHTML = `
+                    <div class="user-avatar">👤</div>
+                    <div class="login-prompt">Login to save favorites</div>
+                    <button class="login-btn-small" onclick="openAuth()">Login</button>
+                `;
+            }
+        }
+
+        function openAuth() {
+            authOverlay.classList.add('show');
+        }
+
+        function closeAuth() {
+            authOverlay.classList.remove('show');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Simple demo login - in real app, validate against backend
+            const savedUser = localStorage.getItem(`user_${email}`);
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showToast(`Welcome back, ${currentUser.name}!`, 'success');
+            } else {
+                showToast('User not found. Please sign up.', 'error');
+                return;
+            }
+            
+            saveToStorage();
+            renderUserSection();
+            closeAuth();
+            loginForm.reset();
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            currentUser = {
+                id: Date.now().toString(),
+                name: name,
+                email: email,
+                favorites: [],
+                orderHistory: []
+            };
+            
+            localStorage.setItem(`user_${email}`, JSON.stringify(currentUser));
+            saveToStorage();
+            renderUserSection();
+            closeAuth();
+            signupForm.reset();
+            showToast(`Account created! Welcome, ${name}!`, 'success');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('ar-menu-user');
+            renderUserSection();
+            showToast('Logged out successfully', 'success');
+        }
+
+        // MENU & ITEMS FUNCTIONS
         function generateStars(rating) {
             const fullStars = Math.floor(rating);
-            const hasHalfStar = rating % 1 >= 0.5;
             let stars = '';
-            
-            for (let i = 0; i < fullStars; i++) {
-                stars += '⭐';
-            }
-            if (hasHalfStar) {
-                stars += '⭐';
-            }
-            
+            for (let i = 0; i < fullStars; i++) stars += '⭐';
             return stars;
         }
-        
-        function updateRatingDisplay(item) {
-            ratingStars.textContent = generateStars(item.rating);
-            ratingScore.textContent = item.rating.toFixed(1);
-            ratingCount.textContent = `${item.reviewCount} reviews`;
-        }
-        
-        // FIXED: Reviews modal now closes properly
-        function showReviews() {
-            if (!currentItem || !currentItem.reviews) return;
-            
-            reviewsContent.innerHTML = '';
-            
-            currentItem.reviews.forEach(review => {
-                const reviewDiv = document.createElement('div');
-                reviewDiv.className = 'review-item';
-                reviewDiv.innerHTML = `
-                    <div class="review-header">
-                        <span class="review-author">${review.author}</span>
-                        <span class="review-stars">${generateStars(review.rating)}</span>
-                    </div>
-                    <div class="review-date">${review.date}</div>
-                    <div class="review-text">${review.text}</div>
-                `;
-                reviewsContent.appendChild(reviewDiv);
-            });
-            
-            reviewsModal.classList.add('show');
-            reviewsOverlay.classList.add('show');
-        }
-        
-        function closeReviews() {
-            reviewsModal.classList.remove('show');
-            reviewsOverlay.classList.remove('show');
-        }
 
-        function toggleInfoCard() {
-            isInfoMinimized = !isInfoMinimized;
-            
-            if (isInfoMinimized) {
-                infoCard.classList.add('minimized');
-                minimizeBtn.textContent = '+';
-                minimizeBtn.title = 'Maximize';
+        function toggleFavorite(itemId) {
+            const index = favorites.indexOf(itemId);
+            if (index > -1) {
+                favorites.splice(index, 1);
             } else {
-                infoCard.classList.remove('minimized');
-                minimizeBtn.textContent = '−';
-                minimizeBtn.title = 'Minimize';
+                favorites.push(itemId);
             }
-        }
-
-        function showError(title, message) {
-            errorTitle.textContent = title;
-            errorText.textContent = message;
-            errorMessage.classList.add('show');
-            loadingOverlay.classList.remove('show');
-        }
-        
-        function hideError() {
-            errorMessage.classList.remove('show');
-        }
-
-        function showLoading() {
-            loadingOverlay.classList.add('show');
-            loadingProgressBar.style.width = '0%';
-        }
-        
-        function hideLoading() {
-            loadingOverlay.classList.remove('show');
-        }
-        
-        function updateLoadingProgress(percent) {
-            loadingProgressBar.style.width = percent + '%';
+            saveToStorage();
+            updateCounters();
+            renderAllItems();
+            renderFavorites();
         }
 
         function renderAllItems() {
@@ -1783,6 +3203,11 @@
                 itemDiv.classList.add('active');
             }
             
+            const cartQty = getCartItemQuantity(item.id);
+            if (cartQty > 0) {
+                itemDiv.classList.add('in-cart');
+            }
+            
             itemDiv.innerHTML = `
                 <div class="menu-item-content">
                     <div class="menu-item-header">
@@ -1790,13 +3215,16 @@
                         <div class="menu-item-rating">${generateStars(item.rating)} ${item.rating}</div>
                     </div>
                     <div class="menu-item-details">
-                        <div class="menu-item-price">${item.price}</div>
-                        <div class="menu-item-views">👁️ ${item.views60Days.toLocaleString()} views</div>
+                        <div class="menu-item-price">$${item.price.toFixed(2)}</div>
+                        <div class="menu-item-views">👁️ ${item.views60Days.toLocaleString()}</div>
                     </div>
                 </div>
-                <button class="item-fav-btn">
-                    ${favorites.includes(item.id) ? '❤️' : '🤍'}
-                </button>
+                <div class="menu-item-actions">
+                    <button class="item-fav-btn" aria-label="Toggle favorite">
+                        ${favorites.includes(item.id) ? '❤️' : '🤍'}
+                    </button>
+                    ${cartQty > 0 ? `<span class="cart-qty-badge">${cartQty}</span>` : `<button class="quick-add-btn">+ Add</button>`}
+                </div>
             `;
             
             itemDiv.querySelector('.menu-item-content').addEventListener('click', () => {
@@ -1809,6 +3237,14 @@
                 e.stopPropagation();
                 toggleFavorite(item.id);
             });
+            
+            const quickAddBtn = itemDiv.querySelector('.quick-add-btn');
+            if (quickAddBtn) {
+                quickAddBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    addToCart(item, 1);
+                });
+            }
             
             return itemDiv;
         }
@@ -1878,49 +3314,90 @@
             });
         }
 
+        // ITEM SELECTION & AR
+        function applyRestaurantLighting(restaurant) {
+            const lighting = restaurant.lighting;
+            viewer.setAttribute('exposure', lighting.exposure);
+            viewer.setAttribute('shadow-intensity', lighting.shadowIntensity);
+            viewer.setAttribute('environment-image', lighting.environmentImage);
+            viewer.setAttribute('camera-orbit', lighting.cameraOrbit);
+        }
+
         function selectItem(item, restaurant, category) {
-            currentItem = {
-                ...item,
-                restaurant: restaurant.name,
-                restaurantId: restaurant.id,
-                category: category.name
-            };
+            currentItem = item;
+            currentRestaurant = restaurant;
+            currentQuantity = 1;
             
-            currentFoodName.textContent = item.name;
-            currentFoodPrice.textContent = item.price;
-            currentFoodMeta.innerHTML = `
+            document.getElementById('currentFoodName').textContent = item.name;
+            document.getElementById('currentFoodPrice').textContent = `$${item.price.toFixed(2)}`;
+            document.getElementById('currentFoodMeta').innerHTML = `
                 <span>🏪 ${restaurant.name.substring(2)}</span>
                 <span>•</span>
                 <span>${category.name}</span>
             `;
             
-            updateRatingDisplay(item);
+            document.getElementById('ratingStars').textContent = generateStars(item.rating);
+            document.getElementById('ratingScore').textContent = item.rating.toFixed(1);
+            document.getElementById('ratingCount').textContent = `${item.reviewCount} reviews`;
             
-            showLoading();
+            document.getElementById('qtyDisplay').textContent = currentQuantity;
             
-            const isDark = document.body.classList.contains('dark-theme');
-            const fallbackImage = createFallbackImage(item.name, item.emoji, isDark);
-            viewer.setAttribute('poster', fallbackImage);
+            document.getElementById('loadingOverlay').classList.add('show');
             
             viewer.src = item.modelGLB;
             const encodedUSDZ = item.modelUSDZ.split('/').map(encodeURIComponent).join('/');
             viewer.iosSrc = encodedUSDZ;
             
-            updateURL(restaurant.id, item.id);
+            // FIXED: iOS AR placement
+            viewer.setAttribute('ar-scale', 'auto');
+            viewer.setAttribute('ar-placement', 'floor');
+            viewer.setAttribute('camera-target', '0m 0m 0m');
+            viewer.setAttribute('interaction-prompt', 'auto');
+            viewer.setAttribute('interaction-prompt-threshold', '0');
             
-            trackItemView(item.id, item.name);
+            applyRestaurantLighting(restaurant);
             
             renderAllItems();
             renderFavorites();
-            
-            console.log(`✅ Selected: ${item.name}`);
-            console.log(`⭐ Rating: ${item.rating} (${item.reviewCount} reviews)`);
-            console.log(`👁️  Views (60 days): ${item.views60Days}`);
         }
 
-        // FIXED: Menu now closes reviews modal when opened
+        function updateQuantity(change) {
+            currentQuantity = Math.max(1, currentQuantity + change);
+            document.getElementById('qtyDisplay').textContent = currentQuantity;
+        }
+
+        function showReviews() {
+            if (!currentItem || !currentItem.reviews) return;
+            
+            reviewsContent.innerHTML = '';
+            
+            currentItem.reviews.forEach(review => {
+                const reviewDiv = document.createElement('div');
+                reviewDiv.className = 'review-item';
+                reviewDiv.innerHTML = `
+                    <div class="review-header">
+                        <span class="review-author">${review.author}</span>
+                        <span class="review-stars">${generateStars(review.rating)}</span>
+                    </div>
+                    <div class="review-date">${review.date}</div>
+                    <div class="review-text">${review.text}</div>
+                `;
+                reviewsContent.appendChild(reviewDiv);
+            });
+            
+            reviewsModal.classList.add('show');
+            reviewsOverlay.classList.add('show');
+        }
+
+        function closeReviews() {
+            reviewsModal.classList.remove('show');
+            reviewsOverlay.classList.remove('show');
+        }
+
+        // MENU CONTROLS
         function openMenu() {
-            closeReviews(); // Close reviews if open
+            closeReviews();
+            closeCart();
             sideMenu.classList.add('open');
             menuOverlay.classList.add('show');
         }
@@ -1958,12 +3435,6 @@
                 themeBtn.textContent = '🌙';
                 localStorage.setItem('ar-menu-theme', 'light');
             }
-            
-            if (currentItem) {
-                const isDark = body.classList.contains('dark-theme');
-                const fallbackImage = createFallbackImage(currentItem.name, currentItem.emoji, isDark);
-                viewer.setAttribute('poster', fallbackImage);
-            }
         }
 
         function loadTheme() {
@@ -1975,188 +3446,185 @@
             }
         }
 
-        function openShareModal() {
-            shareModal.classList.add('show');
-            trackShareClick();
+        function toggleInfoCard() {
+            isInfoMinimized = !isInfoMinimized;
+            
+            if (isInfoMinimized) {
+                infoCard.classList.add('minimized');
+                minimizeBtn.textContent = '+';
+            } else {
+                infoCard.classList.remove('minimized');
+                minimizeBtn.textContent = '−';
+            }
         }
 
-        function closeShareModal() {
-            shareModal.classList.remove('show');
-        }
-
+        // SHARE FUNCTIONS
         function shareItem(platform) {
             if (!currentItem) return;
             
-            const shareUrl = getShareableURL(currentItem.restaurantId, currentItem.id);
-            const shareText = `Check out ${currentItem.name} in AR! ${currentItem.price}`;
-            
-            console.log(`📤 Share clicked: ${platform}`);
+            const shareUrl = window.location.origin + window.location.pathname + `?restaurant=${currentRestaurant.id}&item=${currentItem.id}`;
+            const shareText = `Check out ${currentItem.name} in AR! $${currentItem.price.toFixed(2)}`;
             
             switch(platform) {
                 case 'whatsapp':
-                    window.location.href = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
+                    window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`, '_blank');
                     break;
                 case 'twitter':
-                    window.location.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
                     break;
                 case 'copy':
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(shareUrl).then(() => {
-                            alert('✅ Link copied!\n\n' + shareUrl);
-                        }).catch(() => {
-                            fallbackCopyToClipboard(shareUrl);
-                        });
-                    } else {
-                        fallbackCopyToClipboard(shareUrl);
-                    }
+                    copyToClipboard(shareUrl);
                     break;
                 case 'native':
                     if (navigator.share) {
-                        navigator.share({
-                            title: currentItem.name,
-                            text: shareText,
-                            url: shareUrl
-                        }).catch((err) => {
-                            console.log('Share cancelled or failed', err);
-                        });
+                        navigator.share({ title: currentItem.name, text: shareText, url: shareUrl }).catch(() => copyToClipboard(shareUrl));
                     } else {
-                        alert('Native sharing not supported on this device.\n\nLink: ' + shareUrl);
+                        copyToClipboard(shareUrl);
                     }
                     break;
             }
             
-            closeShareModal();
+            shareModal.classList.remove('show');
         }
-        
-        function fallbackCopyToClipboard(text) {
+
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('Link copied to clipboard!', 'success');
+                }).catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
             const textArea = document.createElement('textarea');
             textArea.value = text;
             textArea.style.position = 'fixed';
             textArea.style.left = '-999999px';
-            textArea.style.top = '-999999px';
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            
             try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    alert('✅ Link copied!\n\n' + text);
-                } else {
-                    prompt('Copy this link:', text);
-                }
+                document.execCommand('copy');
+                showToast('Link copied!', 'success');
             } catch (err) {
                 prompt('Copy this link:', text);
             }
-            
             document.body.removeChild(textArea);
         }
 
-        // Event Listeners
-        welcomeButton.addEventListener('click', dismissWelcome);
-        menuBtn.addEventListener('click', openMenu);
-        favBtn.addEventListener('click', () => {
-            openMenu();
-            showFavorites();
+        // EVENT LISTENERS
+        welcomeButton.addEventListener('click', () => {
+            welcomeOverlay.classList.remove('show');
+            localStorage.setItem('ar-menu-welcome-seen', 'true');
         });
-        
-        // FIXED: Close menu when clicking overlay
-        menuOverlay.addEventListener('click', closeMenu);
-        
-        // FIXED: Close reviews when clicking overlay
-        reviewsOverlay.addEventListener('click', closeReviews);
+
+        tutorialClose.addEventListener('click', () => tutorialOverlay.classList.remove('show'));
+        helpBtn.addEventListener('click', () => tutorialOverlay.classList.add('show'));
+
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('active');
+            signupTab.classList.remove('active');
+            loginForm.classList.add('active');
+            signupForm.classList.remove('active');
+        });
+
+        signupTab.addEventListener('click', () => {
+            signupTab.classList.add('active');
+            loginTab.classList.remove('active');
+            signupForm.classList.add('active');
+            loginForm.classList.remove('active');
+        });
+
+        loginForm.addEventListener('submit', handleLogin);
+        signupForm.addEventListener('submit', handleSignup);
+        authCloseBtn.addEventListener('click', closeAuth);
+        userBtn.addEventListener('click', openAuth);
+
+        menuBtn.addEventListener('click', openMenu);
+        cartBtn.addEventListener('click', openCart);
+        favBtn.addEventListener('click', () => { openMenu(); showFavorites(); });
+        menuOverlay.addEventListener('click', () => { closeMenu(); closeCart(); closeCheckout(); });
+        cartOverlay.addEventListener('click', () => { closeCart(); closeCheckout(); });
         
         themeBtn.addEventListener('click', toggleTheme);
         minimizeBtn.addEventListener('click', toggleInfoCard);
+        qtyMinus.addEventListener('click', () => updateQuantity(-1));
+        qtyPlus.addEventListener('click', () => updateQuantity(1));
         ratingSection.addEventListener('click', showReviews);
+        reviewsOverlay.addEventListener('click', closeReviews);
         reviewsClose.addEventListener('click', closeReviews);
-        shareBtn.addEventListener('click', openShareModal);
-        shareClose.addEventListener('click', closeShareModal);
+
+        cartClose.addEventListener('click', closeCart);
+        checkoutBtn.addEventListener('click', openCheckout);
+        checkoutClose.addEventListener('click', closeCheckout);
+        checkoutForm.addEventListener('submit', placeOrder);
+        confirmationDone.addEventListener('click', () => orderConfirmationOverlay.classList.remove('show'));
+
+        document.querySelectorAll('.payment-method').forEach(method => {
+            method.addEventListener('click', () => {
+                selectedPaymentMethod = method.dataset.method;
+                document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('active'));
+                method.classList.add('active');
+                placeOrderBtn.disabled = !tableNumber.value.trim();
+                
+                const { subtotal, gst, gstRate, total } = calculateCartTotals();
+                document.getElementById('checkoutGST').textContent = `$${gst.toFixed(2)}`;
+                document.getElementById('checkoutGSTRate').textContent = gstRate;
+                document.getElementById('checkoutTotal').textContent = `$${total.toFixed(2)}`;
+            });
+        });
+
+        tableNumber.addEventListener('input', () => {
+            placeOrderBtn.disabled = !tableNumber.value.trim() || !selectedPaymentMethod;
+        });
+
+        arButton.addEventListener('click', () => viewer.activateAR());
+        addToCartButton.addEventListener('click', () => addToCart(currentItem, currentQuantity));
+        shareBtn.addEventListener('click', () => shareModal.classList.add('show'));
+        shareClose.addEventListener('click', () => shareModal.classList.remove('show'));
+
+        document.querySelectorAll('.share-option').forEach(option => {
+            option.addEventListener('click', () => shareItem(option.dataset.platform));
+        });
+
         allTab.addEventListener('click', showAllItems);
         favTab.addEventListener('click', showFavorites);
-        errorClose.addEventListener('click', hideError);
-        helpBtn.addEventListener('click', dismissWelcome);
-
-        // FIXED: iOS-compatible share options
-        document.querySelectorAll('.share-option').forEach(option => {
-            option.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                shareItem(option.dataset.platform);
-            });
-            
-            option.addEventListener('click', (e) => {
-                if (!('ontouchstart' in window)) {
-                    shareItem(option.dataset.platform);
-                }
-            });
-        });
-
-        arButton.addEventListener('click', () => {
-            viewer.activateAR();
-            trackARActivation();
-        });
 
         viewer.addEventListener('load', () => {
-            console.log('✅ Model loaded successfully');
-            hideLoading();
+            document.getElementById('loadingOverlay').classList.remove('show');
         });
-        
+
         viewer.addEventListener('progress', (event) => {
             const percent = Math.round(event.detail.totalProgress * 100);
-            updateLoadingProgress(percent);
+            document.getElementById('loadingProgressBar').style.width = percent + '%';
         });
 
-        viewer.addEventListener('ar-status', (event) => {
-            if (event.detail.status === 'session-started') {
-                console.log('🎉 AR session started');
-            } else if (event.detail.status === 'failed') {
-                showError('AR Failed', 'Could not start AR session. Make sure you have good lighting and a clear surface.');
-            }
-        });
-
-        viewer.addEventListener('error', (event) => {
-            console.error('❌ Model error:', event);
-            hideLoading();
-            
-            const errorMsg = event.detail?.message || 'Unknown error';
-            
-            if (errorMsg.includes('404') || errorMsg.includes('Not Found')) {
-                showError('Model Not Found', 'The 3D model file could not be found. Please try another item.');
-            } else if (errorMsg.includes('network') || errorMsg.includes('fetch')) {
-                showError('Network Error', 'Could not load model. Please check your internet connection and try again.');
-            } else {
-                showError('Loading Error', 'Could not load the 3D model. Please try again or select another item.');
-            }
-        });
-
+        // INITIALIZATION
         function init() {
-            console.log('🚀 AR Menu Platform Starting...');
-            console.log('✨ Fixed version with proper modal handling');
+            console.log('🚀 AR Menu MVP - Complete Version');
+            console.log('✅ Cart System | ✅ User Auth | ✅ Checkout | ✅ iOS AR Fixed');
             
             detectIOS();
-            loadFavorites();
+            loadFromStorage();
             loadTheme();
-            checkWelcomeScreen();
+            renderUserSection();
             renderAllItems();
             renderFavorites();
             
-            const urlItem = findItemByURL();
-            
-            if (urlItem) {
-                selectItem(urlItem.item, urlItem.restaurant, urlItem.category);
-                expandedRestaurants.push(urlItem.restaurant.id);
-            } else {
-                const firstRestaurant = RESTAURANTS[0];
-                const firstCategory = firstRestaurant.categories[0];
-                const firstItem = firstCategory.items[0];
-                selectItem(firstItem, firstRestaurant, firstCategory);
-                expandedRestaurants.push(firstRestaurant.id);
+            const hasSeenWelcome = localStorage.getItem('ar-menu-welcome-seen');
+            if (!hasSeenWelcome) {
+                welcomeOverlay.classList.add('show');
             }
             
+            const firstRestaurant = RESTAURANTS[0];
+            const firstItem = firstRestaurant.categories[0].items[0];
+            selectItem(firstItem, firstRestaurant, firstRestaurant.categories[0]);
+            expandedRestaurants.push(firstRestaurant.id);
             renderAllItems();
             
-            console.log('✅ AR Menu Ready!');
-            console.log('✅ All UX issues fixed');
+            console.log('✅ All systems ready!');
         }
 
         init();
