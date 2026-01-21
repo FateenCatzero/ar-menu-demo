@@ -4400,6 +4400,10 @@
         welcomeButton.addEventListener('click', () => {
             welcomeOverlay.classList.remove('show');
             localStorage.setItem('ar-menu-welcome-seen', 'true');
+            // Show tutorial after welcome closes
+            setTimeout(() => {
+                tutorialOverlay.classList.add('show');
+            }, 300);
         });
 
         tutorialClose.addEventListener('click', () => tutorialOverlay.classList.remove('show'));
