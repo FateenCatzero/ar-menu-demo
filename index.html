@@ -835,6 +835,12 @@
             min-width: 0;
         }
 
+        .info-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
         .food-name {
             font-size: 18px;
             font-weight: 700;
@@ -859,7 +865,7 @@
             font-size: 16px;
         }
 
-        .minimize-btn {
+        .minimize-btn, .info-fav-btn {
             background: rgba(0, 0, 0, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
@@ -871,18 +877,19 @@
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            font-weight: 700;
             transition: all 0.2s;
             flex-shrink: 0;
         }
 
-        .dark-theme .minimize-btn {
+        .dark-theme .minimize-btn,
+        .dark-theme .info-fav-btn {
             background: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(0, 0, 0, 0.2);
             color: var(--dark-bg);
         }
 
-        .minimize-btn:active {
+        .minimize-btn:active,
+        .info-fav-btn:active {
             transform: scale(0.95);
         }
 
@@ -1741,12 +1748,12 @@
 
         .payment-methods {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 12px;
         }
 
         .payment-method {
-            padding: 16px;
+            padding: 16px 8px;
             background: var(--light-bg-secondary);
             border: 2px solid var(--light-border);
             border-radius: var(--radius-md);
@@ -1766,13 +1773,20 @@
         }
 
         .payment-method-icon {
-            font-size: 32px;
+            font-size: 28px;
             margin-bottom: 8px;
         }
 
         .payment-method-name {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .payment-method-gst {
+            font-size: 10px;
+            color: var(--color-primary);
+            font-weight: 700;
         }
 
         .order-summary-mini {
@@ -2200,8 +2214,8 @@
                     <span>Add items to cart with custom quantities</span>
                 </div>
                 <div class="welcome-step">
-                    <span class="welcome-step-icon">📋</span>
-                    <span>Enter table number and place your order</span>
+                    <span class="welcome-step-icon">💳</span>
+                    <span>Enter table number and choose payment: Cash (15% GST) or Card (5% GST)</span>
                 </div>
             </div>
             
@@ -2253,7 +2267,23 @@
                 <div class="tutorial-step-icon">📋</div>
                 <div class="tutorial-step-content">
                     <div class="tutorial-step-title">Place Order</div>
-                    <div class="tutorial-step-text">Enter your table number, choose payment method (Cash/Card), and place your order</div>
+                    <div class="tutorial-step-text">Enter table number, choose payment (Cash 15% GST, Card Machine 5% GST, or Online Card 5% GST)</div>
+                </div>
+            </div>
+
+            <div class="tutorial-step">
+                <div class="tutorial-step-icon">❤️</div>
+                <div class="tutorial-step-content">
+                    <div class="tutorial-step-title">Add to Favorites</div>
+                    <div class="tutorial-step-text">Tap heart icon in menu or on info card (top right) to save your favorite items</div>
+                </div>
+            </div>
+
+            <div class="tutorial-step">
+                <div class="tutorial-step-icon">▲▼</div>
+                <div class="tutorial-step-content">
+                    <div class="tutorial-step-title">Expand/Collapse Info</div>
+                    <div class="tutorial-step-text">Use arrow buttons to expand or minimize the info card for a better view</div>
                 </div>
             </div>
 
@@ -2261,7 +2291,7 @@
                 <div class="tutorial-step-icon">⭐</div>
                 <div class="tutorial-step-content">
                     <div class="tutorial-step-title">Login for More</div>
-                    <div class="tutorial-step-text">Login to save favorites, add ratings, and track your order history</div>
+                    <div class="tutorial-step-text">Login to save favorites permanently and track your order history</div>
                 </div>
             </div>
         </div>
@@ -2393,14 +2423,17 @@
     </div>
 
     <!-- Info Card -->
-    <div class="info-card" id="infoCard">
+    <div class="info-card minimized" id="infoCard">
         <div class="info-card-content">
             <div class="info-header">
                 <div class="info-main">
                     <div class="food-name" id="currentFoodName">🔵 Blue Artifact</div>
                     <div class="food-price" id="currentFoodPrice">$9.99</div>
                 </div>
-                <button class="minimize-btn" id="minimizeBtn" title="Minimize">−</button>
+                <div class="info-actions">
+                    <button class="info-fav-btn" id="infoFavBtn" title="Toggle favorite">🤍</button>
+                    <button class="minimize-btn" id="minimizeBtn" title="Expand">▲</button>
+                </div>
             </div>
             
             <div class="info-details">
@@ -2499,13 +2532,20 @@
             <div class="checkout-section">
                 <div class="checkout-section-title">Payment Method *</div>
                 <div class="payment-methods">
-                    <div class="payment-method" data-method="cash">
+                    <div class="payment-method" data-method="cash" data-gst="0.15">
                         <div class="payment-method-icon">💵</div>
                         <div class="payment-method-name">Cash</div>
+                        <div class="payment-method-gst">15% GST</div>
                     </div>
-                    <div class="payment-method" data-method="card">
+                    <div class="payment-method" data-method="card-machine" data-gst="0.05">
                         <div class="payment-method-icon">💳</div>
-                        <div class="payment-method-name">Card</div>
+                        <div class="payment-method-name">Card Machine</div>
+                        <div class="payment-method-gst">5% GST</div>
+                    </div>
+                    <div class="payment-method" data-method="card-online" data-gst="0.05">
+                        <div class="payment-method-icon">🌐</div>
+                        <div class="payment-method-name">Online Card</div>
+                        <div class="payment-method-gst">5% GST</div>
                     </div>
                 </div>
             </div>
@@ -2762,9 +2802,10 @@
         let cart = [];
         let currentUser = null;
         let selectedPaymentMethod = null;
+        let selectedPaymentGST = 0;
         let expandedRestaurants = [];
         let isIOS = false;
-        let isInfoMinimized = false;
+        let isInfoMinimized = true; // START MINIMIZED
 
         // DOM ELEMENTS
         const viewer = document.querySelector('model-viewer');
@@ -2791,6 +2832,7 @@
         const themeBtn = document.getElementById('themeBtn');
         const infoCard = document.getElementById('infoCard');
         const minimizeBtn = document.getElementById('minimizeBtn');
+        const infoFavBtn = document.getElementById('infoFavBtn');
         const qtyMinus = document.getElementById('qtyMinus');
         const qtyPlus = document.getElementById('qtyPlus');
         const qtyDisplay = document.getElementById('qtyDisplay');
@@ -2935,7 +2977,7 @@
 
         function calculateCartTotals() {
             const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const gstRate = selectedPaymentMethod === 'cash' ? 0.05 : 0.08; // 5% for cash, 8% for card
+            const gstRate = selectedPaymentGST || 0.15; // Default 15% if not selected
             const gst = subtotal * gstRate;
             const total = subtotal + gst;
             
@@ -3031,9 +3073,23 @@
             const orderNumber = Math.floor(1000 + Math.random() * 9000);
             const { total } = calculateCartTotals();
             
+            // Get payment method display name
+            let paymentDisplay = '';
+            switch(selectedPaymentMethod) {
+                case 'cash':
+                    paymentDisplay = 'Cash (15% GST)';
+                    break;
+                case 'card-machine':
+                    paymentDisplay = 'Card Machine (5% GST)';
+                    break;
+                case 'card-online':
+                    paymentDisplay = 'Online Card (5% GST)';
+                    break;
+            }
+            
             document.getElementById('orderNumber').textContent = `#${orderNumber}`;
             document.getElementById('confirmTableNumber').textContent = table;
-            document.getElementById('confirmPaymentMethod').textContent = selectedPaymentMethod === 'cash' ? 'Cash' : 'Card';
+            document.getElementById('confirmPaymentMethod').textContent = paymentDisplay;
             document.getElementById('confirmTotalAmount').textContent = `$${total.toFixed(2)}`;
             
             closeCheckout();
@@ -3045,6 +3101,7 @@
             updateCounters();
             tableNumber.value = '';
             selectedPaymentMethod = null;
+            selectedPaymentGST = 0;
             document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('active'));
         }
 
@@ -3145,6 +3202,7 @@
             }
             saveToStorage();
             updateCounters();
+            updateInfoFavoriteButton();
             renderAllItems();
             renderFavorites();
         }
@@ -3342,6 +3400,20 @@
             
             document.getElementById('qtyDisplay').textContent = currentQuantity;
             
+            // Update favorite button
+            updateInfoFavoriteButton();
+            
+            // Maintain minimize state (don't change it)
+            if (isInfoMinimized) {
+                infoCard.classList.add('minimized');
+                minimizeBtn.textContent = '▲';
+                minimizeBtn.title = 'Expand';
+            } else {
+                infoCard.classList.remove('minimized');
+                minimizeBtn.textContent = '▼';
+                minimizeBtn.title = 'Minimize';
+            }
+            
             document.getElementById('loadingOverlay').classList.add('show');
             
             viewer.src = item.modelGLB;
@@ -3451,10 +3523,18 @@
             
             if (isInfoMinimized) {
                 infoCard.classList.add('minimized');
-                minimizeBtn.textContent = '+';
+                minimizeBtn.textContent = '▲';
+                minimizeBtn.title = 'Expand';
             } else {
                 infoCard.classList.remove('minimized');
-                minimizeBtn.textContent = '−';
+                minimizeBtn.textContent = '▼';
+                minimizeBtn.title = 'Minimize';
+            }
+        }
+
+        function updateInfoFavoriteButton() {
+            if (currentItem) {
+                infoFavBtn.textContent = favorites.includes(currentItem.id) ? '❤️' : '🤍';
             }
         }
 
@@ -3550,6 +3630,11 @@
         
         themeBtn.addEventListener('click', toggleTheme);
         minimizeBtn.addEventListener('click', toggleInfoCard);
+        infoFavBtn.addEventListener('click', () => {
+            if (currentItem) {
+                toggleFavorite(currentItem.id);
+            }
+        });
         qtyMinus.addEventListener('click', () => updateQuantity(-1));
         qtyPlus.addEventListener('click', () => updateQuantity(1));
         ratingSection.addEventListener('click', showReviews);
@@ -3565,6 +3650,7 @@
         document.querySelectorAll('.payment-method').forEach(method => {
             method.addEventListener('click', () => {
                 selectedPaymentMethod = method.dataset.method;
+                selectedPaymentGST = parseFloat(method.dataset.gst);
                 document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('active'));
                 method.classList.add('active');
                 placeOrderBtn.disabled = !tableNumber.value.trim();
