@@ -1590,7 +1590,7 @@
         function toggleFavorite(itemId) {
             const index = favorites.indexOf(itemId);
             if (index > -1) {
-                favorites.splice(index, 1);
+                favorites.splice(index, -1);
             } else {
                 favorites.push(itemId);
             }
